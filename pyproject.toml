@@ -6,7 +6,12 @@ authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7,<4.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^6.2.5"
+pytest-cov = "^4.1.0"
+deepdiff = "^6.7.1"
 
 [build-system]
 requires = ["poetry-core"]
