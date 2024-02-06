@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "sunray"
+version = "0.1.0b0"
+description = ""
+authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
