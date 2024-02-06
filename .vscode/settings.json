@@ -1,8 +1,10 @@
 {
     "cSpell.words": [
         "deepdiff",
+        "importlib",
         "pygrep",
         "pyupgrade",
+        "redef",
         "sunray",
         "unfixable"
     ],
