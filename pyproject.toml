@@ -12,6 +12,7 @@ python = "^3.7,<4.0"
 pytest = "^6.2.5"
 pytest-cov = "^4.1.0"
 deepdiff = "^6.7.1"
+importlib_metadata = "6.7.0"
 
 [build-system]
 requires = ["poetry-core"]
