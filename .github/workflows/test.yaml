@@ -66,13 +66,9 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - run: mkdir coverage
-
       - name: Run pytest
-        run: poetry run coverage run -m pytest -v
-        env:
-          COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
-          CONTEXT: ${{ runner.os }}-py${{ matrix.python-version }}
+        run: |
+          poetry run pytest --cov -v --cov-report=xml:coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
