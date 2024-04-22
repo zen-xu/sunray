@@ -16,6 +16,7 @@ ray = [
 [tool.poetry.group.test.dependencies]
 deepdiff           = "^6.7.1"
 importlib_metadata = "6.7.0"
+mypy               = { version = "~1.9", python = "^3.9" }
 pytest             = "^6.2.5"
 pytest-cov         = "^4.1.0"
 
@@ -66,3 +67,10 @@ required-imports    = ["from __future__ import annotations"]
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.mypy]
+disable_error_code     = ["overload-overlap"]
+explicit_package_bases = true
+files                  = "sunray"
+namespace_packages     = true
+show_error_codes       = true
