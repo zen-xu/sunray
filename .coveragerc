@@ -1,0 +1,25 @@
+[run]
+branch = True
+source = sunray
+omit =
+    sunray/**/__init__.py
+    sunray/typing.py
+
+[report]
+skip_covered = True
+show_missing = True
+exclude_lines =
+    if TYPE_CHECKING:
+    @overload( |$)
+    def __repr__
+    def __str__
+
+    pragma: no cover
+    if self\.debug
+    raise AssertionError
+    raise NotImplementedError
+    @abc.abstractmethod
+    @abstractmethod
+    if 0:
+    if __name__ == .__main__.:
+    def __reduce__

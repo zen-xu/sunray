@@ -82,12 +82,9 @@ class ActorClass(Generic[_P, _ClassT]):
     else:
 
         def remote(self, *args, **kwargs):
-            if self._default_opts:
-                handle = ray.remote(**self._default_opts)(self._klass).remote(
-                    *args, **kwargs
-                )
-            else:
-                handle = ray.remote(self._klass).remote(*args, **kwargs)
+            options = self._default_opts or {}
+            handle = ray.remote(**options)(self._klass).remote(*args, **kwargs)
+
             return Actor(handle)
 
     def options(
@@ -107,10 +104,8 @@ class ActorClassWrapper(Generic[_P, _ClassT]):
     else:
 
         def remote(self, *args, **kwargs):
-            if self._opts:
-                handle = ray.remote(**self._opts)(self._klass).remote(*args, **kwargs)
-            else:
-                handle = ray.remote(self._klass).remote(*args, **kwargs)
+            options = self._opts or {}
+            handle = ray.remote(**options)(self._klass).remote(*args, **kwargs)
             return Actor(handle)
 
 
@@ -171,7 +166,11 @@ if TYPE_CHECKING:
 
         @overload
         def options(
-            self, *, name: str = ..., concurrency_group: str = ...
+            self,
+            *,
+            unpack: Literal[False] = False,
+            name: str = ...,
+            concurrency_group: str = ...,
         ) -> MethodWrapper[_P, _Ret, ray.ObjectRef[_Ret]]: ...
 
         @overload
