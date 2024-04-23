@@ -26,9 +26,10 @@ if TYPE_CHECKING:
     from ray.actor import ActorHandle
     from ray.actor import ActorMethod
 
+    from .core import ObjectRef
+    from .core import ObjectRefGenerator
     from .typing import ActorRemoteOptions
     from .typing import RemoteCallable
-    from .typing import StreamingObjectRefGenerator
 
     _P = ParamSpec("_P")
 
@@ -162,7 +163,7 @@ class Actor(Generic[_ClassT]):
 if TYPE_CHECKING:
 
     class Method(Generic[_P, _Ret]):
-        remote: RemoteCallable[Callable[_P, _Ret], ray.ObjectRef[_Ret]]
+        remote: RemoteCallable[Callable[_P, _Ret], ObjectRef[_Ret]]
 
         @overload
         def options(
@@ -171,7 +172,7 @@ if TYPE_CHECKING:
             unpack: Literal[False] = False,
             name: str = ...,
             concurrency_group: str = ...,
-        ) -> MethodWrapper[_P, _Ret, ray.ObjectRef[_Ret]]: ...
+        ) -> MethodWrapper[_P, _Ret, ObjectRef[_Ret]]: ...
 
         @overload
         def options(
@@ -180,7 +181,7 @@ if TYPE_CHECKING:
             unpack: Literal[True],
             name: str = ...,
             concurrency_group: str = ...,
-        ) -> MethodWrapper[_P, _Ret, tuple[ray.ObjectRef[_R0]]]: ...
+        ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0]]]: ...
 
         @overload
         def options(
@@ -189,7 +190,7 @@ if TYPE_CHECKING:
             unpack: Literal[True],
             name: str = ...,
             concurrency_group: str = ...,
-        ) -> MethodWrapper[_P, _Ret, tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1]]]: ...
+        ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1]]]: ...
 
         @overload
         def options(
@@ -199,7 +200,7 @@ if TYPE_CHECKING:
             name: str = ...,
             concurrency_group: str = ...,
         ) -> MethodWrapper[
-            _P, _Ret, tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1], ray.ObjectRef[_R2]]
+            _P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]
         ]: ...
 
         @overload
@@ -213,10 +214,10 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
             ],
         ]: ...
 
@@ -231,11 +232,11 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
             ],
         ]: ...
 
@@ -250,12 +251,12 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
             ],
         ]: ...
 
@@ -270,13 +271,13 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
             ],
         ]: ...
 
@@ -291,14 +292,14 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
             ],
         ]: ...
 
@@ -313,15 +314,15 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
-                ray.ObjectRef[_R8],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
+                ObjectRef[_R8],
             ],
         ]: ...
 
@@ -336,16 +337,16 @@ if TYPE_CHECKING:
             _P,
             _Ret,
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
-                ray.ObjectRef[_R8],
-                ray.ObjectRef[_R9],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
+                ObjectRef[_R8],
+                ObjectRef[_R9],
             ],
         ]: ...
 
@@ -356,12 +357,12 @@ if TYPE_CHECKING:
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
 
     class AsyncMethod(Generic[_P, _Ret]):
-        remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], ray.ObjectRef[_Ret]]
+        remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], ObjectRef[_Ret]]
 
         @overload
         def options(
             self, *, name: str = ..., concurrency_group: str = ...
-        ) -> MethodWrapper[_P, Awaitable[_Ret], ray.ObjectRef[_Ret]]: ...
+        ) -> MethodWrapper[_P, Awaitable[_Ret], ObjectRef[_Ret]]: ...
 
         @overload
         def options(
@@ -370,7 +371,7 @@ if TYPE_CHECKING:
             unpack: Literal[True],
             name: str = ...,
             concurrency_group: str = ...,
-        ) -> MethodWrapper[_P, Awaitable[_Ret], tuple[ray.ObjectRef[_R0]]]: ...
+        ) -> MethodWrapper[_P, Awaitable[_Ret], tuple[ObjectRef[_R0]]]: ...
 
         @overload
         def options(
@@ -380,7 +381,7 @@ if TYPE_CHECKING:
             name: str = ...,
             concurrency_group: str = ...,
         ) -> MethodWrapper[
-            _P, Awaitable[_Ret], tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1]]
+            _P, Awaitable[_Ret], tuple[ObjectRef[_R0], ObjectRef[_R1]]
         ]: ...
 
         @overload
@@ -393,7 +394,7 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1], ray.ObjectRef[_R2]],
+            tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]],
         ]: ...
 
         @overload
@@ -407,10 +408,10 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
             ],
         ]: ...
 
@@ -425,11 +426,11 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
             ],
         ]: ...
 
@@ -444,12 +445,12 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
             ],
         ]: ...
 
@@ -464,13 +465,13 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
             ],
         ]: ...
 
@@ -485,14 +486,14 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
             ],
         ]: ...
 
@@ -507,15 +508,15 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
-                ray.ObjectRef[_R8],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
+                ObjectRef[_R8],
             ],
         ]: ...
 
@@ -532,16 +533,16 @@ if TYPE_CHECKING:
             _P,
             Awaitable[_Ret],
             tuple[
-                ray.ObjectRef[_R0],
-                ray.ObjectRef[_R1],
-                ray.ObjectRef[_R2],
-                ray.ObjectRef[_R3],
-                ray.ObjectRef[_R4],
-                ray.ObjectRef[_R5],
-                ray.ObjectRef[_R6],
-                ray.ObjectRef[_R7],
-                ray.ObjectRef[_R8],
-                ray.ObjectRef[_R9],
+                ObjectRef[_R0],
+                ObjectRef[_R1],
+                ObjectRef[_R2],
+                ObjectRef[_R3],
+                ObjectRef[_R4],
+                ObjectRef[_R5],
+                ObjectRef[_R6],
+                ObjectRef[_R7],
+                ObjectRef[_R8],
+                ObjectRef[_R9],
             ],
         ]: ...
 
@@ -552,13 +553,11 @@ if TYPE_CHECKING:
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> Awaitable[_Ret]: ...
 
     class StreamMethod(Generic[_P, _Ret, _YieldItem]):
-        remote: RemoteCallable[
-            Callable[_P, _Ret], StreamingObjectRefGenerator[_YieldItem]
-        ]
+        remote: RemoteCallable[Callable[_P, _Ret], ObjectRefGenerator[_YieldItem]]
 
         def options(
             self, *, name: str = ..., concurrency_group: str = ...
-        ) -> MethodWrapper[_P, _Ret, StreamingObjectRefGenerator[_YieldItem]]: ...
+        ) -> MethodWrapper[_P, _Ret, ObjectRefGenerator[_YieldItem]]: ...
 
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
 

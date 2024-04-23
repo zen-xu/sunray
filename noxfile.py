@@ -5,10 +5,12 @@ import nox.tasks
 
 
 def _test(session, ray_version):
-    packages = ["pytest", "pytest-cov", f"ray=={ray_version}"]
+    packages = ["pytest", "pytest-cov", f"ray[default]=={ray_version}"]
     if session.python < "3.9":
         # https://github.com/ray-project/ray/issues/27299#issuecomment-1239918086
         packages.append("grpcio>1.48")
+    if ray_version < "2.9":
+        packages.append("async-timeout")
     session.install(*packages)
     coverage_file = session.posargs[0] if session.posargs else "coverage.xml"
     session.run("pytest", "-s", "--cov", "-v", f"--cov-report=xml:{coverage_file}")

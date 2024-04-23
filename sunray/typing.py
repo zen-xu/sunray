@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from typing import NotRequired
     from typing import ParamSpec
     from typing import Required
-    from typing import Self
     from typing import TypedDict
     from typing import TypeVar
     from typing import Union
@@ -39,15 +38,6 @@ if TYPE_CHECKING:
     _T9 = TypeVar("_T9")
 
     RemoteArg = Union[_T, ray.ObjectRef[_T]]
-
-    class StreamingObjectRefGenerator(Generic[_T]):
-        def __iter__(self) -> Self: ...
-
-        async def __aiter__(self) -> Self: ...
-
-        def __next__(self) -> ray.ObjectRef[_T]: ...
-
-        async def __anext__(self) -> ray.ObjectRef[_T]: ...
 
     SchedulingStrategy = Union[
         Literal["DEFAULT", "SPREAD"],
