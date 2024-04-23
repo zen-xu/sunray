@@ -103,17 +103,17 @@ def test_keyword_params(demo_actor: Actor[Demo]):
 
 
 def test_override_default_actor_options(init_ray):
-    num_cpus = 2
+    num_cpus = 0.1
     demo = Demo.new_actor().options(num_cpus=num_cpus).remote(1)
     assert ray.get(demo.methods.get_num_cpu.remote()) == num_cpus
 
 
 def test_actor_eq(init_ray):
-    demo1 = Demo.new_actor().remote(1)
-    demo2 = Demo.new_actor().remote(1)
+    demo1 = Demo.new_actor().options(num_cpus=0).remote(1)
+    demo2 = Demo.new_actor().options(num_cpus=0).remote(1)
     assert demo1 != demo2
 
-    @ray.remote
+    @ray.remote(num_cpus=0)
     def cmp_actor(actor1, actor2) -> bool:
         return actor1 == actor2
 
