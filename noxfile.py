@@ -10,7 +10,8 @@ def _test(session, ray_version):
         # https://github.com/ray-project/ray/issues/27299#issuecomment-1239918086
         packages.append("grpcio>1.48")
     session.install(*packages)
-    session.run("pytest", "--cov", "-v", "--cov-report=xml")
+    coverage_file = session.posargs[0] if session.posargs else "coverage.xml"
+    session.run("pytest", "--cov", "-v", f"--cov-report=xml:{coverage_file}")
 
 
 @nox.session(python="3.7", reuse_venv=True, tags=["py3.7"])

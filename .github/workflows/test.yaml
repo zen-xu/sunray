@@ -63,7 +63,7 @@ jobs:
 
       - name: Run nox
         run: |
-          COVERAGE_FILE=coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml nox -t "py${{ matrix.python-version }}" --no-stop-on-first-error
+          nox -t "py${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
