@@ -25,9 +25,10 @@ if TYPE_CHECKING:
 
     from ray.actor import ActorClass
 
+    from .core import ObjectRef
+    from .core import ObjectRefGenerator
     from .typing import FunctionRemoteOptions
     from .typing import RemoteCallable
-    from .typing import StreamingObjectRefGenerator
 
     _P = ParamSpec("_P")
 else:
@@ -65,7 +66,7 @@ class RemoteFunctionWrapper(Generic[_Callable_co, _RemoteRet]):
 
 
 class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
-    remote: RemoteCallable[_Callable_co, ray.ObjectRef[_R]]
+    remote: RemoteCallable[_Callable_co, ObjectRef[_R]]
 
     @overload
     def options(
@@ -73,7 +74,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         *,
         unpack: Literal[False] = False,
         **opts: Unpack[FunctionRemoteOptions],
-    ) -> RemoteFunctionWrapper[_Callable_co, ray.ObjectRef[_R]]: ...
+    ) -> RemoteFunctionWrapper[_Callable_co, ObjectRef[_R]]: ...
 
     @overload
     def options(
@@ -81,7 +82,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         *,
         unpack: Literal[True],
         **opts: Unpack[FunctionRemoteOptions],
-    ) -> RemoteFunctionWrapper[_Callable_co, tuple[ray.ObjectRef[_R0]]]: ...
+    ) -> RemoteFunctionWrapper[_Callable_co, tuple[ObjectRef[_R0]]]: ...
 
     @overload
     def options(
@@ -89,9 +90,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         *,
         unpack: Literal[True],
         **opts: Unpack[FunctionRemoteOptions],
-    ) -> RemoteFunctionWrapper[
-        _Callable_co, tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1]]
-    ]: ...
+    ) -> RemoteFunctionWrapper[_Callable_co, tuple[ObjectRef[_R0], ObjectRef[_R1]]]: ...
 
     @overload
     def options(
@@ -100,7 +99,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         unpack: Literal[True],
         **opts: Unpack[FunctionRemoteOptions],
     ) -> RemoteFunctionWrapper[
-        _Callable_co, tuple[ray.ObjectRef[_R0], ray.ObjectRef[_R1], ray.ObjectRef[_R2]]
+        _Callable_co, tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]
     ]: ...
 
     @overload
@@ -112,10 +111,10 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
         ],
     ]: ...
 
@@ -128,11 +127,11 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
         ],
     ]: ...
 
@@ -145,12 +144,12 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
-            ray.ObjectRef[_R5],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
+            ObjectRef[_R5],
         ],
     ]: ...
 
@@ -163,13 +162,13 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
-            ray.ObjectRef[_R5],
-            ray.ObjectRef[_R6],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
+            ObjectRef[_R5],
+            ObjectRef[_R6],
         ],
     ]: ...
 
@@ -184,14 +183,14 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
-            ray.ObjectRef[_R5],
-            ray.ObjectRef[_R6],
-            ray.ObjectRef[_R7],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
+            ObjectRef[_R5],
+            ObjectRef[_R6],
+            ObjectRef[_R7],
         ],
     ]: ...
 
@@ -206,15 +205,15 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
-            ray.ObjectRef[_R5],
-            ray.ObjectRef[_R6],
-            ray.ObjectRef[_R7],
-            ray.ObjectRef[_R8],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
+            ObjectRef[_R5],
+            ObjectRef[_R6],
+            ObjectRef[_R7],
+            ObjectRef[_R8],
         ],
     ]: ...
 
@@ -229,16 +228,16 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ) -> RemoteFunctionWrapper[
         _Callable_co,
         tuple[
-            ray.ObjectRef[_R0],
-            ray.ObjectRef[_R1],
-            ray.ObjectRef[_R2],
-            ray.ObjectRef[_R3],
-            ray.ObjectRef[_R4],
-            ray.ObjectRef[_R5],
-            ray.ObjectRef[_R6],
-            ray.ObjectRef[_R7],
-            ray.ObjectRef[_R8],
-            ray.ObjectRef[_R9],
+            ObjectRef[_R0],
+            ObjectRef[_R1],
+            ObjectRef[_R2],
+            ObjectRef[_R3],
+            ObjectRef[_R4],
+            ObjectRef[_R5],
+            ObjectRef[_R6],
+            ObjectRef[_R7],
+            ObjectRef[_R8],
+            ObjectRef[_R9],
         ],
     ]: ...
 
@@ -290,7 +289,7 @@ if TYPE_CHECKING:
         def __call__(
             self, __obj: Callable[_P, Generator[_R, Any, Any]]
         ) -> RemoteStream[
-            Callable[_P, Generator[_R, Any, Any]], StreamingObjectRefGenerator[_R]
+            Callable[_P, Generator[_R, Any, Any]], ObjectRefGenerator[_R]
         ]: ...
 
         @overload
@@ -308,9 +307,7 @@ def remote(__type: type) -> ActorClass: ...
 @overload
 def remote(
     __func: Callable[_P, Generator[_R, Any, Any]],
-) -> RemoteStream[
-    Callable[_P, Generator[_R, Any, Any]], StreamingObjectRefGenerator[_R]
-]: ...
+) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], ObjectRefGenerator[_R]]: ...
 
 
 @overload
