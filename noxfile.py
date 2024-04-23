@@ -5,7 +5,7 @@ import nox.tasks
 
 
 def _test(session, ray_version):
-    packages = ["pytest", "pytest-cov", f"ray=={ray_version}"]
+    packages = ["pytest", "pytest-cov", f"ray[default]=={ray_version}"]
     if session.python < "3.9":
         # https://github.com/ray-project/ray/issues/27299#issuecomment-1239918086
         packages.append("grpcio>1.48")
