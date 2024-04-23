@@ -10,3 +10,4 @@ __authors__ = [
 from .actor_mixin import Actor as Actor
 from .actor_mixin import ActorMixin as ActorMixin
 from .actor_mixin import remote_method as remote_method
+from .remote import remote as remote

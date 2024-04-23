@@ -14,13 +14,6 @@ from sunray import remote_method
 from sunray.actor_mixin import add_var_keyword_to_klass
 
 
-@pytest.fixture(scope="module")
-def init_ray():
-    ray.init(address="local", include_dashboard=False)
-    yield
-    ray.shutdown()
-
-
 class Demo(ActorMixin, num_cpus=1, concurrency_groups={"group1": 1}):
     def __init__(self, init: int):
         self.init = init
