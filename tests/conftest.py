@@ -6,6 +6,6 @@ import ray
 
 @pytest.fixture(scope="module")
 def init_ray():
-    ray.init(address="local", include_dashboard=False)
+    ray.init(address="local", include_dashboard=True)
     yield
     ray.shutdown()
