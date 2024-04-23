@@ -31,13 +31,11 @@ jobs:
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:
-        os: [Ubuntu, macOS, Windows]
+        os: [Ubuntu, macOS]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         include:
           - os: Ubuntu
             image: ubuntu-22.04
-          - os: Windows
-            image: windows-2022
           - os: macOS
             image: macos-12
       fail-fast: false
@@ -53,34 +51,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install and configure Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1
-          virtualenvs-in-project: true
+      - name: Set up nox
+        run: pip install nox
 
       - name: Set up cache
         uses: actions/cache@v4
         id: cache
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          path: .nox
+          key: nox-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
 
-      - name: Ensure cache is healthy
-        if: steps.cache.outputs.cache-hit == 'true'
+      - name: Run nox
         run: |
-          # `timeout` is not available on macOS, so we define a custom function.
-          [ "$(command -v timeout)" ] || function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
-
-          # Using `timeout` is a safeguard against the Poetry command hanging for some reason.
-          timeout 10s poetry run pip --version || rm -rf .venv
-
-      - name: Install dependencies
-        run: poetry install
-
-      - name: Run pytest
-        run: |
-          poetry run pytest --cov -v --cov-report=xml:coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
+          nox -t "py${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

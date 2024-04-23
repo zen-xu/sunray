@@ -9,9 +9,13 @@
         "unfixable"
     ],
     "ruff.enable": true,
-    "ruff.fixAll": true,
+    "ruff.fixAll": false,
     "[python]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always",
+            "source.fixAll": "explicit",
+        }
     },
 }
