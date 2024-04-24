@@ -1,7 +1,7 @@
 # ruff: noqa: I002
 from typing import Tuple
 
-from sunray.util import get_num_returns
+from sunray._internal.util import get_num_returns
 
 
 def func1() -> Tuple[int, float]:

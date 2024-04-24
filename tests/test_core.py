@@ -6,9 +6,9 @@ from ray.util.state import get_actor
 
 from sunray import Actor
 from sunray import ActorMixin
-from sunray import core
 from sunray import remote
 from sunray import remote_method
+from sunray._internal import core
 
 
 def test_get(init_ray):
