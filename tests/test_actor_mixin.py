@@ -135,3 +135,15 @@ def test_add_var_keyword_to_klass():
 
     origin_init = C2.__init__
     assert add_var_keyword_to_klass(C2).__init__ == origin_init
+
+
+def test_actor_without_default_options():
+    class Demo(ActorMixin): ...
+
+    Demo.new_actor().remote()
+
+
+def test_actor_specify_empty_options():
+    class Demo(ActorMixin): ...
+
+    Demo.new_actor().options().remote()

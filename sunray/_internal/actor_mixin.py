@@ -83,8 +83,12 @@ class ActorClass(Generic[_P, _ClassT]):
     else:
 
         def remote(self, *args, **kwargs):
-            options = self._default_opts or {}
-            handle = ray.remote(**options)(self._klass).remote(*args, **kwargs)
+            remote_cls = (
+                ray.remote(**self._default_opts)(self._klass)
+                if self._default_opts
+                else ray.remote(self._klass)
+            )
+            handle = remote_cls.remote(*args, **kwargs)
 
             return Actor(handle)
 
@@ -105,8 +109,12 @@ class ActorClassWrapper(Generic[_P, _ClassT]):
     else:
 
         def remote(self, *args, **kwargs):
-            options = self._opts or {}
-            handle = ray.remote(**options)(self._klass).remote(*args, **kwargs)
+            remote_cls = (
+                ray.remote(**self._opts)(self._klass)
+                if self._opts
+                else ray.remote(self._klass)
+            )
+            handle = remote_cls.remote(*args, **kwargs)
             return Actor(handle)
 
 
