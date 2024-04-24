@@ -17,7 +17,7 @@ typing-extensions = "^4.5.0"
 [tool.poetry.group.test.dependencies]
 deepdiff            = "^6.7.1"
 importlib_metadata  = "6.7.0"
-pytest              = "^6.2.5"
+pytest              = "<8.0"
 pytest-cov          = "^4.1.0"
 pytest-mypy-plugins = "<3"
 
