@@ -3,7 +3,7 @@ branch = True
 source = sunray
 omit =
     sunray/**/__init__.py
-    sunray/typing.py
+    sunray/_internal/typing.py
 
 [report]
 skip_covered = True
