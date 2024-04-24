@@ -12,6 +12,7 @@ import ray
 import ray.actor
 
 from ray import remote_function as ray_func
+from typing_extensions import ParamSpec
 
 from .util import get_num_returns
 
@@ -20,22 +21,19 @@ if TYPE_CHECKING:
     from typing import Any
     from typing import Generator
     from typing import Literal
-    from typing import ParamSpec
-    from typing import Unpack
 
     from ray.actor import ActorClass
+    from typing_extensions import Unpack
 
     from .core import ObjectRef
     from .core import ObjectRefGenerator
     from .typing import FunctionRemoteOptions
     from .typing import RemoteCallable
 
-    _P = ParamSpec("_P")
-else:
-    _P = TypeVar("_P")
 
 _Callable_co = TypeVar("_Callable_co", covariant=True, bound=Callable)
 _RemoteRet = TypeVar("_RemoteRet")
+_P = ParamSpec("_P")
 _R = TypeVar("_R")
 _R0 = TypeVar("_R0")
 _R1 = TypeVar("_R1")
