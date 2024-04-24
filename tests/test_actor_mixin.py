@@ -11,7 +11,7 @@ import ray
 from sunray import Actor
 from sunray import ActorMixin
 from sunray import remote_method
-from sunray.actor_mixin import add_var_keyword_to_klass
+from sunray._internal.actor_mixin import add_var_keyword_to_klass
 
 
 class Demo(ActorMixin, num_cpus=1, concurrency_groups={"group1": 1}):
