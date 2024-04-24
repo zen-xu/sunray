@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typeddjango/pytest-mypy-plugins/master/pytest_mypy_plugins/schema.json
+
+- case: func_without_args
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> int:
+      return 1
+
+    reveal_type(f)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunction[def () -> builtins.int, builtins.int]"
+
+- case: func_with_args
+  main: |
+    from sunray import remote
+
+    @remote
+    def f(v: int) -> int:
+      return v
+
+    reveal_type(f)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunction[def (v: builtins.int) -> builtins.int, builtins.int]"
+
+- case: remote_decorator_with_args
+  main: |
+    from sunray import remote
+
+    @remote(num_cpus=1)
+    def f(v: int) -> int:
+      return v
+
+    reveal_type(f)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunction[def (v: builtins.int) -> builtins.int, builtins.int]"
+
+- case: remote_call
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> int:
+      return 1
+
+    reveal_type(f.remote())
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: remote_call_mismatch_args
+  main: |
+    from sunray import remote
+
+    @remote
+    def f(v1: int, v2: int, v3: int, v4: int, v5: int) -> int:
+      return 1
+
+    f.remote(1, 2)
+  out: |
+    main:7: error: No overload variant of "__call__" of "RemoteCallable" matches argument types "int", "int"  [call-overload]
+    main:7: note: Possible overload variants:
+    main:7: note:     def __call__(self, int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], /) -> ObjectRef[int]
+    main:7: note:     def __call__(self, int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], /, v5: int) -> ObjectRef[int]
+    main:7: note:     def __call__(self, int | ObjectRef[int], int | ObjectRef[int], int | ObjectRef[int], /, v4: int, v5: int) -> ObjectRef[int]
+    main:7: note:     def __call__(self, int | ObjectRef[int], int | ObjectRef[int], /, v3: int, v4: int, v5: int) -> ObjectRef[int]
+    main:7: note:     def __call__(self, int | ObjectRef[int], /, v2: int, v3: int, v4: int, v5: int) -> ObjectRef[int]
+    main:7: note:     def __call__(self, v1: int, v2: int, v3: int, v4: int, v5: int) -> ObjectRef[int]
+
+- case: remote_with_default_args
+  main: |
+    from sunray import remote
+
+    @remote
+    def f(v1: int, v2: int = 2) -> int:
+      return 1
+
+    f.remote(1)
+
+- case: remote_with_object_ref
+  main: |
+    from sunray import ObjectRef, remote
+
+    @remote
+    def f(v1: int) -> int:
+      return v1
+
+    def main(v: ObjectRef[int]):
+        f.remote(v)
+
+- case: remote_with_invalid_object_ref
+  main: |
+    from sunray import ObjectRef, remote
+
+    @remote
+    def f(v1: int) -> int:
+      return v1
+
+    def main(v: ObjectRef[str]):
+        f.remote(v)
+  out: |
+    main:8: error: Argument 1 to "__call__" of "RemoteCallable" has incompatible type "sunray._internal.core.ObjectRef[str]"; expected "int | ray._raylet.ObjectRef[int]"  [arg-type]
+
+- case: invoke_options
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> int:
+      return 1
+
+    reveal_type(f.options(num_cpus=1))
+  out: |
+    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunctionWrapper[def () -> builtins.int, sunray._internal.core.ObjectRef[builtins.int]]"
+
+- case: default_return_tuple
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> tuple[int, int]:
+      return 1, 2
+
+    reveal_type(f.remote())
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[builtins.int, builtins.int]]"
+
+- case: unpack_return_tuple
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> tuple[int, int]:
+      return 1, 2
+
+    reveal_type(f.options(unpack=True).remote())
+  out: |
+    main:7: note: Revealed type is "tuple[sunray._internal.core.ObjectRef[builtins.int], sunray._internal.core.ObjectRef[builtins.int]]"
+
+- case: disable_unpack_return_tuple
+  main: |
+    from sunray import remote
+
+    @remote
+    def f() -> tuple[int, int]:
+      return 1, 2
+
+    reveal_type(f.options(unpack=False).remote())
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[builtins.int, builtins.int]]"
+
+- case: stream
+  main: |
+    from typing import Generator
+    from sunray import remote
+
+    @remote
+    def stream() -> Generator[int, None, None]:
+      yield from range(10)
+
+    reveal_type(stream)
+    stream_gen = stream.remote()
+    reveal_type(stream_gen)
+    reveal_type(next(stream_gen))
+  out: |
+    main:8: note: Revealed type is "sunray._internal.remote.RemoteStream[def () -> typing.Generator[builtins.int, Any, Any], sunray._internal.core.ObjectRefGenerator[builtins.int]]"
+    main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
+    main:11: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: stream_tuple_unsupported_unpack
+  main: |
+    from typing import Generator
+
+    from sunray import remote
+
+    @remote
+    def stream() -> Generator[tuple[int, int], None, None]:
+        for i in range(10):
+            yield i, i + 1
+
+    stream.options(unpack=True).remote()
+  out: |
+    main:10: error: Unexpected keyword argument "unpack" for "options" of "RemoteStream"  [call-arg]
