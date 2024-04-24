@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from typing import Awaitable
 from typing import Generic
 from typing import TypeVar
 from typing import overload
