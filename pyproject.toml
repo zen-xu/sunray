@@ -12,6 +12,7 @@ ray = [
   { version = "<2.11", extras = ["default"], python = "~3.8" },
   { version = "^2.11", extras = ["default"], python = "^3.9" },
 ]
+typing-extensions = "^4.5.0"
 
 [tool.poetry.group.test.dependencies]
 deepdiff           = "^6.7.1"

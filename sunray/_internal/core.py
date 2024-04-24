@@ -33,23 +33,18 @@ if TYPE_CHECKING:
     from . import actor_mixin
     from .typing import RuntimeEnv
 
-
-_T = TypeVar("_T")
-
-_R = TypeVar("_R")
-_R0 = TypeVar("_R0")
-_R1 = TypeVar("_R1")
-_R2 = TypeVar("_R2")
-_R3 = TypeVar("_R3")
-_R4 = TypeVar("_R4")
-_R5 = TypeVar("_R5")
-_R6 = TypeVar("_R6")
-_R7 = TypeVar("_R7")
-_R8 = TypeVar("_R8")
-_R9 = TypeVar("_R9")
-
-
-if TYPE_CHECKING:
+    _T = TypeVar("_T")
+    _R = TypeVar("_R")
+    _R0 = TypeVar("_R0")
+    _R1 = TypeVar("_R1")
+    _R2 = TypeVar("_R2")
+    _R3 = TypeVar("_R3")
+    _R4 = TypeVar("_R4")
+    _R5 = TypeVar("_R5")
+    _R6 = TypeVar("_R6")
+    _R7 = TypeVar("_R7")
+    _R8 = TypeVar("_R8")
+    _R9 = TypeVar("_R9")
 
     class _BaseID:
         def binary(self) -> bytes: ...

@@ -10,6 +10,8 @@ from typing import overload
 
 import ray
 
+from typing_extensions import ParamSpec
+
 from .util import get_num_returns
 
 
@@ -17,29 +19,25 @@ if TYPE_CHECKING:
     from typing import AsyncGenerator
     from typing import Awaitable
     from typing import Callable
-    from typing import Concatenate
     from typing import Generator
     from typing import Literal
-    from typing import ParamSpec
-    from typing import Unpack
 
     from ray.actor import ActorHandle
     from ray.actor import ActorMethod
+    from typing_extensions import Concatenate
+    from typing_extensions import Unpack
 
     from .core import ObjectRef
     from .core import ObjectRefGenerator
     from .typing import ActorRemoteOptions
     from .typing import RemoteCallable
 
-    _P = ParamSpec("_P")
-
-else:
-    _P = TypeVar("_P")
 
 _Ret = TypeVar("_Ret")
 _YieldItem = TypeVar("_YieldItem")
 _RemoteRet = TypeVar("_RemoteRet")
 _ClassT = TypeVar("_ClassT")
+_P = ParamSpec("_P")
 _R0 = TypeVar("_R0")
 _R1 = TypeVar("_R1")
 _R2 = TypeVar("_R2")

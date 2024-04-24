@@ -8,11 +8,9 @@ if TYPE_CHECKING:
 
     from typing import Any
     from typing import Callable
-    from typing import Concatenate
     from typing import Generic
     from typing import Literal
     from typing import NotRequired
-    from typing import ParamSpec
     from typing import Required
     from typing import TypedDict
     from typing import TypeVar
@@ -23,6 +21,8 @@ if TYPE_CHECKING:
 
     from ray import runtime_env
     from ray.util import scheduling_strategies
+    from typing_extensions import Concatenate
+    from typing_extensions import ParamSpec
 
     _P = ParamSpec("_P")
     _T = TypeVar("_T")
