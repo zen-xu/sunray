@@ -345,7 +345,6 @@ if TYPE_CHECKING:
         @property
         def gcs_address(self) -> str: ...
 
-        @property
         @deprecated("Use get_accelerator_ids() instead.")
         def get_resource_ids(self) -> dict[str, list[str]]:
             return super().get_resource_ids()
