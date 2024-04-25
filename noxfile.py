@@ -18,18 +18,25 @@ def _test(session, ray_version):
         packages.append("async-timeout")
 
     coverage_file = session.posargs[0] if session.posargs else "coverage.xml"
-    pytest_args = ["pytest", "-s", "--cov", "-v", f"--cov-report=xml:{coverage_file}"]
-
-    if session.python != "3.7":
-        # because mypy is not supported on python 3.7, so only run on python 3.8+
-        packages += ["mypy==1.9", "pytest-mypy-plugins"]
-        pytest_args += [
-            "--mypy-only-local-stub",
-            "--mypy-pyproject-toml-file=pyproject.toml",
-        ]
-
     session.install(*packages)
-    session.run(*pytest_args)
+    session.run("pytest", "-s", "--cov", "-v", f"--cov-report=xml:{coverage_file}")
+
+
+def _test_mypy(session, ray_version):
+    session.install(
+        "pytest",
+        "typing-extensions",
+        f"ray[default]=={ray_version}",
+        "mypy==1.9",
+        "pytest-mypy-plugins",
+    )
+    session.run(
+        "pytest",
+        "tests/mypy",
+        "-v",
+        "--mypy-only-local-stub",
+        "--mypy-pyproject-toml-file=pyproject.toml",
+    )
 
 
 @nox.session(python="3.7", reuse_venv=True, tags=["py3.7"])
@@ -62,22 +69,25 @@ def test_py311(session, ray_version):
     _test(session, ray_version)
 
 
-@nox.session(python="3.11", reuse_venv=True)
+@nox.session(python="3.8", reuse_venv=True, tags=["py3.8_mypy"])
+@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0"])
+def test_py38_mypy(session, ray_version):
+    _test_mypy(session, ray_version)
+
+
+@nox.session(python="3.9", reuse_venv=True, tags=["py3.9_mypy"])
 @nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
-def test_mypy(session, ray_version):
-    packages = [
-        "pytest",
-        "pytest-cov",
-        "pytest-mypy-plugins",
-        "mypy==1.9",
-        "typing-extensions",
-        f"ray[default]=={ray_version}",
-    ]
-    session.install(*packages)
-    session.run(
-        "pytest",
-        "-v",
-        "--mypy-only-local-stub",
-        "--mypy-pyproject-toml-file=pyproject.toml",
-        "tests/mypy",
-    )
+def test_py39_mypy(session, ray_version):
+    _test_mypy(session, ray_version)
+
+
+@nox.session(python="3.10", reuse_venv=True, tags=["py3.10_mypy"])
+@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
+def test_py310_mypy(session, ray_version):
+    _test_mypy(session, ray_version)
+
+
+@nox.session(python="3.11", reuse_venv=True, tags=["py3.11_mypy"])
+@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
+def test_py311_mypy(session, ray_version):
+    _test_mypy(session, ray_version)
