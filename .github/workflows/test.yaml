@@ -27,7 +27,7 @@ jobs:
       - run: taplo fmt --check
 
   unit-tests:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    name: unit test ${{ matrix.os }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:
@@ -75,7 +75,7 @@ jobs:
           git diff --exit-code --stat HEAD
 
   mypy-tests:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    name: mypy test ${{ matrix.os }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:
@@ -105,7 +105,7 @@ jobs:
         id: cache
         with:
           path: .nox
-          key: nox-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
+          key: nox-mypy-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
 
       - name: Run mypy test
         run: |
