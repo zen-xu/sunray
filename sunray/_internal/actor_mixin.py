@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from ray.actor import ActorMethod
     from typing_extensions import Concatenate
     from typing_extensions import Literal
+    from typing_extensions import TypedDict
     from typing_extensions import Unpack
 
     from .core import ObjectRef
@@ -168,6 +169,13 @@ class Actor(Generic[_ClassT]):
 
 if TYPE_CHECKING:
 
+    class MethodOptions(TypedDict, total=False):
+        concurrency_group: str
+        max_task_retries: int
+        retry_exceptions: bool | list[type[Exception]]
+        enable_task_events: bool
+        _generator_backpressure_num_objects: Any
+
     class Method(Generic[_P, _Ret]):
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRef[_Ret]]
 
@@ -176,8 +184,7 @@ if TYPE_CHECKING:
             self,
             *,
             unpack: Literal[False] = False,
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[_P, _Ret, ObjectRef[_Ret]]: ...
 
         @overload
@@ -185,8 +192,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0]]]: ...
 
         @overload
@@ -194,8 +200,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1]]]: ...
 
         @overload
@@ -203,8 +208,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]
         ]: ...
@@ -214,8 +218,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -232,8 +235,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -251,8 +253,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -271,8 +272,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -292,8 +292,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -314,8 +313,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7, _R8]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -337,8 +335,7 @@ if TYPE_CHECKING:
             self: Method[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7, _R8, _R9]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             _Ret,
@@ -357,7 +354,7 @@ if TYPE_CHECKING:
         ]: ...
 
         def options(
-            self, *, unpack: bool = False, name: str = ..., concurrency_group: str = ...
+            self, *, unpack: bool = False, **options: Unpack[MethodOptions]
         ) -> MethodWrapper: ...
 
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
@@ -367,7 +364,7 @@ if TYPE_CHECKING:
 
         @overload
         def options(
-            self, *, name: str = ..., concurrency_group: str = ...
+            self, *, unpack: Literal[False] = False, **options: Unpack[MethodOptions]
         ) -> MethodWrapper[_P, Awaitable[_Ret], ObjectRef[_Ret]]: ...
 
         @overload
@@ -375,8 +372,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[_P, Awaitable[_Ret], tuple[ObjectRef[_R0]]]: ...
 
         @overload
@@ -384,8 +380,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P, Awaitable[_Ret], tuple[ObjectRef[_R0], ObjectRef[_R1]]
         ]: ...
@@ -395,8 +390,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -408,8 +402,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -426,8 +419,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3, _R4]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -445,8 +437,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -465,8 +456,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -486,8 +476,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -508,8 +497,7 @@ if TYPE_CHECKING:
             self: AsyncMethod[_P, tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7, _R8]],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -533,8 +521,7 @@ if TYPE_CHECKING:
             ],
             *,
             unpack: Literal[True],
-            name: str = ...,
-            concurrency_group: str = ...,
+            **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
@@ -553,7 +540,7 @@ if TYPE_CHECKING:
         ]: ...
 
         def options(
-            self, *, unpack: bool = False, name: str = ..., concurrency_group: str = ...
+            self, *, unpack: bool = False, **options: Unpack[MethodOptions]
         ) -> MethodWrapper: ...
 
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> Awaitable[_Ret]: ...
@@ -562,7 +549,7 @@ if TYPE_CHECKING:
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRefGenerator[_YieldItem]]
 
         def options(
-            self, *, name: str = ..., concurrency_group: str = ...
+            self, **options: Unpack[MethodOptions]
         ) -> MethodWrapper[_P, _Ret, ObjectRefGenerator[_YieldItem]]: ...
 
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
@@ -599,7 +586,7 @@ if TYPE_CHECKING:
 
 
 @overload
-def remote_method(*, concurrency_group: str = ..., **kwargs) -> MethodDecorator: ...
+def remote_method(**options: Unpack[MethodOptions]) -> MethodDecorator: ...
 
 
 @overload
