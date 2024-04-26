@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.0] - 2024-04-26
 
 ### 🚀 Features
 
@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 
 - Add README.md (#24)
 - Update README.md (#26)
+- Add cliff.toml and CHANGELOG.md (#27)
 
 ### 🧪 Testing
 
