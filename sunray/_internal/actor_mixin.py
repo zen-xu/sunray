@@ -20,11 +20,11 @@ if TYPE_CHECKING:
     from typing import Awaitable
     from typing import Callable
     from typing import Generator
-    from typing import Literal
 
     from ray.actor import ActorHandle
     from ray.actor import ActorMethod
     from typing_extensions import Concatenate
+    from typing_extensions import Literal
     from typing_extensions import Unpack
 
     from .core import ObjectRef

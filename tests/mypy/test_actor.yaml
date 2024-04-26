@@ -1,0 +1,370 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typeddjango/pytest-mypy-plugins/master/pytest_mypy_plugins/schema.json
+
+- case: without_args__new_actor
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin): ...
+
+    reveal_type(Actor.new_actor())
+  out: |
+    main:5: note: Revealed type is "sunray._internal.actor_mixin.ActorClass[[], main.Actor]"
+
+- case: without_args__remote
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin): ...
+
+    reveal_type(Actor.new_actor().remote)
+  out: |
+    main:5: note: Revealed type is "sunray._internal.typing.RemoteCallable[def () -> main.Actor, sunray._internal.actor_mixin.Actor[main.Actor]]"
+
+- case: without_args__remote_call
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin): ...
+
+    reveal_type(Actor.new_actor().remote())
+  out: |
+    main:5: note: Revealed type is "sunray._internal.actor_mixin.Actor[main.Actor]"
+
+- case: without_args__options_call
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin): ...
+
+    reveal_type(Actor.new_actor().options(num_cpus=1))
+  out: |
+    main:5: note: Revealed type is "sunray._internal.actor_mixin.ActorClassWrapper[[], main.Actor]"
+
+
+- case: with_args__new_actor
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin):
+        def __init__(self, a: int, b: str): ...
+
+    reveal_type(Actor.new_actor())
+  out: |
+    main:6: note: Revealed type is "sunray._internal.actor_mixin.ActorClass[[a: builtins.int, b: builtins.str], main.Actor]"
+
+- case: with_args__remote
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin):
+        def __init__(self, a: int, b: str): ...
+
+    reveal_type(Actor.new_actor().remote)
+  out: |
+    main:6: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (a: builtins.int, b: builtins.str) -> main.Actor, sunray._internal.actor_mixin.Actor[main.Actor]]"
+
+- case: with_args__remote_call
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin):
+        def __init__(self, a: int, b: str): ...
+
+    reveal_type(Actor.new_actor().remote(1, 'a'))
+  out: |
+    main:6: note: Revealed type is "sunray._internal.actor_mixin.Actor[main.Actor]"
+
+- case: with_args__remote_call_missing_args
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin):
+        def __init__(self, a: int, b: str): ...
+
+    Actor.new_actor().remote()
+  out: |
+    main:6: error: All overload variants of "__call__" of "RemoteCallable" require at least one argument  [call-overload]
+    main:6: note: Possible overload variants:
+    main:6: note:     def __call__(self, int | ObjectRef[int], str | ObjectRef[str], /) -> sunray._internal.actor_mixin.Actor[main.Actor]
+    main:6: note:     def __call__(self, int | ObjectRef[int], /, b: str) -> sunray._internal.actor_mixin.Actor[main.Actor]
+    main:6: note:     def __call__(self, a: int, b: str) -> sunray._internal.actor_mixin.Actor[main.Actor]
+
+- case: with_args__options_call
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin):
+        def __init__(self, a: int, b: str): ...
+
+    reveal_type(Actor.new_actor().options(num_cpus=1))
+  out: |
+    main:6: note: Revealed type is "sunray._internal.actor_mixin.ActorClassWrapper[[a: builtins.int, b: builtins.str], main.Actor]"
+
+- case: actor__methods
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods)
+  out: |
+    main:7: note: Revealed type is "Type[main.Actor]"
+
+- case: remote_method_without_args
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods.echo)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.Method[[], builtins.str]"
+
+- case: remote_method_without_args__options_call
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods.echo.options(name="test"))
+  out: |
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: remote_method_without_args__remote
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def () -> builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: remote_method_without_args__remote_call
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote())
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.str]"
+
+- case: remote_method_with_args
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self, msg: str) -> str: return msg
+
+    reveal_type(Actor.new_actor().remote().methods.echo)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.Method[[msg: builtins.str], builtins.str]"
+
+- case: remote_method_with_args__options_call
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self, msg: str) -> str: return "hello"
+
+    reveal_type(Actor.new_actor().remote().methods.echo.options(name="test"))
+  out: |
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[msg: builtins.str], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: remote_method_with_args__remote
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self, msg: str) -> str: return msg
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (msg: builtins.str) -> builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: remote_method_with_args__remote_call
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self, msg: str) -> str: return msg
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote("hello"))
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.str]"
+
+- case: remote_method_with_args__remote_call_missing_args
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def echo(self, msg: str) -> str: return msg
+
+    Actor.new_actor().remote().methods.echo.remote()
+  out: |
+    main:7: error: All overload variants of "__call__" of "RemoteCallable" require at least one argument  [call-overload]
+    main:7: note: Possible overload variants:
+    main:7: note:     def __call__(self, str | ObjectRef[str], /) -> ObjectRef[str]
+    main:7: note:     def __call__(self, msg: str) -> ObjectRef[str]
+
+- case: async_method__remote
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        async def echo(self, msg: str) -> str: return msg
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote)
+  out: |
+    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (msg: builtins.str) -> typing.Awaitable[builtins.str], sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: async_method__remote_call
+  main: |
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        async def echo(self, msg: str) -> str: return msg
+
+    reveal_type(Actor.new_actor().remote().methods.echo.remote("abc"))
+  out: |
+    main:7: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.str]"
+
+- case: stream
+  main: |
+    from typing import Generator
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def g(self) -> Generator[int , None, None]: yield from range(10)
+
+    obj_ref_generator = Actor.new_actor().remote().methods.g.remote()
+    reveal_type(obj_ref_generator)
+    reveal_type(next(obj_ref_generator))
+  out: |
+    main:9: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
+    main:10: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: async_stream
+  main: |
+    from typing import AsyncGenerator
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        async def g(self) -> AsyncGenerator[int , None]:
+            for i in range(10):
+                yield i
+
+    obj_ref_generator = Actor.new_actor().remote().methods.g.remote()
+    reveal_type(obj_ref_generator)
+    reveal_type(next(obj_ref_generator))
+  out: |
+    main:11: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
+    main:12: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: default_tuple_returns
+  main: |
+    from typing import Tuple
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def f(self) -> Tuple[int ,str]: return 1, "A"
+
+    reveal_type(Actor.new_actor().remote().methods.f.remote())
+  out: |
+    main:8: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[builtins.int, builtins.str]]"
+
+- case: unpack_tuple_returns
+  main: |
+    from typing import Tuple
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def f(self) -> Tuple[int ,str]: return 1, "A"
+
+    reveal_type(Actor.new_actor().remote().methods.f.options(unpack=True).remote())
+  out: |
+    main:8: note: Revealed type is "tuple[sunray._internal.core.ObjectRef[builtins.int], sunray._internal.core.ObjectRef[builtins.str]]"
+
+- case: do_not_unpack_tuple_returns
+  main: |
+    from typing import Tuple
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method
+        def f(self) -> Tuple[int ,str]: return 1, "A"
+
+    reveal_type(Actor.new_actor().remote().methods.f.options(unpack=False).remote())
+  out: |
+    main:8: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[builtins.int, builtins.str]]"
+
+- case: actor_mixin_class_args
+  main: |
+    from sunray import ActorMixin
+
+    class Dummy: ...
+    obj = Dummy()
+    class Actor(ActorMixin, {{ arg }}=obj): ...  # E: Argument "{{ arg }}" to "__init_subclass__" of "ActorMixin" has incompatible type "Dummy"; expected "{{ expected_type }}"  [arg-type]
+  parametrized:
+    - arg: num_cpus
+      expected_type: float
+    - arg: num_gpus
+      expected_type: float
+    - arg: resources
+      expected_type: dict[str, float]
+    - arg: accelerator_type
+      expected_type: str
+    - arg: memory
+      expected_type: float
+    - arg: object_store_memory
+      expected_type: float
+    - arg: max_restarts
+      expected_type: int
+    - arg: max_task_retries
+      expected_type: int
+    - arg: max_pending_calls
+      expected_type: int
+    - arg: max_concurrency
+      expected_type: int
+    - arg: name
+      expected_type: str
+    - arg: namespace
+      expected_type: str
+    - arg: lifetime
+      expected_type: Literal['detached'] | None
+    - arg: runtime_env
+      expected_type: RuntimeEnv
+    - arg: concurrency_groups
+      expected_type: dict[str, int]
+    - arg: scheduling_strategy
+      expected_type: Literal['DEFAULT', 'SPREAD'] | PlacementGroupSchedulingStrategy | NodeAffinitySchedulingStrategy | NodeLabelSchedulingStrategy | None
+
+- case: actor_mixin_class_with_invalid_args
+  main: |
+    from sunray import ActorMixin
+
+    class Actor(ActorMixin, num_cpu=1): ...
+  out: |
+    main:3: error: Unexpected keyword argument "num_cpu" for "__init_subclass__" of "ActorMixin"; did you mean "num_cpus" or "num_gpus"?  [call-arg]

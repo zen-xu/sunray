@@ -26,8 +26,8 @@ jobs:
 
       - run: taplo fmt --check
 
-  tests:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+  unit-tests:
+    name: unit test ${{ matrix.os }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:
@@ -59,16 +59,49 @@ jobs:
         id: cache
         with:
           path: .nox
-          key: nox-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
+          key: nox-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('noxfile.py') }}
 
-      - name: Run nox
+      - name: Run unit test
         run: |
-          nox -t "py${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
+          nox -s "test-${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Check for clean working tree
+        run: |
+          git diff --exit-code --stat HEAD
+
+  mypy-tests:
+    name: mypy tests
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Set up nox
+        run: pip install nox
+
+      - name: Set up cache
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: .nox
+          key: nox-mypy-${{ hashFiles('noxfile.py') }}
+
+      - name: Run mypy test
+        run: |
+          nox -s test_mypy
 
       - name: Check for clean working tree
         run: |

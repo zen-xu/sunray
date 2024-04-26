@@ -9,10 +9,6 @@ if TYPE_CHECKING:
     from typing import Any
     from typing import Callable
     from typing import Generic
-    from typing import Literal
-    from typing import NotRequired
-    from typing import Required
-    from typing import TypedDict
     from typing import TypeVar
     from typing import Union
     from typing import overload
@@ -22,7 +18,11 @@ if TYPE_CHECKING:
     from ray import runtime_env
     from ray.util import scheduling_strategies
     from typing_extensions import Concatenate
+    from typing_extensions import Literal
+    from typing_extensions import NotRequired
     from typing_extensions import ParamSpec
+    from typing_extensions import Required
+    from typing_extensions import TypedDict
 
     _P = ParamSpec("_P")
     _T = TypeVar("_T")

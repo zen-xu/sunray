@@ -21,13 +21,13 @@ if TYPE_CHECKING:
     from typing import Any
     from typing import Callable
     from typing import Generator
-    from typing import Self
-    from typing import TypedDict
 
     import ray.actor
 
     from ray._private.worker import BaseContext
     from ray.job_config import JobConfig
+    from typing_extensions import Self
+    from typing_extensions import TypedDict
     from typing_extensions import deprecated
 
     from . import actor_mixin
@@ -345,7 +345,6 @@ if TYPE_CHECKING:
         @property
         def gcs_address(self) -> str: ...
 
-        @property
         @deprecated("Use get_accelerator_ids() instead.")
         def get_resource_ids(self) -> dict[str, list[str]]:
             return super().get_resource_ids()
