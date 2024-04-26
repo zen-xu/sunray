@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typeddjango/pytest-mypy-plugins/master/pytest_mypy_plugins/schema.json
+
+- case: put
+  main: |
+    from sunray import put
+
+    reveal_type(put(1))
+  out: |
+    main:3: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: get
+  main: |
+    from sunray import get, put
+
+    int_ref = put(1)
+    str_ref = put("a")
+
+    reveal_type(get(int_ref))
+    reveal_type(get([int_ref, int_ref]))
+    reveal_type(get([int_ref, str_ref]))
+    reveal_type(get((int_ref, str_ref)))
+  out: |
+    main:6: note: Revealed type is "builtins.int"
+    main:7: note: Revealed type is "builtins.tuple[builtins.int, ...]"
+    main:8: note: Revealed type is "builtins.tuple[Any, ...]"
+    main:9: note: Revealed type is "tuple[builtins.int, builtins.str]"
+
+- case: wait
+  main: |
+    from sunray import wait, put
+
+    int_ref = put(1)
+    str_ref = put("a")
+
+    reveal_type(wait([int_ref, int_ref]))
+    reveal_type(wait([int_ref, str_ref]))
+  out: |
+    main:6: note: Revealed type is "tuple[builtins.list[sunray._internal.core.ObjectRef[builtins.int]], builtins.list[sunray._internal.core.ObjectRef[builtins.int]]]"
+    main:7: note: Revealed type is "tuple[builtins.list[sunray._internal.core.ObjectRef[Any]], builtins.list[sunray._internal.core.ObjectRef[Any]]]"
+
+- case: get_actor
+  main: |
+    from sunray import get_actor, ActorMixin
+
+    class MyActor(ActorMixin, name="my-actor"): ...
+
+    reveal_type(get_actor("my-actor"))
+    reveal_type(get_actor[MyActor]("my-actor"))
+  out: |
+    main:5: note: Revealed type is "ray.actor.ActorHandle"
+    main:6: note: Revealed type is "sunray._internal.actor_mixin.Actor[main.MyActor]"
