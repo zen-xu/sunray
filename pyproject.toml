@@ -3,7 +3,7 @@ authors     = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 description = ""
 name        = "sunray"
 readme      = "README.md"
-version     = "0.1.0b0"
+version     = "0.1.0"
 
 [tool.poetry.dependencies]
 python = "^3.7,<3.12"
