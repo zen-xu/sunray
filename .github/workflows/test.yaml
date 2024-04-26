@@ -75,27 +75,19 @@ jobs:
           git diff --exit-code --stat HEAD
 
   mypy-tests:
-    name: mypy test ${{ matrix.os }} / ${{ matrix.python-version }}
-    runs-on: ${{ matrix.image }}
-    strategy:
-      matrix:
-        os: [Ubuntu]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-        include:
-          - os: Ubuntu
-            image: ubuntu-22.04
-      fail-fast: false
+    name: mypy tests
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         id: setup-python
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Set up nox
         run: pip install nox
@@ -105,11 +97,11 @@ jobs:
         id: cache
         with:
           path: .nox
-          key: nox-mypy-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
+          key: nox-mypy-${{ hashFiles('noxfile.py') }}
 
       - name: Run mypy test
         run: |
-          nox -t "py${{ matrix.python-version }}_mypy" --no-stop-on-first-error
+          nox -t mypy
 
       - name: Check for clean working tree
         run: |

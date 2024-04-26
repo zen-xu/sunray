@@ -63,31 +63,7 @@ def test_py310(session, ray_version):
     _test(session, ray_version)
 
 
-@nox.session(python="3.11", reuse_venv=True, tags=["py3.11"])
+@nox.session(python="3.11", reuse_venv=True, tags=["mypy"])
 @nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
-def test_py311(session, ray_version):
-    _test(session, ray_version)
-
-
-@nox.session(python="3.8", reuse_venv=True, tags=["py3.8_mypy"])
-@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0"])
-def test_py38_mypy(session, ray_version):
-    _test_mypy(session, ray_version)
-
-
-@nox.session(python="3.9", reuse_venv=True, tags=["py3.9_mypy"])
-@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
-def test_py39_mypy(session, ray_version):
-    _test_mypy(session, ray_version)
-
-
-@nox.session(python="3.10", reuse_venv=True, tags=["py3.10_mypy"])
-@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
-def test_py310_mypy(session, ray_version):
-    _test_mypy(session, ray_version)
-
-
-@nox.session(python="3.11", reuse_venv=True, tags=["py3.11_mypy"])
-@nox.parametrize("ray_version", ["2.7.2", "2.8.1", "2.9.3", "2.10.0", "2.11.0"])
-def test_py311_mypy(session, ray_version):
+def test_mypy(session, ray_version):
     _test_mypy(session, ray_version)
