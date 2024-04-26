@@ -1,6 +1,7 @@
 # Sunray
 
 [![Tests](https://github.com/zen-xu/sunray/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test.yaml)
+[![Mypy](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml)
 [![codecov](https://codecov.io/gh/zen-xu/sunray/graph/badge.svg?token=NkaEIVRqk6)](https://codecov.io/gh/zen-xu/sunray)
 ![GitHub License](https://img.shields.io/github/license/zen-xu/sunray)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sunray)
@@ -68,3 +69,53 @@ pip install sunray
 - sunray will auto unpack tuple result if options specify `unpack=True`.
 - ray need to specify how many return numbers, so you need to count it.
 - ray mypy raise error 'RemoteFunctionNoArgs has no attribute "options"'.
+
+### Round 7: Get actor
+|                                    sunray                                    |                                    ray                                    |
+| :--------------------------------------------------------------------------: | :-----------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_get_actor.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_get_actor.jpg) |
+
+- sunray get_actor will return `ActorHandle`, and return `Actor[Demo]` if you specify with generic type.
+- ray just return `Any`.
+
+## API
+
+`sunray` re-export all apis from `ray.core` with friendly type hinting. In addition, `sunray` provides `ActorMixin` which is used to help creating more robust actors.
+
+### ActorMixin
+
+`ActorMixin` is a mixin, and provides a classmethod `new_actor`
+
+```python
+import sunray
+
+
+class Demo(
+                       # Here to specify default actor options
+    sunray.ActorMixin, name="DemoActor", num_cpus=1, concurrency_groups={"g1": 1}
+):
+    def __init__(self, init_v: int):
+        self.init_v = init_v
+
+    # annotate `add` is a remote_method
+    @sunray.remote_method
+    def add(self, v: int) -> int:
+        return self.init_v + v
+
+    # support directly call remote_method
+    @sunray.remote_method
+    def calculate(self, v: int) -> int:
+        return self.add(v)
+
+    # support specify remote method options
+    @sunray.remote_method(concurrency_group="g1")
+    async def sleep(self): ...
+
+
+# construct the actor
+actor = Demo.new_actor().remote(1)
+
+# call remote method
+ref = actor.methods.add.remote(1)
+print(sunray.get(ref))
+```
