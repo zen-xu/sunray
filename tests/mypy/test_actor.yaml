@@ -132,7 +132,7 @@
         @remote_method
         def echo(self) -> str: return "hello"
 
-    reveal_type(Actor.new_actor().remote().methods.echo.options(name="test"))
+    reveal_type(Actor.new_actor().remote().methods.echo.options(concurrency_group="test"))
   out: |
     main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
 
@@ -180,7 +180,7 @@
         @remote_method
         def echo(self, msg: str) -> str: return "hello"
 
-    reveal_type(Actor.new_actor().remote().methods.echo.options(name="test"))
+    reveal_type(Actor.new_actor().remote().methods.echo.options(concurrency_group="test"))
   out: |
     main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[msg: builtins.str], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
 
