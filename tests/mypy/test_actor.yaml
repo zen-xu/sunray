@@ -368,3 +368,23 @@
     class Actor(ActorMixin, num_cpu=1): ...
   out: |
     main:3: error: Unexpected keyword argument "num_cpu" for "__init_subclass__" of "ActorMixin"; did you mean "num_cpus" or "num_gpus"?  [call-arg]
+
+- case: remote_method_with_options
+  main: |
+    from typing import Generator, AsyncGenerator
+    from sunray import ActorMixin, remote_method
+
+    class Actor(ActorMixin):
+        @remote_method(concurrency_group="g1")
+        def method(self) -> int: return 1
+
+        @remote_method(concurrency_group="g2")
+        async def async_method(self) -> int: return 1
+
+        @remote_method(concurrency_group="g3")
+        def stream(self) -> Generator[int, None, None]: yield from range(10)
+
+        @remote_method(concurrency_group="g4")
+        async def async_stream(self) -> AsyncGenerator[int, None]:
+            for i in range(10):
+                yield i
