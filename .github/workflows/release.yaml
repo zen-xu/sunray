@@ -2,13 +2,11 @@ name: Release
 
 on:
   push:
-    branches: [release]
-
-#    tags:
-#      - "*.*.*"
+    tags:
+      - "*.*.*"
 
 jobs:
-  release:
+  pypi-release:
     name: Release
     runs-on: ubuntu-latest
     steps:
@@ -28,3 +26,8 @@ jobs:
 
       - name: Build project for distribution
         run: poetry build -f wheel
+
+      - name: Publish to PyPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+        run: poetry publish
