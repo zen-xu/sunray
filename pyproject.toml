@@ -17,11 +17,11 @@ typing-extensions = "^4.5.0"
 [tool.poetry.group.test.dependencies]
 deepdiff            = "^6.7.1"
 importlib_metadata  = "6.7.0"
-mypy                = "1.4.1"
+mypy                = { version = "^1.9", python = "^3.10" }
 nox                 = "^2024.4.15"
 pytest              = "<8.0"
 pytest-cov          = "^4.1.0"
-pytest-mypy-plugins = "<3"
+pytest-mypy-plugins = { version = "^3", python = "^3.10" }
 
 
 [build-system]
