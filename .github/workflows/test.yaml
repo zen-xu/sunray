@@ -59,11 +59,11 @@ jobs:
         id: cache
         with:
           path: .nox
-          key: nox-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('noxfile.py') }}
+          key: nox-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('noxfile.py') }}
 
       - name: Run unit test
         run: |
-          nox -t "py${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
+          nox -s "test-${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
@@ -101,7 +101,7 @@ jobs:
 
       - name: Run mypy test
         run: |
-          nox -t mypy
+          nox -s test_mypy
 
       - name: Check for clean working tree
         run: |
