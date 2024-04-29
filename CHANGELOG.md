@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-04-29
+
+### 🚀 Features
+
+- Support actor to call self remote method (#31)
+
+### 🐛 Bug Fixes
+
+- Fix __version__ (#33)
+
+### ⚙️ Miscellaneous Tasks
+
+- Add commitizen config to support dump version (#34)
+- *(cliff)* Add more skip cases (#35)
+- Update release message (#36)
+
 ## [0.1.0] - 2024-04-26
 
 ### 🚀 Features
@@ -42,6 +58,7 @@ All notable changes to this project will be documented in this file.
 - Add py.typed (#20)
 - Upgrade github action codecov from v3 -> v4 (#23)
 - Add test-mypy.yaml (#25)
+- Enable release (#28)
 
 ### Build
 
