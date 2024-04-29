@@ -109,8 +109,9 @@
         def echo(self) -> str: return "hello"
 
     reveal_type(Actor.new_actor().remote().methods)
+  regex: true
   out: |
-    main:7: note: Revealed type is "Type[main.Actor]"
+    main:7: note: Revealed type is "(T|t)ype\[main.Actor\]"
 
 - case: remote_method_without_args
   main: |
