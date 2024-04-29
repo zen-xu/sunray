@@ -11,6 +11,7 @@ import ray
 from sunray import Actor
 from sunray import ActorMixin
 from sunray import remote_method
+from sunray._internal.actor_mixin import ActorMethodWrapper
 from sunray._internal.actor_mixin import add_var_keyword_to_klass
 
 
@@ -147,3 +148,58 @@ def test_actor_specify_empty_options():
     class Demo(ActorMixin): ...
 
     Demo.new_actor().options().remote()
+
+
+def test_actor_method_wrapper():
+    class Demo(ActorMixin):
+        def __init__(self) -> None:
+            self.init_v = 1
+
+        @remote_method
+        async def f1(self) -> int:
+            return 1
+
+        @remote_method
+        def check_method_type(self) -> bool:
+            return isinstance(self.f1, ActorMethodWrapper)
+
+        @remote_method
+        def check_init_val_type(self) -> bool:
+            return isinstance(self.init_v, int)
+
+    demo = Demo.new_actor().remote()
+    assert ray.get(demo.methods.check_method_type.remote())
+    assert ray.get(demo.methods.check_init_val_type.remote())
+
+
+def test_call_self_remote_method():
+    class Demo(ActorMixin):
+        @remote_method
+        async def f1(self) -> int:
+            return 1
+
+        @remote_method
+        async def f2(self) -> int:
+            return await self.f1.remote()
+
+    actor = Demo.new_actor().remote()
+    assert ray.get(actor.methods.f2.remote())
+
+
+def test_call_self_remote_method_with_options():
+    class Demo(ActorMixin, concurrency_groups={"a": 2, "b": 2}):
+        @remote_method(concurrency_group="a")
+        async def f1(self) -> int:
+            return 1
+
+        @remote_method
+        async def f2(self) -> int:
+            return await self.f1()
+
+        @remote_method
+        async def f3(self) -> int:
+            return await self.f1.options(concurrency_group="b").remote()
+
+    actor = Demo.new_actor().remote()
+    assert ray.get(actor.methods.f2.remote())
+    assert ray.get(actor.methods.f3.remote())

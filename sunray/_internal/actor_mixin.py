@@ -668,6 +668,35 @@ def remote_method(__method=None, **kwargs):
     return build_method(__method, kwargs)
 
 
+class ActorMethodWrapper:  # pragma: no cover
+    def __init__(self, actor_inst, method) -> None:
+        self.actor_inst = actor_inst
+        self.method = method
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        return self.method(*args, **kwds)
+
+    @property
+    def _sunray_actor(self) -> Actor:
+        if not getattr(self.actor_inst, "__sunray_actor__", None):
+            import sunray
+
+            ctx = sunray.get_runtime_context()
+            current_actor_handle = ctx.current_actor
+            self.actor_inst.__sunray_actor__ = Actor(current_actor_handle)
+        return self.actor_inst.__sunray_actor__
+
+    def options(self, *args: Any, **kwds: Any) -> Any:
+        return getattr(self._sunray_actor.methods, self.method.__name__).options(
+            *args, **kwds
+        )
+
+    def remote(self, *args: Any, **kwds: Any) -> Any:
+        return getattr(self._sunray_actor.methods, self.method.__name__).remote(
+            *args, **kwds
+        )
+
+
 class ActorMixin:
     """
     Make a class into an actor class.
@@ -739,6 +768,12 @@ class ActorMixin:
     def __init_subclass__(cls, **default_ray_opts: Unpack[ActorRemoteOptions]) -> None:
         super().__init_subclass__()
         cls._default_ray_opts = default_ray_opts
+
+    def __getattribute__(self, name: str) -> Any:  # pragma: no cover
+        attr = super().__getattribute__(name)
+        if getattr(attr, "__ray_num_returns__", None):
+            attr = ActorMethodWrapper(self, attr)
+        return attr
 
     @classmethod
     def new_actor(cls: Callable[_P, _ClassT]) -> ActorClass[_P, _ClassT]:
