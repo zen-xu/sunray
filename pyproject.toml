@@ -24,9 +24,9 @@ pytest-cov          = "^4.1.0"
 pytest-mypy-plugins = { version = "^3", python = "^3.10" }
 
 [tool.commitizen]
-bump_message   = "release: bump version $current_version -> $new_version"
+bump_message   = "chore(release): bump version $current_version -> $new_version"
 pre_bump_hooks = ["./update-changelog.sh"]
-version        = "0.1.0"                                                  # version anchor
+version        = "0.1.0"                                                         # version anchor
 version_files  = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
