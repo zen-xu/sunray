@@ -18,7 +18,7 @@ To address this shortfall, sunray provides enhanced and more robust type hints.
 pip install sunray
 ```
 
-## Lets't vs.
+## Let's vs.
 
 ### Round 1: Build an actor
 
