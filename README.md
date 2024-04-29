@@ -78,7 +78,7 @@ pip install sunray
 - sunray get_actor will return `ActorHandle`, and return `Actor[Demo]` if you specify with generic type.
 - ray just return `Any`.
 
-### Round 7: Call self remote method
+### Round 8: Call self remote method
 |                                     sunray                                      |                                     ray                                      |
 | :-----------------------------------------------------------------------------: | :--------------------------------------------------------------------------: |
 | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_call_self_remote_method.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_call_self_remote_method.jpg) |
