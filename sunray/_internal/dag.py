@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 
     import sunray
 
+    from .core import ObjectRefGenerator
+
     _P = ParamSpec("_P")
     _T = TypeVar("_T")
     _T0 = TypeVar("_T0")
@@ -43,6 +45,8 @@ if TYPE_CHECKING:
         ) -> _NodeRet: ...
 
     class FunctionNode(ray_dag.FunctionNode, DAGNode[sunray.ObjectRef[_NodeRet]]): ...
+
+    class StreamNode(ray_dag.FunctionNode, DAGNode[ObjectRefGenerator[_NodeRet]]): ...
 
     _NodeT = TypeVar("_NodeT", bound=ray_dag.DAGNode)
 
@@ -262,4 +266,4 @@ if TYPE_CHECKING:
         def __call__(self, *args: Any, **kwds: Any) -> _NodeT: ...
 else:
     DAGNode = ray_dag.DAGNode
-    FunctionNode = ray_dag.FunctionNode
+    StreamNode = FunctionNode = ray_dag.FunctionNode

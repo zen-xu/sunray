@@ -13,6 +13,7 @@ exclude_lines =
     @overload( |$)
     def __repr__
     def __str__
+    import
 
     pragma: no cover
     if self\.debug

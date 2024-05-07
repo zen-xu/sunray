@@ -163,7 +163,7 @@
     reveal_type(stream_gen)
     reveal_type(next(stream_gen))
   out: |
-    main:8: note: Revealed type is "sunray._internal.remote.RemoteStream[def () -> typing.Generator[builtins.int, Any, Any], sunray._internal.core.ObjectRefGenerator[builtins.int]]"
+    main:8: note: Revealed type is "sunray._internal.remote.RemoteStream[def () -> typing.Generator[builtins.int, Any, Any], builtins.int]"
     main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
     main:11: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
 
@@ -199,3 +199,19 @@
     main:8: note: Revealed type is "sunray._internal.dag.FunctionNode[builtins.int]"
     main:9: note: Revealed type is "builtins.int"
     main:11: note: Revealed type is "sunray._internal.dag.FunctionNode[builtins.int]"
+
+- case: stream_bind
+  main: |
+    import sunray
+    from typing import Generator
+
+    @sunray.remote
+    def func(count: int) -> Generator[int, None, None]:
+        yield from range(count)
+
+    bind_ref = func.bind(10)
+    reveal_type(bind_ref)
+    reveal_type(bind_ref.execute())
+  out: |
+    main:9: note: Revealed type is "sunray._internal.dag.StreamNode[builtins.int]"
+    main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"

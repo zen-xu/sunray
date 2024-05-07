@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from .core import ObjectRefGenerator
     from .dag import BindCallable
     from .dag import FunctionNode
+    from .dag import StreamNode
     from .typing import FunctionRemoteOptions
     from .typing import RemoteCallable
 
@@ -260,7 +261,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
             return self._remote_func.bind(*args, **kwargs)
 
 
-class RemoteStreamWrapper(Generic[_Callable_co, _RemoteRet]):
+class RemoteStreamWrapper(Generic[_Callable_co, _R]):
     def __init__(
         self, remote_func: ray_func.RemoteFunction, opts: FunctionRemoteOptions
     ) -> None:
@@ -268,7 +269,7 @@ class RemoteStreamWrapper(Generic[_Callable_co, _RemoteRet]):
         self._opts = opts
 
     if TYPE_CHECKING:
-        remote: RemoteCallable[_Callable_co, _RemoteRet]
+        remote: RemoteCallable[_Callable_co, ObjectRefGenerator[_R]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -278,12 +279,19 @@ class RemoteStreamWrapper(Generic[_Callable_co, _RemoteRet]):
             return self._remote_func.options(**opts).remote(*args, **kwargs)
 
 
-class RemoteStream(RemoteStreamWrapper[_Callable_co, _RemoteRet]):
+class RemoteStream(RemoteStreamWrapper[_Callable_co, _R]):
     def options(
         self, **opts: Unpack[FunctionRemoteOptions]
-    ) -> RemoteStreamWrapper[_Callable_co, _RemoteRet]:
+    ) -> RemoteStreamWrapper[_Callable_co, _R]:
         opts = {**self._opts, **opts}
         return RemoteStreamWrapper(self._remote_func, opts)
+
+    if TYPE_CHECKING:
+        bind: BindCallable[_Callable_co, StreamNode[_R]]
+    else:
+
+        def bind(self, *args, **kwargs):
+            return self._remote_func.bind(*args, **kwargs)
 
 
 if TYPE_CHECKING:
@@ -295,9 +303,7 @@ if TYPE_CHECKING:
         @overload
         def __call__(
             self, __obj: Callable[_P, Generator[_R, Any, Any]]
-        ) -> RemoteStream[
-            Callable[_P, Generator[_R, Any, Any]], ObjectRefGenerator[_R]
-        ]: ...
+        ) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], _R]: ...
 
         @overload
         def __call__(
@@ -314,7 +320,7 @@ def remote(__type: type) -> ActorClass: ...
 @overload
 def remote(
     __func: Callable[_P, Generator[_R, Any, Any]],
-) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], ObjectRefGenerator[_R]]: ...
+) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], _R]: ...
 
 
 @overload

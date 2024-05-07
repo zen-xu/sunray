@@ -107,3 +107,12 @@ def test_bind(init_ray):
     assert ray.get(b_ref.execute()) == 6
     c_ref = func.bind(b_ref, a_ref)
     assert ray.get(c_ref.execute()) == 9
+
+
+def test_stream_bind(init_ray):
+    @remote
+    def func(count: int) -> Generator[int, None, None]:
+        yield from range(count)
+
+    gen_ref = func.bind(3)
+    assert [ray.get(ref) for ref in gen_ref.execute()] == list(range(3))
