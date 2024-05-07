@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
     from .core import ObjectRef
     from .core import ObjectRefGenerator
+    from .dag import BindCallable
+    from .dag import FunctionNode
     from .typing import FunctionRemoteOptions
     from .typing import RemoteCallable
 
@@ -249,6 +251,13 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         num_returns = get_num_returns(self._remote_func._function) if unpack else 1
         opts["num_returns"] = num_returns  # type: ignore[typeddict-unknown-key]
         return RemoteFunctionWrapper(self._remote_func, opts)
+
+    if TYPE_CHECKING:
+        bind: BindCallable[_Callable_co, FunctionNode[_R]]
+    else:
+
+        def bind(self, *args, **kwargs):
+            return self._remote_func.bind(*args, **kwargs)
 
 
 class RemoteStreamWrapper(Generic[_Callable_co, _RemoteRet]):
