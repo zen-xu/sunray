@@ -409,8 +409,8 @@
     reveal_type(val)
     reveal_type(sunray.get(val.execute()))
   out: |
-    main:14: note: Revealed type is "sunray._internal.dag.ClassNode[main.Actor]"
-    main:15: note: Revealed type is "sunray._internal.dag.ClassMethodNode[builtins.int]"
+    main:14: note: Revealed type is "sunray._internal.dag.ClassNode[sunray._internal.dag.Ins[()], main.Actor]"
+    main:15: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.dag.Ins[()], builtins.int]"
     main:16: note: Revealed type is "builtins.int"
 
 - case: bind_async
@@ -430,7 +430,7 @@
     val = a1.methods.add.bind(1)
     reveal_type(val)
   out: |
-    main:14: note: Revealed type is "sunray._internal.dag.ClassMethodNode[builtins.int]"
+    main:14: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.dag.Ins[()], builtins.int]"
 
 - case: bind_stream
   main: |
@@ -447,7 +447,7 @@
     val = a1.methods.gen.bind(10)
     reveal_type(val)
   out: |
-    main:12: note: Revealed type is "sunray._internal.dag.ClassStreamMethodNode[builtins.int]"
+    main:12: note: Revealed type is "sunray._internal.dag.ClassStreamMethodNode[sunray._internal.dag.Ins[()], builtins.int]"
 
 - case: bind_async_stream
   main: |
@@ -465,4 +465,4 @@
     val = a1.methods.gen.bind(10)
     reveal_type(val)
   out: |
-    main:13: note: Revealed type is "sunray._internal.dag.ClassStreamMethodNode[builtins.int]"
+    main:13: note: Revealed type is "sunray._internal.dag.ClassStreamMethodNode[sunray._internal.dag.Ins[()], builtins.int]"
