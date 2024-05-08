@@ -30,6 +30,10 @@ if TYPE_CHECKING:
 
     from .core import ObjectRef
     from .core import ObjectRefGenerator
+    from .dag import BindCallable
+    from .dag import ClassMethodNode
+    from .dag import ClassNode
+    from .dag import ClassStreamMethodNode
     from .typing import ActorRemoteOptions
     from .typing import RemoteCallable
 
@@ -79,6 +83,7 @@ class ActorClass(Generic[_P, _ClassT]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[Callable[_P, _ClassT], Actor[_ClassT]]
+        bind: BindCallable[Callable[_P, _ClassT], ClassNode[_ClassT]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -90,6 +95,11 @@ class ActorClass(Generic[_P, _ClassT]):
             handle = remote_cls.remote(*args, **kwargs)
 
             return Actor(handle)
+
+        def bind(self, *args, **kwargs):
+            from .dag import ClassNode
+
+            return ClassNode(self._klass, args, kwargs, self._default_opts)
 
     def options(
         self, **opts: Unpack[ActorRemoteOptions]
@@ -178,6 +188,7 @@ if TYPE_CHECKING:
 
     class Method(Generic[_P, _Ret]):
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRef[_Ret]]
+        bind: BindCallable[Callable[_P, _Ret], ClassMethodNode[_Ret]]
 
         @overload
         def options(
@@ -361,6 +372,7 @@ if TYPE_CHECKING:
 
     class AsyncMethod(Generic[_P, _Ret]):
         remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], ObjectRef[_Ret]]
+        bind: BindCallable[Callable[_P, Awaitable[_Ret]], ClassMethodNode[_Ret]]
 
         @overload
         def options(
@@ -547,6 +559,7 @@ if TYPE_CHECKING:
 
     class StreamMethod(Generic[_P, _Ret, _YieldItem]):
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRefGenerator[_YieldItem]]
+        bind: BindCallable[Callable[_P, _Ret], ClassStreamMethodNode[_YieldItem]]
 
         def options(
             self, **options: Unpack[MethodOptions]
@@ -693,6 +706,11 @@ class ActorMethodWrapper:  # pragma: no cover
 
     def remote(self, *args: Any, **kwds: Any) -> Any:
         return getattr(self._sunray_actor.methods, self.method.__name__).remote(
+            *args, **kwds
+        )
+
+    def bind(self, *args: Any, **kwds: Any) -> Any:
+        return getattr(self._sunray_actor.methods, self.method.__name__).bind(
             *args, **kwds
         )
 

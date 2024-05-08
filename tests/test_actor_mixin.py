@@ -4,9 +4,12 @@ import asyncio
 import time
 
 from typing import AsyncGenerator
+from typing import Generator
 
 import pytest
 import ray
+
+import sunray
 
 from sunray import Actor
 from sunray import ActorMixin
@@ -203,3 +206,67 @@ def test_call_self_remote_method_with_options():
     actor = Demo.new_actor().remote()
     assert ray.get(actor.methods.f2.remote())
     assert ray.get(actor.methods.f3.remote())
+
+
+def test_bind(init_ray):
+    class Actor(sunray.ActorMixin):
+        def __init__(self, init_value: int):
+            self.i = init_value
+
+        @sunray.remote_method
+        def inc(self, x: int):
+            self.i += x
+
+        @sunray.remote_method
+        def get(self) -> int:
+            return self.i
+
+    a1 = Actor.new_actor().bind(10)
+    val = a1.methods.get.bind()
+    assert sunray.get(val.execute()) == 10
+
+    @sunray.remote
+    def combine(x: int, y: int) -> int:
+        return x + y
+
+    a2 = Actor.new_actor().bind(10)
+    a1.methods.inc.bind(2)
+    a1.methods.inc.bind(4)
+    a2.methods.inc.bind(6)
+
+    dag = combine.bind(a1.methods.get.bind(), a2.methods.get.bind())
+    assert sunray.get(dag.execute()) == 32
+
+
+def test_async_bind(init_ray):
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        async def cal(self, x: int) -> int:
+            return x + 2
+
+    a1 = Actor.new_actor().bind()
+    node = a1.methods.cal.bind(1)
+    assert sunray.get(node.execute()) == 3
+
+
+def test_stream_bind(init_ray):
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        def gen(self, x: int) -> Generator[int, None, None]:
+            yield from range(x)
+
+    a1 = Actor.new_actor().bind()
+    node = a1.methods.gen.bind(3)
+    assert [sunray.get(ref) for ref in node.execute()] == list(range(3))
+
+
+def test_async_stream_bind(init_ray):
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        async def gen(self, x: int) -> AsyncGenerator[int, None]:
+            for i in range(x):
+                yield i
+
+    a1 = Actor.new_actor().bind()
+    node = a1.methods.gen.bind(3)
+    assert [sunray.get(ref) for ref in node.execute()] == list(range(3))

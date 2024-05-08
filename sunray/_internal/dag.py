@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 from ray import dag as ray_dag
 
+from .actor_mixin import Actor
+
 
 if TYPE_CHECKING:
     from typing import Any
@@ -47,6 +49,18 @@ if TYPE_CHECKING:
     class FunctionNode(ray_dag.FunctionNode, DAGNode[sunray.ObjectRef[_NodeRet]]): ...
 
     class StreamNode(ray_dag.FunctionNode, DAGNode[ObjectRefGenerator[_NodeRet]]): ...
+
+    class ClassNode(ray_dag.ClassNode, DAGNode[sunray.Actor[_NodeRet]]):
+        @property
+        def methods(self) -> type[_NodeRet]: ...
+
+    class ClassMethodNode(
+        ray_dag.ClassMethodNode, DAGNode[sunray.ObjectRef[_NodeRet]]
+    ): ...
+
+    class ClassStreamMethodNode(
+        ray_dag.ClassMethodNode, DAGNode[ObjectRefGenerator[_NodeRet]]
+    ): ...
 
     _NodeT = TypeVar("_NodeT", bound=ray_dag.DAGNode)
 
@@ -267,3 +281,14 @@ if TYPE_CHECKING:
 else:
     DAGNode = ray_dag.DAGNode
     StreamNode = FunctionNode = ray_dag.FunctionNode
+    ClassMethodNode = ClassStreamMethodNode = ray_dag.ClassMethodNode
+
+    class ClassNode(ray_dag.ClassNode):
+        def execute(self, *args, _ray_cache_refs=False, **kwargs):
+            return Actor(
+                super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
+            )
+
+        @property
+        def methods(self):
+            return self
