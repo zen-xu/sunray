@@ -31,6 +31,7 @@ _T7 = TypeVar("_T7")
 _T8 = TypeVar("_T8")
 _T9 = TypeVar("_T9")
 _In = TypeVar("_In")
+_Ins = TypeVarTuple("_Ins")
 _Outs = TypeVarTuple("_Outs")
 _Out = TypeVar("_Out")
 _Out0 = TypeVar("_Out0")
@@ -45,24 +46,36 @@ _Out8 = TypeVar("_Out8")
 _Out9 = TypeVar("_Out9")
 
 
-class DAGNode(Generic[_In, Unpack[_Outs]]): ...
+class Ins(Generic[Unpack[_Ins]]): ...
 
 
-class FunctionNode(ray_dag.FunctionNode, DAGNode[_In, _Out]):
-    def execute(  # type: ignore[override]
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.ObjectRef[_Out]:
-        return super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)  # type: ignore[return-value]
+class Outs(Generic[Unpack[_Outs]]): ...
 
 
-class StreamNode(ray_dag.FunctionNode, DAGNode[_In, _Out]):
-    def execute(  # type: ignore[override]
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.ObjectRefGenerator[_Out]:
-        return super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)  # type: ignore[return-value]
+_InsT = TypeVar("_InsT", bound=Ins)
+_OutsT = TypeVar("_OutsT", bound=Outs)
 
 
-class ClassNode(ray_dag.ClassNode, DAGNode[_In, _Out]):
+class DAGNode(Generic[_InsT, _OutsT]): ...
+
+
+class FunctionNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
+    if TYPE_CHECKING:
+
+        def execute(  # type: ignore[override]
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRef[_Out]: ...
+
+
+class StreamNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
+    if TYPE_CHECKING:
+
+        def execute(  # type: ignore[override]
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
+
+
+class ClassNode(ray_dag.ClassNode, DAGNode[_InsT, Outs[_Out]]):
     @property
     def methods(self) -> type[_Out]:
         return self  # type: ignore[return-value]
@@ -74,25 +87,28 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_In, _Out]):
         return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
 
 
-class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_In, _Out]):
-    def execute(  # type: ignore[override]
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.ObjectRef[_Out]:
-        return super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)  # type: ignore[return-value]
+class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
+    if TYPE_CHECKING:
+
+        def execute(  # type: ignore[override]
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRef[_Out]: ...
 
 
-class ClassStreamMethodNode(ray_dag.ClassMethodNode, DAGNode[_In, _Out]):
-    def execute(  # type: ignore[override]
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.ObjectRefGenerator[_Out]:
-        return super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)  # type: ignore[return-value]
+class ClassStreamMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
+    if TYPE_CHECKING:
+
+        def execute(  # type: ignore[override]
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
 
 
-class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_In, _Out]):
-    def execute(  # type: ignore[override]
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.ObjectRef[_Out]:
-        return super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)  # type: ignore[return-value]
+class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_InsT, Outs[_Out]]):
+    if TYPE_CHECKING:
+
+        def execute(  # type: ignore[override]
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRef[_Out]: ...
 
 
 _AttrT = TypeVar("_AttrT")
@@ -104,201 +120,337 @@ _Ts = TypeVarTuple("_Ts")
 
 class InputNode(
     ray_dag.InputNode,
-    DAGNode[_In, _In],
+    DAGNode[Ins[_In], Outs[_In]],
     Generic[_In, Unpack[_Ts]],
 ):
-    @overload
-    def __class_getitem__(cls, t: type[_In]) -> type[InputNode[_In]]: ...
+    if TYPE_CHECKING:
 
-    @overload
-    def __class_getitem__(
-        cls, t: type[_In], attr: type[_AttrT]
-    ) -> type[InputNode[_In, _AttrT]]: ...
+        @overload
+        def __class_getitem__(cls, t: type[_In]) -> type[InputNode[_In]]: ...
 
-    @overload
-    def __class_getitem__(
-        cls, t: type[_In], attr: type[_AttrT], get_item: type[_GetItemT]
-    ) -> type[InputNode[_In, _AttrT, _GetItemT]]: ...
+        @overload
+        def __class_getitem__(
+            cls, t: type[_In], attr: type[_AttrT]
+        ) -> type[InputNode[_In, _AttrT]]: ...
 
-    def __class_getitem__(cls, t, attr=None, get_item=None):
-        return InputNode
+        @overload
+        def __class_getitem__(
+            cls, t: type[_In], attr: type[_AttrT], get_item: type[_GetItemT]
+        ) -> type[InputNode[_In, _AttrT, _GetItemT]]: ...
 
-    @overload
-    def __getattr__(self: InputNode[_In], key: str) -> InputAttributeNode[_In, Any]: ...
+        def __class_getitem__(cls, t, attr=None, get_item=None):
+            return InputNode
 
-    @overload
-    def __getattr__(
-        self: InputNode[_In, _AttrT], key: str
-    ) -> InputAttributeNode[_In, _AttrT]: ...
+        @overload
+        def __getattr__(
+            self: InputNode[_In], key: str
+        ) -> InputAttributeNode[Ins[_In], Outs[Any]]: ...
 
-    @overload
-    def __getattr__(
-        self: InputNode[_In, _AttrT, Any], key: str
-    ) -> InputAttributeNode[_In, _AttrT]: ...
+        @overload
+        def __getattr__(
+            self: InputNode[_In, _AttrT], key: str
+        ) -> InputAttributeNode[Ins[_In], Outs[_AttrT]]: ...
 
-    def __getattr__(self, key):
-        return super().__getattr__(key)
+        @overload
+        def __getattr__(
+            self: InputNode[_In, _AttrT, Any], key: str
+        ) -> InputAttributeNode[Ins[_In], Outs[_AttrT]]: ...
 
-    def __getitem__(
-        self: InputNode[_In, _AttrT, _GetItemT], key: int | str
-    ) -> InputAttributeNode[_In, _GetItemT]:
-        return super().__getitem__(key)
+        def __getattr__(self, key): ...  # type: ignore[overload]
 
-    def __enter__(self) -> Self:
-        return super().__enter__()
+        def __getitem__(
+            self: InputNode[_In, _AttrT, _GetItemT], key: int | str
+        ) -> InputAttributeNode[Ins[_In], Outs[_GetItemT]]: ...
 
-
-OutputArg = Union[DAGNode[_In, _Out], _In]
+        def __enter__(self) -> Self: ...
 
 
-class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
-    @overload
-    def __new__(
-        cls,
-        args: tuple[DAGNode[_In, _Out0]],
-        other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_In, _Out0]: ...
+OutputArg = Union[DAGNode[Ins[_In], Outs[_Out]], _In]
 
+
+class MultiOutputNode(DAGNode[_InsT, _OutsT]):
     @overload
     def __new__(
         cls,
-        args: tuple[OutputArg[_In, _Out0], OutputArg[_In, _Out1]],
+        args: tuple[DAGNode[Ins[()], Outs[_Out0]]],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_In, _Out0, _Out1]: ...
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0]]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0], OutputArg[_In, _Out1], OutputArg[_In, _Out2]
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_In, _Out0, _Out1, _Out2]: ...
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0, _Out1]]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3]: ...
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2]]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2, _Out3]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+            DAGNode[Ins[()], Outs[_Out5]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+            DAGNode[Ins[()], Outs[_Out5]],
+            DAGNode[Ins[()], Outs[_Out6]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _In,
-        _Out0,
-        _Out1,
-        _Out2,
-        _Out3,
-        _Out4,
+        Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]
     ]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
-            OutputArg[_In, _Out5],
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+            DAGNode[Ins[()], Outs[_Out5]],
+            DAGNode[Ins[()], Outs[_Out6]],
+            DAGNode[Ins[()], Outs[_Out7]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _In,
-        _Out0,
-        _Out1,
-        _Out2,
-        _Out3,
-        _Out4,
-        _Out5,
+        Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]
     ]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
-            OutputArg[_In, _Out5],
-            OutputArg[_In, _Out6],
-        ],
-        other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]: ...
-
-    @overload
-    def __new__(
-        cls,
-        args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
-            OutputArg[_In, _Out5],
-            OutputArg[_In, _Out6],
-            OutputArg[_In, _Out7],
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+            DAGNode[Ins[()], Outs[_Out5]],
+            DAGNode[Ins[()], Outs[_Out6]],
+            DAGNode[Ins[()], Outs[_Out7]],
+            DAGNode[Ins[()], Outs[_Out8]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7
+        Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8]
     ]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
-            OutputArg[_In, _Out5],
-            OutputArg[_In, _Out6],
-            OutputArg[_In, _Out7],
-            OutputArg[_In, _Out8],
+            DAGNode[Ins[()], Outs[_Out0]],
+            DAGNode[Ins[()], Outs[_Out1]],
+            DAGNode[Ins[()], Outs[_Out2]],
+            DAGNode[Ins[()], Outs[_Out3]],
+            DAGNode[Ins[()], Outs[_Out4]],
+            DAGNode[Ins[()], Outs[_Out5]],
+            DAGNode[Ins[()], Outs[_Out6]],
+            DAGNode[Ins[()], Outs[_Out7]],
+            DAGNode[Ins[()], Outs[_Out8]],
+            DAGNode[Ins[()], Outs[_Out9]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8
+        Ins[()],
+        Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9],
+    ]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[DAGNode[Ins[_In], Outs[_Out0]]],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0, _Out1]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+            DAGNode[Ins[_In], Outs[_Out5]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+            DAGNode[Ins[_In], Outs[_Out5]],
+            DAGNode[Ins[_In], Outs[_Out6]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[
+        Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]
     ]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[
-            OutputArg[_In, _Out0],
-            OutputArg[_In, _Out1],
-            OutputArg[_In, _Out2],
-            OutputArg[_In, _Out3],
-            OutputArg[_In, _Out4],
-            OutputArg[_In, _Out5],
-            OutputArg[_In, _Out6],
-            OutputArg[_In, _Out7],
-            OutputArg[_In, _Out8],
-            OutputArg[_In, _Out9],
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+            DAGNode[Ins[_In], Outs[_Out5]],
+            DAGNode[Ins[_In], Outs[_Out6]],
+            DAGNode[Ins[_In], Outs[_Out7]],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9
+        Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]
+    ]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+            DAGNode[Ins[_In], Outs[_Out5]],
+            DAGNode[Ins[_In], Outs[_Out6]],
+            DAGNode[Ins[_In], Outs[_Out7]],
+            DAGNode[Ins[_In], Outs[_Out8]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[
+        Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8]
+    ]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            DAGNode[Ins[_In], Outs[_Out0]],
+            DAGNode[Ins[_In], Outs[_Out1]],
+            DAGNode[Ins[_In], Outs[_Out2]],
+            DAGNode[Ins[_In], Outs[_Out3]],
+            DAGNode[Ins[_In], Outs[_Out4]],
+            DAGNode[Ins[_In], Outs[_Out5]],
+            DAGNode[Ins[_In], Outs[_Out6]],
+            DAGNode[Ins[_In], Outs[_Out7]],
+            DAGNode[Ins[_In], Outs[_Out8]],
+            DAGNode[Ins[_In], Outs[_Out9]],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[
+        Ins[_In],
+        Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9],
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
@@ -308,7 +460,109 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0],
+            self: MultiOutputNode[Ins[()], Outs[_Out0]],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Ins[()], Outs[_Out0, _Out1]],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0, _Out1]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2]],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0, _Out1, _Out2]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2, _Out3]],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0, _Out1, _Out2, _Out3]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4]],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0, _Out1, _Out2, _Out3, _Out4]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5]
+            ],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]
+            ],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]
+        ]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Ins[()], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]
+            ],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]
+        ]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Ins[()],
+                Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8],
+            ],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8]
+        ]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Ins[()],
+                Outs[
+                    _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9
+                ],
+            ],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9]
+        ]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Ins[_In], Outs[_Out0]],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -317,7 +571,7 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1],
+            self: MultiOutputNode[Ins[_In], Outs[_Out0, _Out1]],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -326,7 +580,7 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1, _Out2],
+            self: MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2]],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -335,7 +589,7 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3],
+            self: MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3]],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -344,7 +598,7 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3, _Out4],
+            self: MultiOutputNode[Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4]],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -353,7 +607,9 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5],
+            self: MultiOutputNode[
+                Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5]
+            ],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -362,7 +618,9 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 
         @overload
         def execute(
-            self: MultiOutputNode[_In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6],
+            self: MultiOutputNode[
+                Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6]
+            ],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -374,7 +632,7 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
         @overload
         def execute(
             self: MultiOutputNode[
-                _In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7
+                Ins[_In], Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]
             ],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
@@ -387,7 +645,8 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
         @overload
         def execute(
             self: MultiOutputNode[
-                _In, _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8
+                Ins[_In],
+                Outs[_Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8],
             ],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
@@ -400,17 +659,10 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
         @overload
         def execute(
             self: MultiOutputNode[
-                _In,
-                _Out0,
-                _Out1,
-                _Out2,
-                _Out3,
-                _Out4,
-                _Out5,
-                _Out6,
-                _Out7,
-                _Out8,
-                _Out9,
+                Ins[_In],
+                Outs[
+                    _Out0, _Out1, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7, _Out8, _Out9
+                ],
             ],
             __arg0: _In | sunray.ObjectRef[_In],
             *,
@@ -427,13 +679,14 @@ class MultiOutputNode(DAGNode[_In, Unpack[_Outs]]):
 _NodeT = TypeVar("_NodeT", bound=DAGNode)
 _Callable_co = TypeVar("_Callable_co", covariant=True, bound=Callable)
 BindArg = Union[
-    "DAGNode[_In, _T]",
-    "sunray.ObjectRef[_T]",
     _T,
+    "DAGNode[_InsT, Outs[_T]]",
+    "sunray.ObjectRef[_T]",
 ]
 
 
 class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
+    # ============ Stream Node ============
     @overload
     def __call__(
         self: BindCallable[
@@ -444,20 +697,19 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
-        __arg9: BindArg[_In, _T9],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
+        __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
-
+    ) -> StreamNode[Ins[()], _Out]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -468,18 +720,18 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -491,17 +743,17 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -513,16 +765,16 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -534,15 +786,15 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -554,14 +806,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -573,13 +825,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -591,12 +843,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -608,11 +860,11 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -624,10 +876,205 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             StreamNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
+        __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> StreamNode[_In, _Out]: ...
+    ) -> StreamNode[Ins[()], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        __arg9: BindArg[_T9, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            StreamNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> StreamNode[Ins[_In], _Out]: ...
 
     @overload
     def __call__(
@@ -640,6 +1087,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         **kwargs: _P.kwargs,
     ) -> StreamNode[Any, _Out]: ...
 
+    # # ============ Function Node ============
     @overload
     def __call__(
         self: BindCallable[
@@ -650,20 +1098,19 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
-        __arg9: BindArg[_In, _T9],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
+        __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
-
+    ) -> FunctionNode[Ins[()], _Out]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -674,18 +1121,18 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -697,17 +1144,17 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -719,16 +1166,16 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -740,15 +1187,15 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -760,14 +1207,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -779,13 +1226,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -797,12 +1244,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -814,11 +1261,11 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -830,10 +1277,205 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             FunctionNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
+        __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> FunctionNode[_In, _Out]: ...
+    ) -> FunctionNode[Ins[()], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        __arg9: BindArg[_T9, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            FunctionNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> FunctionNode[Ins[_In], _Out]: ...
 
     @overload
     def __call__(
@@ -846,6 +1488,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         **kwargs: _P.kwargs,
     ) -> FunctionNode[Any, _Out]: ...
 
+    # # ============ Class Node ============
     @overload
     def __call__(
         self: BindCallable[
@@ -856,20 +1499,19 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
-        __arg9: BindArg[_In, _T9],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
+        __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
-
+    ) -> ClassNode[Ins[()], _Out]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -880,18 +1522,18 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -903,17 +1545,17 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -925,16 +1567,16 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -946,15 +1588,15 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -966,14 +1608,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -985,13 +1627,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1003,12 +1645,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1020,11 +1662,11 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1036,10 +1678,205 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
+        __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[_In, _Out]: ...
+    ) -> ClassNode[Ins[()], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        __arg9: BindArg[_T9, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            ClassNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassNode[Ins[_In], _Out]: ...
 
     @overload
     def __call__(
@@ -1052,6 +1889,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         **kwargs: _P.kwargs,
     ) -> ClassNode[Any, _Out]: ...
 
+    # # ============ Class Method Node ============
     @overload
     def __call__(
         self: BindCallable[
@@ -1062,20 +1900,19 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
-        __arg9: BindArg[_In, _T9],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
+        __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
-
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -1086,18 +1923,18 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1109,17 +1946,17 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1131,16 +1968,16 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1152,15 +1989,15 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1172,14 +2009,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1191,13 +2028,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1209,12 +2046,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1226,11 +2063,11 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1242,10 +2079,205 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
+        __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassMethodNode[_In, _Out]: ...
+    ) -> ClassMethodNode[Ins[()], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        __arg9: BindArg[_T9, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            ClassMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassMethodNode[Ins[_In], _Out]: ...
 
     @overload
     def __call__(
@@ -1258,6 +2290,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         **kwargs: _P.kwargs,
     ) -> ClassMethodNode[Any, _Out]: ...
 
+    # # ============ Class Stream Method Node ============
     @overload
     def __call__(
         self: BindCallable[
@@ -1268,20 +2301,19 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
-        __arg9: BindArg[_In, _T9],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
+        __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
-
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -1292,18 +2324,18 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
-        __arg8: BindArg[_In, _T8],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
+        __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1315,17 +2347,17 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
-        __arg7: BindArg[_In, _T7],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
+        __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1337,16 +2369,16 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
-        __arg6: BindArg[_In, _T6],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
+        __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1358,15 +2390,15 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
-        __arg5: BindArg[_In, _T5],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
+        __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1378,14 +2410,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
-        __arg4: BindArg[_In, _T4],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
+        __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1397,13 +2429,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
-        __arg3: BindArg[_In, _T3],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
+        __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1415,12 +2447,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
-        __arg2: BindArg[_In, _T2],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
+        __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1432,11 +2464,11 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
-        __arg1: BindArg[_In, _T1],
+        __arg0: BindArg[_T0, Ins[()]],
+        __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
 
     @overload
     def __call__(
@@ -1448,10 +2480,205 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
             ClassStreamMethodNode,
             _Out,
         ],
-        __arg0: BindArg[_In, _T0],
+        __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassStreamMethodNode[_In, _Out]: ...
+    ) -> ClassStreamMethodNode[Ins[()], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        __arg9: BindArg[_T9, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        __arg8: BindArg[_T8, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        __arg7: BindArg[_T7, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        __arg6: BindArg[_T6, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        __arg5: BindArg[_T5, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        __arg4: BindArg[_T4, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        __arg3: BindArg[_T3, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        __arg2: BindArg[_T2, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        __arg1: BindArg[_T1, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            ClassStreamMethodNode,
+            _Out,
+        ],
+        __arg0: BindArg[_T0, Ins[_In]],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> ClassStreamMethodNode[Ins[_In], _Out]: ...
 
     @overload
     def __call__(
