@@ -16,6 +16,8 @@ from sunray import ActorMixin
 from sunray import remote_method
 from sunray._internal.actor_mixin import ActorMethodWrapper
 from sunray._internal.actor_mixin import add_var_keyword_to_klass
+from sunray.dag import InputNode
+from sunray.dag import MultiOutputNode
 
 
 class Demo(ActorMixin, num_cpus=1, concurrency_groups={"group1": 1}):
@@ -270,3 +272,28 @@ def test_async_stream_bind(init_ray):
     a1 = Actor.new_actor().bind()
     node = a1.methods.gen.bind(3)
     assert [sunray.get(ref) for ref in node.execute()] == list(range(3))
+
+
+def test_reuse_ray_actor_in_dag(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self):
+            self.forwarded = 0
+
+        @sunray.remote_method
+        def forward(self, input_data: int) -> float:
+            self.forwarded += 1
+            return input_data + 1.0
+
+        @sunray.remote_method
+        def num_forwarded(self) -> int:
+            return self.forwarded
+
+    worker = Worker.new_actor().remote()
+
+    with InputNode[int]() as input_data:
+        dag = MultiOutputNode((worker.methods.forward.bind(input_data),))
+
+    assert sunray.get(dag.execute(1)) == (2,)
+    assert sunray.get(dag.execute(2)) == (3,)
+    assert sunray.get(dag.execute(3)) == (4,)
+    assert sunray.get(worker.methods.num_forwarded.remote()) == 3

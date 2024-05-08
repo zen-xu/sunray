@@ -254,7 +254,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         return RemoteFunctionWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:
-        bind: BindCallable[_Callable_co, FunctionNode[_R]]
+        bind: BindCallable[_Callable_co, FunctionNode, _R]
     else:
 
         def bind(self, *args, **kwargs):
@@ -287,7 +287,7 @@ class RemoteStream(RemoteStreamWrapper[_Callable_co, _R]):
         return RemoteStreamWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:
-        bind: BindCallable[_Callable_co, StreamNode[_R]]
+        bind: BindCallable[_Callable_co, StreamNode, _R]
     else:
 
         def bind(self, *args, **kwargs):

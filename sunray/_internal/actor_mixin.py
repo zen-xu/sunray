@@ -83,7 +83,7 @@ class ActorClass(Generic[_P, _ClassT]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[Callable[_P, _ClassT], Actor[_ClassT]]
-        bind: BindCallable[Callable[_P, _ClassT], ClassNode[_ClassT]]
+        bind: BindCallable[Callable[_P, _ClassT], ClassNode, _ClassT]
     else:
 
         def remote(self, *args, **kwargs):
@@ -152,6 +152,9 @@ class ActorMethodProxy:
 
         return self.actor_method.options(**options)
 
+    def bind(self, *args, **kwargs):
+        return self.actor_method.bind(*args, **kwargs)
+
 
 class Actor(Generic[_ClassT]):
     def __init__(self, actor_handle: ActorHandle):
@@ -188,7 +191,7 @@ if TYPE_CHECKING:
 
     class Method(Generic[_P, _Ret]):
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRef[_Ret]]
-        bind: BindCallable[Callable[_P, _Ret], ClassMethodNode[_Ret]]
+        bind: BindCallable[Callable[_P, _Ret], ClassMethodNode, _Ret]
 
         @overload
         def options(
@@ -372,7 +375,7 @@ if TYPE_CHECKING:
 
     class AsyncMethod(Generic[_P, _Ret]):
         remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], ObjectRef[_Ret]]
-        bind: BindCallable[Callable[_P, Awaitable[_Ret]], ClassMethodNode[_Ret]]
+        bind: BindCallable[Callable[_P, Awaitable[_Ret]], ClassMethodNode, _Ret]
 
         @overload
         def options(
@@ -559,7 +562,7 @@ if TYPE_CHECKING:
 
     class StreamMethod(Generic[_P, _Ret, _YieldItem]):
         remote: RemoteCallable[Callable[_P, _Ret], ObjectRefGenerator[_YieldItem]]
-        bind: BindCallable[Callable[_P, _Ret], ClassStreamMethodNode[_YieldItem]]
+        bind: BindCallable[Callable[_P, _Ret], ClassStreamMethodNode, _YieldItem]
 
         def options(
             self, **options: Unpack[MethodOptions]
