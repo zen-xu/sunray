@@ -223,6 +223,9 @@ def test_bind(init_ray):
         def get(self) -> int:
             return self.i
 
+    a0 = Actor.new_actor().bind(10).execute()
+    assert isinstance(a0, sunray.Actor)
+
     a1 = Actor.new_actor().bind(10)
     val = a1.methods.get.bind()
     assert sunray.get(val.execute()) == 10
