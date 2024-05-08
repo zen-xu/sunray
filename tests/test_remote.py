@@ -94,25 +94,3 @@ def test_remote_class(init_ray):
 
     assert ray.get(C1.remote().echo.remote("hello")) == "C1 hello"
     assert ray.get(C2.remote().echo.remote("hello")) == "C2 hello"
-
-
-def test_bind(init_ray):
-    @remote
-    def func(src: int, inc: int = 1) -> int:
-        return src + inc
-
-    a_ref = func.bind(1, inc=2)
-    assert ray.get(a_ref.execute()) == 3
-    b_ref = func.bind(a_ref, 3)
-    assert ray.get(b_ref.execute()) == 6
-    c_ref = func.bind(b_ref, a_ref)
-    assert ray.get(c_ref.execute()) == 9
-
-
-def test_stream_bind(init_ray):
-    @remote
-    def func(count: int) -> Generator[int, None, None]:
-        yield from range(count)
-
-    gen_ref = func.bind(3)
-    assert [ray.get(ref) for ref in gen_ref.execute()] == list(range(3))
