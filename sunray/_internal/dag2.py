@@ -82,6 +82,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[sunray.ObjectRef[_O0]]: ...
@@ -89,6 +90,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[sunray.ObjectRef[_O0], sunray.ObjectRef[_O1]]: ...
@@ -117,6 +119,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -130,6 +133,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -144,6 +148,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -159,6 +164,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -175,6 +181,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -194,6 +201,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
             self: DAGNode[
                 NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
             ],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -212,6 +220,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[NoInput, Out[_O]],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> sunray.ObjectRef[_O]: ...
@@ -221,7 +230,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -230,7 +239,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -239,7 +248,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -250,7 +259,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -263,7 +272,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -278,7 +287,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -294,7 +303,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -311,7 +320,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -329,7 +338,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -350,7 +359,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
             self: DAGNode[
                 In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
             ],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -370,7 +379,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[In[_I], Out[_O]],
-            __arg: ExecArg[_I],
+            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -391,6 +400,7 @@ class _StreamLikeNode(DAGNode[_InT, Yield[_O]]):
         @overload
         def execute(
             self: DAGNode[NoInput, Any],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> sunray.ObjectRefGenerator[_O]: ...
@@ -398,7 +408,8 @@ class _StreamLikeNode(DAGNode[_InT, Yield[_O]]):
         @overload
         def execute(
             self: DAGNode[In[_I], Any],
-            __arg0: ExecArg[_I],
+            __in: ExecArg[_I],
+            *,
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> sunray.ObjectRefGenerator[_O]: ...
@@ -424,6 +435,7 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
     @overload
     def execute(
         self: DAGNode[NoInput, Any],
+        *,
         _ray_cache_refs: bool = False,
         **kwargs,
     ) -> sunray.Actor[_ActorT]: ...
@@ -431,7 +443,8 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
     @overload
     def execute(
         self: DAGNode[In[_I], Any],
-        __arg0: ExecArg[_I],
+        __in: ExecArg[_I],
+        *,
         _ray_cache_refs: bool = False,
         **kwargs,
     ) -> sunray.Actor[_ActorT]: ...
@@ -451,3 +464,28 @@ class ClassMethodNode(  # type: ignore[misc]
 class ClassStreamNode(  # type: ignore[misc]
     _StreamLikeNode[_InT, _O], ray_dag.ClassMethodNode
 ): ...
+
+
+class InputAttributeNode(  # type: ignore[misc]
+    ray_dag.InputAttributeNode, DAGNode[_InT, Out[_T]]
+):
+    if TYPE_CHECKING:
+
+        @overload
+        def execute(
+            self: DAGNode[NoInput, Any],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _T: ...
+
+        @overload
+        def execute(
+            self: DAGNode[In[_I], Any],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _T: ...
+
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
