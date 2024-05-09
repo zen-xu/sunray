@@ -76,7 +76,7 @@ ExecArg = Union[_T, "sunray.ObjectRef[_T]", "DAGNode[Any, Out[_T]]"]
 class DAGNode(Generic[_InT, _OutT]): ...
 
 
-class FunctionNode(ray_dag.FunctionNode, DAGNode[_InT, _OutT]):
+class _FunctionLikeNode(DAGNode[_InT, _OutT]):
     if TYPE_CHECKING:
         # ==== without input ====
         @overload
@@ -379,6 +379,12 @@ class FunctionNode(ray_dag.FunctionNode, DAGNode[_InT, _OutT]):
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
 
 
+class FunctionNode(  # type: ignore[misc]
+    _FunctionLikeNode[_InT, _OutT],
+    ray_dag.FunctionNode,
+): ...
+
+
 class StreamNode(ray_dag.FunctionNode, DAGNode[_InT, Yield[_O]]):
     if TYPE_CHECKING:
 
@@ -430,3 +436,9 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
     ) -> sunray.Actor[_ActorT]:
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
         return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
+
+
+class ClassMethodNode(  # type: ignore[misc]
+    _FunctionLikeNode[_InT, _OutT],
+    ray_dag.ClassMethodNode,
+): ...
