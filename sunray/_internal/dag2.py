@@ -385,7 +385,7 @@ class FunctionNode(  # type: ignore[misc]
 ): ...
 
 
-class StreamNode(ray_dag.FunctionNode, DAGNode[_InT, Yield[_O]]):
+class _StreamLikeNode(DAGNode[_InT, Yield[_O]]):
     if TYPE_CHECKING:
 
         @overload
@@ -406,6 +406,11 @@ class StreamNode(ray_dag.FunctionNode, DAGNode[_InT, Yield[_O]]):
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRefGenerator[_O]: ...
+
+
+class StreamNode(  # type: ignore[misc]
+    _StreamLikeNode[_InT, _O], ray_dag.FunctionNode
+): ...
 
 
 _ActorT = TypeVar("_ActorT", bound=sunray.ActorMixin)
@@ -439,6 +444,10 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
 
 
 class ClassMethodNode(  # type: ignore[misc]
-    _FunctionLikeNode[_InT, _OutT],
-    ray_dag.ClassMethodNode,
+    _FunctionLikeNode[_InT, _OutT], ray_dag.ClassMethodNode
+): ...
+
+
+class ClassStreamNode(  # type: ignore[misc]
+    _StreamLikeNode[_InT, _O], ray_dag.ClassMethodNode
 ): ...
