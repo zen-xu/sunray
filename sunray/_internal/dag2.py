@@ -62,7 +62,7 @@ class Out(_BaseOut, Generic[_O]): ...
 class Outs(_BaseOut, Generic[Unpack[_Os]]): ...
 
 
-class Gen(_BaseOut, Generic[_O]): ...
+class Yield(_BaseOut, Generic[_O]): ...
 
 
 _InT = TypeVar("_InT", bound=In, covariant=True)
@@ -380,3 +380,26 @@ class FunctionNode(ray_dag.FunctionNode, DAGNode[_InT, _OutT]):
         ) -> sunray.ObjectRef[_O]: ...
 
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
+
+
+class StreamNode(ray_dag.FunctionNode, DAGNode[_InT, Yield[_O]]):
+    if TYPE_CHECKING:
+
+        @overload
+        def execute(
+            self: StreamNode[NoInput, Any],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_O]: ...
+
+        @overload
+        def execute(
+            self: StreamNode[In[_I], Any],
+            __arg0: ExecArg[_I],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_O]: ...
+
+        def execute(
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> sunray.ObjectRefGenerator[_O]: ...
