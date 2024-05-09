@@ -677,7 +677,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0]],
+            self: DAGNode[In[_I] | NoIn, Outs[_O0]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -686,7 +686,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1]],
+            self: DAGNode[In[_I] | NoIn, Outs[_O0, _O1]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -695,7 +695,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2]],
+            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -704,7 +704,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3]],
+            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -713,7 +713,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4]],
+            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -722,7 +722,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -731,7 +731,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            self: MultiOutputNode[
+                In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]
+            ],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -740,7 +742,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            self: MultiOutputNode[
+                In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]
+            ],
             __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
@@ -750,7 +754,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I],
+                In[_I] | NoIn,
                 Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
             ],
             __in: ExecArg[_I],
@@ -762,7 +766,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I],
+                In[_I] | NoIn,
                 Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
             ],
             __in: ExecArg[_I],
