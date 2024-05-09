@@ -111,3 +111,66 @@
   out: |
     main:9: note: Revealed type is "sunray._internal.dag.StreamNode[sunray._internal.dag.Ins[()], builtins.int]"
     main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
+
+- case: input_node_sequence
+  main: |
+    from sunray.dag import InputNode
+
+    with InputNode[list[int]]() as node:
+        v = node[2]
+        reveal_type(v)
+        reveal_type(node.a)
+    ret = v.execute([1, 2, 3])
+    reveal_type(ret)
+  out: |
+    main:5: note: Revealed type is "sunray._internal.dag.InputAttributeNode[sunray._internal.dag.Ins[builtins.list[builtins.int]], builtins.int]"
+    main:6: note: Revealed type is "Any"
+    main:8: note: Revealed type is "builtins.int"
+
+- case: input_node_mapping
+  main: |
+    from sunray.dag import InputNode
+
+    with InputNode[dict[str, int]]() as node:
+        v = node["a"]
+        reveal_type(v)
+        reveal_type(node.a)
+    ret = v.execute({"a": 2})
+    reveal_type(ret)
+  out: |
+    main:5: note: Revealed type is "sunray._internal.dag.InputAttributeNode[sunray._internal.dag.Ins[builtins.dict[builtins.str, builtins.int]], builtins.int]"
+    main:6: note: Revealed type is "Any"
+    main:8: note: Revealed type is "builtins.int"
+
+- case: multi_output_node
+  main: |
+    import sunray
+
+    from sunray.dag import InputNode
+    from sunray.dag import MultiOutputNode
+
+    class Worker(sunray.ActorMixin):
+        def __init__(self):
+            self.forwarded = 0
+
+        @sunray.remote_method
+        def forward(self, input_data: int) -> float:
+            self.forwarded += 1
+            return input_data + 1.0
+
+        @sunray.remote_method
+        def num_forwarded(self) -> int:
+            return self.forwarded
+
+    worker = Worker.new_actor().remote()
+
+    with InputNode[int]() as input_data:
+        dag = MultiOutputNode((worker.methods.forward.bind(input_data),))
+
+    reveal_type(dag)
+    reveal_type(dag.execute(1))
+    reveal_type(worker.methods.num_forwarded.remote())
+  out: |
+    main:24: note: Revealed type is "sunray._internal.dag.MultiOutputNode[sunray._internal.dag.Ins[builtins.int], sunray._internal.dag.Outs[sunray._internal.core.ObjectRef[builtins.float]]]"
+    main:25: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[sunray._internal.core.ObjectRef[builtins.float]]]"
+    main:26: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
