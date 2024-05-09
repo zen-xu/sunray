@@ -5,12 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generic
+from typing import Mapping
+from typing import Sequence
 from typing import TypeVar
 from typing import Union
 from typing import overload
 
 from ray import dag as ray_dag
 from typing_extensions import ParamSpec
+from typing_extensions import Self
 from typing_extensions import TypeVarTuple
 from typing_extensions import Unpack
 
@@ -30,8 +33,8 @@ _T7 = TypeVar("_T7")
 _T8 = TypeVar("_T8")
 _T9 = TypeVar("_T9")
 
-_I = TypeVar("_I")
-_O = TypeVar("_O")
+_I = TypeVar("_I", covariant=True)
+_O = TypeVar("_O", covariant=True)
 _O0 = TypeVar("_O0")
 _O1 = TypeVar("_O1")
 _O2 = TypeVar("_O2")
@@ -489,3 +492,49 @@ class InputAttributeNode(  # type: ignore[misc]
         ) -> _T: ...
 
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
+
+
+_K = TypeVar("_K")
+_V = TypeVar("_V")
+
+
+class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
+    if TYPE_CHECKING:
+
+        def __getattr__(self, key) -> Any: ...
+
+        @overload
+        def __getitem__(
+            self: InputNode[Mapping[_K, _V]], key: _K
+        ) -> InputAttributeNode[In[_I], _V]: ...
+
+        @overload
+        def __getitem__(
+            self: InputNode[Sequence[_V]], key: int
+        ) -> InputAttributeNode[In[_I], _V]: ...
+
+        @overload
+        def __getitem__(self, key) -> InputAttributeNode[In[_I], Any]: ...
+
+        def __getitem__(self, key) -> Any: ...
+
+        def __enter__(self) -> Self: ...
+
+        @overload
+        def execute(
+            self: DAGNode[NoInput, Any],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _I: ...
+
+        @overload
+        def execute(
+            self: DAGNode[In[_I], Any],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _I: ...
+
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _I: ...
