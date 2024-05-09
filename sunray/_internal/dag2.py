@@ -14,9 +14,7 @@ from typing_extensions import ParamSpec
 from typing_extensions import TypeVarTuple
 from typing_extensions import Unpack
 
-
-if TYPE_CHECKING:
-    import sunray
+import sunray
 
 
 _P = ParamSpec("_P")
@@ -63,6 +61,9 @@ class Outs(_BaseOut, Generic[Unpack[_Os]]): ...
 
 
 class Yield(_BaseOut, Generic[_O]): ...
+
+
+class Actor(_BaseOut, Generic[_T]): ...
 
 
 _InT = TypeVar("_InT", bound=In, covariant=True)
@@ -403,3 +404,33 @@ class StreamNode(ray_dag.FunctionNode, DAGNode[_InT, Yield[_O]]):
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRefGenerator[_O]: ...
+
+
+_ActorT = TypeVar("_ActorT", bound=sunray.ActorMixin)
+
+
+class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
+    @property
+    def methods(self) -> type[_ActorT]:
+        return self  # type: ignore[return-value]
+
+    @overload
+    def execute(
+        self: ClassNode[NoInput, Any],
+        _ray_cache_refs: bool = False,
+        **kwargs,
+    ) -> sunray.Actor[_ActorT]: ...
+
+    @overload
+    def execute(
+        self: ClassNode[In[_I], Any],
+        __arg0: ExecArg[_I],
+        _ray_cache_refs: bool = False,
+        **kwargs,
+    ) -> sunray.Actor[_ActorT]: ...
+
+    def execute(
+        self, *args, _ray_cache_refs: bool = False, **kwargs
+    ) -> sunray.Actor[_ActorT]:
+        handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
+        return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
