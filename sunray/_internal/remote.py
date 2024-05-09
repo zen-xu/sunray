@@ -14,6 +14,8 @@ import ray.actor
 from ray import remote_function as ray_func
 from typing_extensions import ParamSpec
 
+from .dag import FunctionNode
+from .dag import StreamNode
 from .util import get_num_returns
 
 
@@ -28,8 +30,6 @@ if TYPE_CHECKING:
     from .core import ObjectRef
     from .core import ObjectRefGenerator
     from .dag import BindCallable
-    from .dag import FunctionNode
-    from .dag import StreamNode
     from .typing import FunctionRemoteOptions
     from .typing import RemoteCallable
 
@@ -67,7 +67,7 @@ class RemoteFunctionWrapper(Generic[_Callable_co, _RemoteRet]):
             return self._remote_func.options(**opts).remote(*args, **kwargs)
 
         def bind(self, *args, **kwargs):
-            return self._remote_func.bind(*args, **kwargs)
+            return FunctionNode(self._remote_func._function, args, kwargs, self._opts)
 
 
 class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
@@ -274,6 +274,7 @@ class RemoteStreamWrapper(Generic[_Callable_co, _R]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[_Callable_co, ObjectRefGenerator[_R]]
+        bind: BindCallable[_Callable_co, StreamNode, _R]
     else:
 
         def remote(self, *args, **kwargs):
@@ -281,6 +282,12 @@ class RemoteStreamWrapper(Generic[_Callable_co, _R]):
             opts["num_returns"] = "streaming"
 
             return self._remote_func.options(**opts).remote(*args, **kwargs)
+
+        def bind(self, *args, **kwargs):
+            opts = dict(self._opts)
+            opts["num_returns"] = "streaming"
+
+            return StreamNode(self._remote_func._function, args, kwargs, self._opts)
 
 
 class RemoteStream(RemoteStreamWrapper[_Callable_co, _R]):
@@ -290,9 +297,7 @@ class RemoteStream(RemoteStreamWrapper[_Callable_co, _R]):
         opts = {**self._opts, **opts}
         return RemoteStreamWrapper(self._remote_func, opts)
 
-    if TYPE_CHECKING:
-        bind: BindCallable[_Callable_co, StreamNode, _R]
-    else:
+    if not TYPE_CHECKING:
 
         def bind(self, *args, **kwargs):
             return self._remote_func.bind(*args, **kwargs)

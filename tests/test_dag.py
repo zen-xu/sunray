@@ -15,12 +15,22 @@ def test_func_bind(init_ray):
         return src + inc
 
     a_ref = func.bind(1, inc=2)
-    a_ref.execute()
     assert sunray.get(a_ref.execute()) == 3
     b_ref = func.bind(a_ref, 3)
     assert sunray.get(b_ref.execute()) == 6
     c_ref = func.bind(b_ref, a_ref)
     assert sunray.get(c_ref.execute()) == 9
+
+
+def test_func_option_bind(init_ray):
+    @sunray.remote
+    def func(v: str) -> str:
+        import os
+
+        return f'{os.environ.get("ARG", "1")} + {v}'
+
+    a_ref = func.options(runtime_env={"env_vars": {"ARG": "3"}}).bind("1")
+    assert sunray.get(a_ref.execute()) == "3 + 1"
 
 
 def test_stream_bind(init_ray):
@@ -30,6 +40,18 @@ def test_stream_bind(init_ray):
 
     gen_ref = func.bind(3)
     assert [sunray.get(ref) for ref in gen_ref.execute()] == list(range(3))
+
+
+def test_stream_option_bind(init_ray):
+    @sunray.remote
+    def func(count: int) -> Generator[str, None, None]:
+        import os
+
+        prefix = os.environ["PREFIX"]
+        yield from (f"{prefix}: {v}" for v in range(count))
+
+    a_ref = func.options(runtime_env={"env_vars": {"PREFIX": "test"}}).bind(3)
+    assert sunray.get(list(a_ref.execute())) == ("test: 0", "test: 1", "test: 2")
 
 
 def test_actor_bind(init_ray):
@@ -63,6 +85,21 @@ def test_actor_bind(init_ray):
 
     dag = combine.bind(a1.methods.get.bind(), a2.methods.get.bind())
     assert sunray.get(dag.execute()) == 32
+
+
+def test_actor_option_bind(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self, v: int):
+            import os
+
+            self.v = int(os.environ.get("ARG", "1")) + v
+
+        @sunray.remote_method
+        def get_v(self) -> int:
+            return self.v
+
+    a = Worker.new_actor().options(runtime_env={"env_vars": {"ARG": "3"}}).bind(2)
+    assert sunray.get(a.methods.get_v.bind().execute()) == 3 + 2
 
 
 def test_actor_async_method_bind(init_ray):
