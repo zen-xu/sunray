@@ -121,3 +121,102 @@ def test_reuse_ray_actor_in_dag(init_ray):
     assert sunray.get(dag.execute(2)) == (3,)
     assert sunray.get(dag.execute(3)) == (4,)
     assert sunray.get(worker.methods.num_forwarded.remote()) == 3
+
+
+def test_func_with_input_data(init_ray):
+    @sunray.remote
+    def func(v: int) -> int:
+        return v + 1
+
+    with InputNode[int]() as input_data:
+        dag = func.bind(input_data)
+
+    assert sunray.get(dag.execute(1)) == 2
+    ref = sunray.put(1)
+    assert sunray.get(dag.execute(ref)) == 2
+
+
+def test_stream_with_input_data(init_ray):
+    @sunray.remote
+    def func(v: int) -> Generator[int, None, None]:
+        yield from range(v)
+
+    with InputNode[int]() as input_data:
+        dag = func.bind(input_data)
+
+    assert sunray.get(list(dag.execute(3))) == tuple(range(3))
+    ref = sunray.put(3)
+    assert sunray.get(list(dag.execute(ref))) == tuple(range(3))
+
+
+def test_actor_method_with_input_data(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self, v: int) -> None:
+            self.v = v
+
+        @sunray.remote_method
+        def add(self, v: int) -> int:
+            return self.v + v
+
+    a1 = Worker.new_actor().bind(1)
+    with InputNode[int]() as input_data:
+        dag = a1.methods.add.bind(input_data)
+
+    assert sunray.get(dag.execute(1)) == 2
+    ref = sunray.put(2)
+    assert sunray.get(dag.execute(ref)) == 3
+
+
+def test_actor_async_method_with_input_data(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self, v: int) -> None:
+            self.v = v
+
+        @sunray.remote_method
+        async def add(self, v: int) -> int:
+            return self.v + v
+
+    a1 = Worker.new_actor().bind(1)
+    with InputNode[int]() as input_data:
+        dag = a1.methods.add.bind(input_data)
+
+    assert sunray.get(dag.execute(1)) == 2
+    ref = sunray.put(2)
+    assert sunray.get(dag.execute(ref)) == 3
+
+
+def test_actor_stream_with_input_data(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self, v: int) -> None:
+            self.v = v
+
+        @sunray.remote_method
+        def gen(self, v: int) -> Generator[int, None, None]:
+            yield from range(v)
+
+    a1 = Worker.new_actor().bind(1)
+    with InputNode[int]() as input_data:
+        dag = a1.methods.gen.bind(input_data)
+
+    assert sunray.get(list(dag.execute(2))) == tuple(range(2))
+    ref = sunray.put(2)
+    assert sunray.get(list(dag.execute(ref))) == tuple(range(2))
+
+
+def test_actor_async_stream_with_input_data(init_ray):
+    class Worker(sunray.ActorMixin):
+        def __init__(self, v: int) -> None:
+            self.v = v
+
+        @sunray.remote_method
+        async def gen(self, v: int) -> AsyncGenerator[int, None]:
+            for i in range(v):
+                yield i
+
+    a1 = Worker.new_actor().bind(1)
+    with InputNode[int]() as input_data:
+        dag = a1.methods.gen.bind(input_data)
+
+    assert sunray.get(list(dag.execute(2))) == tuple(range(2))
+    ref = sunray.put(2)
+    assert sunray.get(list(dag.execute(ref))) == tuple(range(2))

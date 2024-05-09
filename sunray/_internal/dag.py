@@ -46,6 +46,9 @@ _Out8 = TypeVar("_Out8")
 _Out9 = TypeVar("_Out9")
 
 
+ExecArg = Union[_T, "sunray.ObjectRef[_T]"]
+
+
 class Ins(Generic[Unpack[_Ins]]): ...
 
 
@@ -62,7 +65,22 @@ class DAGNode(Generic[_InsT, _OutsT]): ...
 class FunctionNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
     if TYPE_CHECKING:
 
-        def execute(  # type: ignore[override]
+        @overload  # type: ignore[override]
+        def execute(
+            self: FunctionNode[Ins[()], _Out],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        @overload
+        def execute(
+            self: FunctionNode[Ins[_In], _Out],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRef[_Out]: ...
 
@@ -70,7 +88,22 @@ class FunctionNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
 class StreamNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
     if TYPE_CHECKING:
 
-        def execute(  # type: ignore[override]
+        @overload  # type: ignore[override]
+        def execute(
+            self: StreamNode[Ins[()], _Out],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
+
+        @overload
+        def execute(
+            self: StreamNode[Ins[_In], _Out],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
+
+        def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRefGenerator[_Out]: ...
 
@@ -80,7 +113,22 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InsT, Outs[_Out]]):
     def methods(self) -> type[_Out]:
         return self  # type: ignore[return-value]
 
-    def execute(  # type: ignore[override]
+    @overload  # type: ignore[override]
+    def execute(
+        self: ClassNode[Ins[()], _Out],
+        _ray_cache_refs: bool = False,
+        **kwargs,
+    ) -> sunray.Actor[_Out]: ...
+
+    @overload
+    def execute(
+        self: ClassNode[Ins[_In], _Out],
+        __arg0: ExecArg[_In],
+        _ray_cache_refs: bool = False,
+        **kwargs,
+    ) -> sunray.Actor[_Out]: ...
+
+    def execute(
         self, *args, _ray_cache_refs: bool = False, **kwargs
     ) -> sunray.Actor[_Out]:
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
@@ -90,6 +138,21 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InsT, Outs[_Out]]):
 class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
     if TYPE_CHECKING:
 
+        @overload  # type: ignore[override]
+        def execute(
+            self: ClassMethodNode[Ins[()], _Out],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        @overload
+        def execute(
+            self: ClassMethodNode[Ins[_In], _Out],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
         def execute(  # type: ignore[override]
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRef[_Out]: ...
@@ -98,7 +161,22 @@ class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
 class ClassStreamMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
     if TYPE_CHECKING:
 
-        def execute(  # type: ignore[override]
+        @overload  # type: ignore[override]
+        def execute(
+            self: ClassStreamMethodNode[Ins[()], _Out],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
+
+        @overload
+        def execute(
+            self: ClassStreamMethodNode[Ins[_In], _Out],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
+
+        def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRefGenerator[_Out]: ...
 
@@ -106,7 +184,22 @@ class ClassStreamMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]])
 class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_InsT, Outs[_Out]]):
     if TYPE_CHECKING:
 
-        def execute(  # type: ignore[override]
+        @overload  # type: ignore[override]
+        def execute(
+            self: InputAttributeNode[Ins[()], _Out],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        @overload
+        def execute(
+            self: InputAttributeNode[Ins[_In], _Out],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
         ) -> sunray.ObjectRef[_Out]: ...
 
