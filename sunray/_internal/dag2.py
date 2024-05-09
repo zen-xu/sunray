@@ -539,3 +539,326 @@ class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
         ) -> _I: ...
 
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _I: ...
+
+
+MoArg = DAGNode[_InT, Out[_O]]
+
+
+class MultiOutputNode(DAGNode[_InT, _OutT]):
+    @overload
+    def __new__(
+        cls,
+        args: tuple[MoArg[_InT, _O0]],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[MoArg[_InT, _O0], MoArg[_InT, _O1]],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[MoArg[_InT, _O0], MoArg[_InT, _O1], MoArg[_InT, _O2]],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0], MoArg[_InT, _O1], MoArg[_InT, _O2], MoArg[_InT, _O3]
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+            MoArg[_InT, _O5],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+            MoArg[_InT, _O5],
+            MoArg[_InT, _O6],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+            MoArg[_InT, _O5],
+            MoArg[_InT, _O6],
+            MoArg[_InT, _O7],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+            MoArg[_InT, _O5],
+            MoArg[_InT, _O6],
+            MoArg[_InT, _O7],
+            MoArg[_InT, _O8],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]]: ...
+
+    @overload
+    def __new__(
+        cls,
+        args: tuple[
+            MoArg[_InT, _O0],
+            MoArg[_InT, _O1],
+            MoArg[_InT, _O2],
+            MoArg[_InT, _O3],
+            MoArg[_InT, _O4],
+            MoArg[_InT, _O5],
+            MoArg[_InT, _O6],
+            MoArg[_InT, _O7],
+            MoArg[_InT, _O8],
+            MoArg[_InT, _O9],
+        ],
+        other_args_to_resolve: dict[str, Any] | None = None,
+    ) -> MultiOutputNode[
+        _InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+    ]: ...
+
+    def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
+        return ray_dag.MultiOutputNode(args, other_args_to_resolve)  # type: ignore[return-value]
+
+    if TYPE_CHECKING:
+
+        @overload
+        def execute(
+            self: DAGNode[In[_I], Outs[_O0]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0]]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[In[_I], Outs[_O0, _O1]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                In[_I],
+                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
+            ],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                In[_I],
+                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
+            ],
+            __in: ExecArg[_I],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[Any, Outs[_O0]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0]]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[Any, Outs[_O0, _O1]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Any,
+                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
+            ],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]]: ...
+
+        @overload
+        def execute(
+            self: MultiOutputNode[
+                Any,
+                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
+            ],
+            *args,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[
+            tuple[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+        ]: ...
+
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
