@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Generic
+from typing import Mapping
+from typing import Sequence
 from typing import TypeVar
 from typing import Union
 from typing import overload
@@ -32,7 +34,7 @@ _T6 = TypeVar("_T6")
 _T7 = TypeVar("_T7")
 _T8 = TypeVar("_T8")
 _T9 = TypeVar("_T9")
-_In = TypeVar("_In")
+_In = TypeVar("_In", covariant=True)
 _Ins = TypeVarTuple("_Ins")
 _Outs = TypeVarTuple("_Outs")
 _Out = TypeVar("_Out")
@@ -209,56 +211,26 @@ class InputAttributeNode(  # type: ignore[misc]
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
 
 
-_AttrT = TypeVar("_AttrT")
-_GetItemT = TypeVar("_GetItemT")
+_K = TypeVar("_K")
+_V = TypeVar("_V")
 
 
-_Ts = TypeVarTuple("_Ts")
-
-
-class InputNode(
-    ray_dag.InputNode,
-    DAGNode[Ins[_In], Outs[_In]],
-    Generic[_In, Unpack[_Ts]],
-):
+class InputNode(ray_dag.InputNode, DAGNode[Ins[_In], Outs[_In]]):
     if TYPE_CHECKING:
 
-        @overload
-        def __class_getitem__(cls, t: type[_In]) -> type[InputNode[_In]]: ...
+        def __getattr__(self, key) -> Any: ...
 
         @overload
-        def __class_getitem__(
-            cls, t: type[_In], attr: type[_AttrT]
-        ) -> type[InputNode[_In, _AttrT]]: ...
-
-        @overload
-        def __class_getitem__(
-            cls, t: type[_In], attr: type[_AttrT], get_item: type[_GetItemT]
-        ) -> type[InputNode[_In, _AttrT, _GetItemT]]: ...
-
-        def __class_getitem__(cls, t, attr=None, get_item=None):
-            return InputNode
-
-        @overload
-        def __getattr__(
-            self: InputNode[_In], key: str
-        ) -> InputAttributeNode[Ins[_In], Outs[Any]]: ...
-
-        @overload
-        def __getattr__(
-            self: InputNode[_In, _AttrT], key: str
-        ) -> InputAttributeNode[Ins[_In], Outs[_AttrT]]: ...
-
-        @overload
-        def __getattr__(
-            self: InputNode[_In, _AttrT, Any], key: str
-        ) -> InputAttributeNode[Ins[_In], Outs[_AttrT]]: ...
-
-        def __getattr__(self, key): ...  # type: ignore[overload]
-
         def __getitem__(
-            self: InputNode[_In, _AttrT, _GetItemT], key: int | str
-        ) -> InputAttributeNode[Ins[_In], Outs[_GetItemT]]: ...
+            self: InputNode[Mapping[_K, _V]], key: _K
+        ) -> InputAttributeNode[Ins[_In], _V]: ...
+
+        @overload
+        def __getitem__(
+            self: InputNode[Sequence[_V]], key: int
+        ) -> InputAttributeNode[Ins[_In], _V]: ...
+
+        def __getitem__(self, key) -> Any: ...
 
         def __enter__(self) -> Self: ...
 
