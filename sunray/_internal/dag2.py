@@ -48,10 +48,13 @@ _O9 = TypeVar("_O9")
 _Os = TypeVarTuple("_Os")
 
 
-class In(Generic[_I]): ...
+class _BaseIn: ...
 
 
-class NoInput(In): ...
+class In(_BaseIn, Generic[_I]): ...
+
+
+class NoIn(_BaseIn): ...
 
 
 class _BaseOut: ...
@@ -69,7 +72,7 @@ class Yield(_BaseOut, Generic[_O]): ...
 class Actor(_BaseOut, Generic[_T]): ...
 
 
-_InT = TypeVar("_InT", bound=In, covariant=True)
+_InT = TypeVar("_InT", bound=_BaseIn, covariant=True)
 _OutT = TypeVar("_OutT", bound=_BaseOut, covariant=True)
 _OutsT = TypeVar("_OutsT", bound=Outs, covariant=True)
 
@@ -84,7 +87,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         # ==== without input ====
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0]],
+            self: DAGNode[NoIn, Outs[_O0]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -92,7 +95,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1]],
+            self: DAGNode[NoIn, Outs[_O0, _O1]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -100,7 +103,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2]],
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -109,7 +112,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3]],
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -121,7 +124,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -135,7 +138,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -150,7 +153,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -166,7 +169,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -183,7 +186,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -201,9 +204,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[
-                NoInput, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
-            ],
+            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -222,7 +223,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Out[_O]],
+            self: DAGNode[NoIn, Out[_O]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -402,7 +403,7 @@ class _StreamLikeNode(DAGNode[_InT, Yield[_O]]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Any],
+            self: DAGNode[NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -437,7 +438,7 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
 
     @overload
     def execute(
-        self: DAGNode[NoInput, Any],
+        self: DAGNode[NoIn, Any],
         *,
         _ray_cache_refs: bool = False,
         **kwargs,
@@ -476,7 +477,7 @@ class InputAttributeNode(  # type: ignore[misc]
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Any],
+            self: DAGNode[NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -522,7 +523,7 @@ class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
 
         @overload
         def execute(
-            self: DAGNode[NoInput, Any],
+            self: DAGNode[NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
