@@ -59,11 +59,15 @@ class RemoteFunctionWrapper(Generic[_Callable_co, _RemoteRet]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[_Callable_co, _RemoteRet]
+        bind: BindCallable[_Callable_co, FunctionNode, _RemoteRet]
     else:
 
         def remote(self, *args, **kwargs):
             opts = dict(self._opts)
             return self._remote_func.options(**opts).remote(*args, **kwargs)
+
+        def bind(self, *args, **kwargs):
+            return self._remote_func.bind(*args, **kwargs)
 
 
 class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
@@ -254,7 +258,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
         return RemoteFunctionWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:
-        bind: BindCallable[_Callable_co, FunctionNode, _R]
+        bind: BindCallable[_Callable_co, FunctionNode, ObjectRef[_R]]
     else:
 
         def bind(self, *args, **kwargs):

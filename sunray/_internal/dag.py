@@ -1,3 +1,5 @@
+# mypy: disable-error-code="override"
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -62,146 +64,149 @@ _OutsT = TypeVar("_OutsT", bound=Outs)
 class DAGNode(Generic[_InsT, _OutsT]): ...
 
 
-class FunctionNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
+class FunctionNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_T]]):
     if TYPE_CHECKING:
-
-        @overload  # type: ignore[override]
-        def execute(
-            self: FunctionNode[Ins[()], _Out],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
 
         @overload
         def execute(
-            self: FunctionNode[Ins[_In], _Out],
-            __arg0: ExecArg[_In],
+            self: FunctionNode[Ins[()], Any],
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
-
-        def execute(
-            self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRef[_Out]: ...
-
-
-class StreamNode(ray_dag.FunctionNode, DAGNode[_InsT, Outs[_Out]]):
-    if TYPE_CHECKING:
-
-        @overload  # type: ignore[override]
-        def execute(
-            self: StreamNode[Ins[()], _Out],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> _T: ...
 
         @overload
         def execute(
-            self: StreamNode[Ins[_In], _Out],
+            self: FunctionNode[Ins[_In], Any],
             __arg0: ExecArg[_In],
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> _T: ...
+
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
+
+
+class StreamNode(
+    ray_dag.FunctionNode, DAGNode[_InsT, Outs["sunray.ObjectRefGenerator[_T]"]]
+):
+    if TYPE_CHECKING:
+
+        @overload
+        def execute(
+            self: StreamNode[Ins[()], Any],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_T]: ...
+
+        @overload
+        def execute(
+            self: StreamNode[Ins[_In], Any],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_T]: ...
 
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> sunray.ObjectRefGenerator[_T]: ...
 
 
-class ClassNode(ray_dag.ClassNode, DAGNode[_InsT, Outs[_Out]]):
+_ActorT = TypeVar("_ActorT")
+
+
+class ClassNode(ray_dag.ClassNode, DAGNode[_InsT, Outs[sunray.Actor[_ActorT]]]):
     @property
-    def methods(self) -> type[_Out]:
+    def methods(self) -> type[_ActorT]:
         return self  # type: ignore[return-value]
-
-    @overload  # type: ignore[override]
-    def execute(
-        self: ClassNode[Ins[()], _Out],
-        _ray_cache_refs: bool = False,
-        **kwargs,
-    ) -> sunray.Actor[_Out]: ...
 
     @overload
     def execute(
-        self: ClassNode[Ins[_In], _Out],
+        self: ClassNode[Ins[()], Any],
+        _ray_cache_refs: bool = False,
+        **kwargs,
+    ) -> sunray.Actor[_ActorT]: ...
+
+    @overload
+    def execute(
+        self: ClassNode[Ins[_In], Any],
         __arg0: ExecArg[_In],
         _ray_cache_refs: bool = False,
         **kwargs,
-    ) -> sunray.Actor[_Out]: ...
+    ) -> sunray.Actor[_ActorT]: ...
 
     def execute(
         self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.Actor[_Out]:
+    ) -> sunray.Actor[_ActorT]:
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
         return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
 
 
-class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
+class ClassMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_T]]):
     if TYPE_CHECKING:
-
-        @overload  # type: ignore[override]
-        def execute(
-            self: ClassMethodNode[Ins[()], _Out],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
 
         @overload
         def execute(
-            self: ClassMethodNode[Ins[_In], _Out],
-            __arg0: ExecArg[_In],
+            self: ClassMethodNode[Ins[()], Any],
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
-
-        def execute(  # type: ignore[override]
-            self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRef[_Out]: ...
-
-
-class ClassStreamMethodNode(ray_dag.ClassMethodNode, DAGNode[_InsT, Outs[_Out]]):
-    if TYPE_CHECKING:
-
-        @overload  # type: ignore[override]
-        def execute(
-            self: ClassStreamMethodNode[Ins[()], _Out],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> _T: ...
 
         @overload
         def execute(
-            self: ClassStreamMethodNode[Ins[_In], _Out],
+            self: ClassMethodNode[Ins[_In], Any],
             __arg0: ExecArg[_In],
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> _T: ...
 
-        def execute(
-            self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
 
 
-class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_InsT, Outs[_Out]]):
+class ClassStreamMethodNode(
+    ray_dag.ClassMethodNode, DAGNode[_InsT, Outs["sunray.ObjectRefGenerator[_T]"]]
+):
     if TYPE_CHECKING:
-
-        @overload  # type: ignore[override]
-        def execute(
-            self: InputAttributeNode[Ins[()], _Out],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
 
         @overload
         def execute(
-            self: InputAttributeNode[Ins[_In], _Out],
+            self: ClassStreamMethodNode[Ins[()], Any],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRefGenerator[_T]: ...
+
+        @overload
+        def execute(
+            self: ClassStreamMethodNode[Ins[_In], Any],
             __arg0: ExecArg[_In],
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
+        ) -> sunray.ObjectRefGenerator[_T]: ...
 
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRef[_Out]: ...
+        ) -> sunray.ObjectRefGenerator[_T]: ...
+
+
+class InputAttributeNode(  # type: ignore[misc]
+    ray_dag.InputAttributeNode, DAGNode[_InsT, Outs[_T]]
+):
+    if TYPE_CHECKING:
+
+        @overload
+        def execute(
+            self: InputAttributeNode[Ins[()], Any],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _T: ...
+
+        @overload
+        def execute(
+            self: InputAttributeNode[Ins[_In], Any],
+            __arg0: ExecArg[_In],
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> _T: ...
+
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
 
 
 _AttrT = TypeVar("_AttrT")
@@ -773,8 +778,9 @@ _NodeT = TypeVar("_NodeT", bound=DAGNode)
 _Callable_co = TypeVar("_Callable_co", covariant=True, bound=Callable)
 BindArg = Union[
     _T,
-    "DAGNode[_InsT, Outs[_T]]",
     "sunray.ObjectRef[_T]",
+    "DAGNode[_InsT, Outs[_T]]",
+    "DAGNode[_InsT, Outs[sunray.ObjectRef[_T]]]",
 ]
 
 
@@ -1590,7 +1596,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1604,7 +1610,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg9: BindArg[_T9, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
     @overload
     def __call__(
         self: BindCallable[
@@ -1613,7 +1619,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1626,7 +1632,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg8: BindArg[_T8, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1636,7 +1642,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1648,7 +1654,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg7: BindArg[_T7, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1658,7 +1664,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1669,7 +1675,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg6: BindArg[_T6, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1679,7 +1685,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1689,7 +1695,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg5: BindArg[_T5, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1699,7 +1705,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1708,7 +1714,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg4: BindArg[_T4, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1718,7 +1724,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
@@ -1726,7 +1732,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg3: BindArg[_T3, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1736,14 +1742,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
         __arg2: BindArg[_T2, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1753,13 +1759,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         __arg1: BindArg[_T1, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1769,12 +1775,12 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[()]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[()], _Out]: ...
+    ) -> ClassNode[Ins[()], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1784,7 +1790,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1798,7 +1804,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg9: BindArg[_T9, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1808,7 +1814,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1821,7 +1827,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg8: BindArg[_T8, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1831,7 +1837,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1843,7 +1849,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg7: BindArg[_T7, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1853,7 +1859,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1864,7 +1870,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg6: BindArg[_T6, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1874,7 +1880,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1884,7 +1890,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg5: BindArg[_T5, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1894,7 +1900,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1903,7 +1909,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg4: BindArg[_T4, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1913,7 +1919,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
@@ -1921,7 +1927,7 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
         __arg3: BindArg[_T3, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1931,14 +1937,14 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
         __arg2: BindArg[_T2, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1948,13 +1954,13 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         __arg1: BindArg[_T1, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
@@ -1964,23 +1970,23 @@ class BindCallable(Generic[_Callable_co, _NodeT, _Out]):
                 Any,
             ],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         __arg0: BindArg[_T0, Ins[_In]],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Ins[_In], _Out]: ...
+    ) -> ClassNode[Ins[_In], _ActorT]: ...
 
     @overload
     def __call__(
         self: BindCallable[
             Callable[_P, Any],
             ClassNode,
-            _Out,
+            _ActorT,
         ],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> ClassNode[Any, _Out]: ...
+    ) -> ClassNode[Any, _ActorT]: ...
 
     # # ============ Class Method Node ============
     @overload

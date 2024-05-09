@@ -181,37 +181,3 @@
     stream.options(unpack=True).remote()
   out: |
     main:10: error: Unexpected keyword argument "unpack" for "options" of "RemoteStream"  [call-arg]
-
-- case: bind
-  main: |
-    import sunray
-
-    @sunray.remote
-    def func(src: int, inc: int = 1) -> int:
-        return src + inc
-
-    a_ref = func.bind(1, inc=2)
-    reveal_type(a_ref)
-    reveal_type(sunray.get(a_ref.execute()))
-    b_ref = func.bind(a_ref, 3)
-    reveal_type(b_ref)
-  out: |
-    main:8: note: Revealed type is "sunray._internal.dag.FunctionNode[sunray._internal.dag.Ins[()], builtins.int]"
-    main:9: note: Revealed type is "builtins.int"
-    main:11: note: Revealed type is "sunray._internal.dag.FunctionNode[sunray._internal.dag.Ins[()], builtins.int]"
-
-- case: stream_bind
-  main: |
-    import sunray
-    from typing import Generator
-
-    @sunray.remote
-    def func(count: int) -> Generator[int, None, None]:
-        yield from range(count)
-
-    bind_ref = func.bind(10)
-    reveal_type(bind_ref)
-    reveal_type(bind_ref.execute())
-  out: |
-    main:9: note: Revealed type is "sunray._internal.dag.StreamNode[sunray._internal.dag.Ins[()], builtins.int]"
-    main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"

@@ -15,6 +15,7 @@ def test_func_bind(init_ray):
         return src + inc
 
     a_ref = func.bind(1, inc=2)
+    a_ref.execute()
     assert sunray.get(a_ref.execute()) == 3
     b_ref = func.bind(a_ref, 3)
     assert sunray.get(b_ref.execute()) == 6
