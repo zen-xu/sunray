@@ -10,7 +10,8 @@ from typing import overload
 
 from typing_extensions import Concatenate
 from typing_extensions import ParamSpec
-from typing_extensions import TypeVarTuple
+
+from . import dag2 as dag
 
 
 if TYPE_CHECKING:
@@ -29,7 +30,6 @@ _T6 = TypeVar("_T6")
 _T7 = TypeVar("_T7")
 _T8 = TypeVar("_T8")
 _T9 = TypeVar("_T9")
-_Ts = TypeVarTuple("_Ts")
 
 RemoteArg = Union[_T, "sunray.ObjectRef[_T]"]
 
@@ -232,3 +232,776 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
     ) -> _RemoteRet: ...
 
     def __call__(self, *args: Any, **kwds: Any) -> Any: ...
+
+
+_BindRet = TypeVar("_BindRet", covariant=True)
+BindArg = Union[
+    _T,
+    "sunray.ObjectRef[_T]",
+    "dag.DAGNode[dag._InT, dag.Out[_T]]",
+]
+
+
+class BindCallable(Generic[_Callable_co, _BindRet]): ...
+
+
+class FunctionNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        __arg9: BindArg[_T9, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        __arg9: BindArg[_T9, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[Callable[_P, Any], Any],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.FunctionNode[dag.NoIn, dag._OutT]: ...
+
+    def __call__(self, *args, **kwargs) -> Any: ...
+
+
+class ClassMethodNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        __arg9: BindArg[_T9, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        __arg9: BindArg[_T9, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.In[dag._I], dag._OutT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[Callable[_P, Any], Any],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
+
+    def __call__(self, *args, **kwargs) -> Any: ...
