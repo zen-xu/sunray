@@ -21,7 +21,7 @@
   out: |
     main:14: note: Revealed type is "sunray._internal.dag.ClassNode[sunray._internal.io.NoIn, sunray._internal.io.Actor[main.Actor]]"
     main:15: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
-    main:16: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:16: note: Revealed type is "builtins.int"
 
 - case: actor_bind_async
   main: |
@@ -57,7 +57,7 @@
     val = a1.methods.gen.bind(10)
     reveal_type(val)
   out: |
-    main:12: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[sunray._internal.core.ObjectRefGenerator[builtins.int]]]"
+    main:12: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
 
 - case: actor_bind_async_stream
   main: |
@@ -170,6 +170,6 @@
     reveal_type(dag.execute(1))
     reveal_type(worker.methods.num_forwarded.remote())
   out: |
-    main:24: note: Revealed type is "sunray._internal.dag.MultiOutputNode[sunray._internal.dag.Ins[builtins.int], sunray._internal.dag.Outs[sunray._internal.core.ObjectRef[builtins.float]]]"
-    main:25: note: Revealed type is "sunray._internal.core.ObjectRef[tuple[sunray._internal.core.ObjectRef[builtins.float]]]"
+    main:24: note: Revealed type is "sunray._internal.dag.MultiOutputNode[sunray._internal.io.In[builtins.int], sunray._internal.io.Outs[sunray._internal.core.ObjectRef[builtins.float]]]"
+    main:25: note: Revealed type is "tuple[sunray._internal.core.ObjectRef[builtins.float]]"
     main:26: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
