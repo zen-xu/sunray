@@ -29,6 +29,9 @@ jobs:
   unit-tests:
     name: unit test ${{ matrix.os }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.image }}
+    concurrency:
+      group: tests-${{ matrix.os }}-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     strategy:
       matrix:
         os: [Ubuntu, macOS]
