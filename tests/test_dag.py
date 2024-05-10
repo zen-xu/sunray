@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import AsyncGenerator
 from typing import Generator
 
+import pytest
+
 import sunray
 
 from sunray.dag import InputNode
@@ -33,15 +35,17 @@ def test_func_option_bind(init_ray):
     assert sunray.get(a_ref.execute()) == "3 + 1"
 
 
+@pytest.mark.min_ray_version(2, 10)
 def test_stream_bind(init_ray):
     @sunray.remote
     def func(count: int) -> Generator[int, None, None]:
         yield from range(count)
 
     gen_ref = func.bind(3)
-    assert [sunray.get(ref) for ref in gen_ref.execute()] == list(range(3))
+    assert sunray.get(list(gen_ref.execute())) == tuple(range(3))
 
 
+@pytest.mark.min_ray_version(2, 10)
 def test_stream_option_bind(init_ray):
     @sunray.remote
     def func(count: int) -> Generator[str, None, None]:
@@ -136,6 +140,7 @@ def test_actor_async_stream_bind(init_ray):
     assert [sunray.get(ref) for ref in node.execute()] == list(range(3))
 
 
+@pytest.mark.min_ray_version(2, 10)
 def test_reuse_ray_actor_in_dag(init_ray):
     class Worker(sunray.ActorMixin):
         def __init__(self):
@@ -174,6 +179,7 @@ def test_func_with_input_data(init_ray):
     assert sunray.get(dag.execute(ref)) == 2
 
 
+@pytest.mark.min_ray_version(2, 10)
 def test_stream_with_input_data(init_ray):
     @sunray.remote
     def func(v: int) -> Generator[int, None, None]:
