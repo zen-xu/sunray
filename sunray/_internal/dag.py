@@ -61,7 +61,6 @@ class Actor(_BaseOut, Generic[_T]): ...
 
 _InT = TypeVar("_InT", bound=_BaseIn, covariant=True)
 _OutT = TypeVar("_OutT", bound=_BaseOut, covariant=True)
-_OutsT = TypeVar("_OutsT", bound=Outs, covariant=True)
 
 ExecArg = Union[_T, "sunray.ObjectRef[_T]", "DAGNode[Any, Out[_T]]"]
 
