@@ -4,6 +4,7 @@ source = sunray
 omit =
     sunray/**/__init__.py
     sunray/_internal/typing.py
+    sunray/_internal/callable.py
 
 [report]
 skip_covered = True
@@ -13,6 +14,7 @@ exclude_lines =
     @overload( |$)
     def __repr__
     def __str__
+    import
 
     pragma: no cover
     if self\.debug

@@ -99,7 +99,7 @@
     def main(v: ObjectRef[str]):
         f.remote(v)
   out: |
-    main:8: error: Argument 1 to "__call__" of "RemoteCallable" has incompatible type "sunray._internal.core.ObjectRef[str]"; expected "int | ray._raylet.ObjectRef[int]"  [arg-type]
+    main:8: error: Argument 1 to "__call__" of "RemoteCallable" has incompatible type "ObjectRef[str]"; expected "int | ObjectRef[int]"  [arg-type]
 
 - case: invoke_options
   main: |
@@ -111,7 +111,7 @@
 
     reveal_type(f.options(num_cpus=1))
   out: |
-    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunctionWrapper[def () -> builtins.int, sunray._internal.core.ObjectRef[builtins.int]]"
+    main:7: note: Revealed type is "sunray._internal.remote.RemoteFunctionWrapper[def () -> builtins.int, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
 
 - case: default_return_tuple
   main: |
@@ -163,7 +163,7 @@
     reveal_type(stream_gen)
     reveal_type(next(stream_gen))
   out: |
-    main:8: note: Revealed type is "sunray._internal.remote.RemoteStream[def () -> typing.Generator[builtins.int, Any, Any], sunray._internal.core.ObjectRefGenerator[builtins.int]]"
+    main:8: note: Revealed type is "sunray._internal.remote.RemoteStream[def () -> typing.Generator[builtins.int, Any, Any], builtins.int]"
     main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
     main:11: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
 

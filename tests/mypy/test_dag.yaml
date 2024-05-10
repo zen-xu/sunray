@@ -1,0 +1,181 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typeddjango/pytest-mypy-plugins/master/pytest_mypy_plugins/schema.json
+
+- case: actor_bind
+  main: |
+    import sunray
+
+
+    class Actor(sunray.ActorMixin):
+        def __init__(self, init_value: int):
+            self.i = init_value
+
+        @sunray.remote_method
+        def add(self, v: int) -> int:
+            return self.i + v
+
+    a1 = Actor.new_actor().bind(10)
+    val = a1.methods.add.bind(1)
+    reveal_type(a1)
+    reveal_type(val)
+    reveal_type(sunray.get(val.execute()))
+  out: |
+    main:14: note: Revealed type is "sunray._internal.dag.ClassNode[sunray._internal.io.NoIn, sunray._internal.io.Actor[main.Actor]]"
+    main:15: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
+    main:16: note: Revealed type is "builtins.int"
+
+- case: actor_bind_async
+  main: |
+    import sunray
+
+
+    class Actor(sunray.ActorMixin):
+        def __init__(self, init_value: int):
+            self.i = init_value
+
+        @sunray.remote_method
+        async def add(self, v: int) -> int:
+            return self.i + v
+
+    a1 = Actor.new_actor().bind(10)
+    val = a1.methods.add.bind(1)
+    reveal_type(val)
+    reveal_type(sunray.get(val.execute()))
+  out: |
+    main:14: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
+    main:15: note: Revealed type is "builtins.int"
+
+- case: actor_bind_stream
+  main: |
+    import sunray
+    from typing import Generator
+
+
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        def gen(self, v: int) -> Generator[int, None, None]:
+            yield from range(v)
+
+    a1 = Actor.new_actor().bind()
+    val = a1.methods.gen.bind(10)
+    reveal_type(val)
+    reveal_type(next(val.execute()))
+  out: |
+    main:12: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
+    main:13: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: actor_bind_async_stream
+  main: |
+    import sunray
+    from typing import AsyncGenerator
+
+
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        async def gen(self, v: int) -> AsyncGenerator[int, None]:
+            for i in range(v):
+                yield i
+
+    a1 = Actor.new_actor().bind()
+    val = a1.methods.gen.bind(10)
+    reveal_type(val)
+    reveal_type(next(val.execute()))
+  out: |
+    main:13: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
+    main:14: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+- case: task_bind
+  main: |
+    import sunray
+
+    @sunray.remote
+    def func(src: int, inc: int = 1) -> int:
+        return src + inc
+
+    a_ref = func.bind(1, inc=2)
+    reveal_type(a_ref)
+    reveal_type(sunray.get(a_ref.execute()))
+    b_ref = func.bind(a_ref, 3)
+    reveal_type(b_ref)
+  out: |
+    main:8: note: Revealed type is "sunray._internal.dag.FunctionNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
+    main:9: note: Revealed type is "builtins.int"
+    main:11: note: Revealed type is "sunray._internal.dag.FunctionNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
+
+- case: stream_bind
+  main: |
+    import sunray
+    from typing import Generator
+
+    @sunray.remote
+    def func(count: int) -> Generator[int, None, None]:
+        yield from range(count)
+
+    bind_ref = func.bind(10)
+    reveal_type(bind_ref)
+    reveal_type(bind_ref.execute())
+  out: |
+    main:9: note: Revealed type is "sunray._internal.dag.StreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
+    main:10: note: Revealed type is "sunray._internal.core.ObjectRefGenerator[builtins.int]"
+
+- case: input_node_sequence
+  main: |
+    from sunray.dag import InputNode
+
+    with InputNode[list[int]]() as node:
+        v = node[2]
+        reveal_type(v)
+        reveal_type(node.a)
+    ret = v.execute([1, 2, 3])
+    reveal_type(ret)
+  out: |
+    main:5: note: Revealed type is "sunray._internal.dag.InputAttributeNode[sunray._internal.io.In[builtins.list[builtins.int]], builtins.int]"
+    main:6: note: Revealed type is "Any"
+    main:8: note: Revealed type is "builtins.int"
+
+- case: input_node_mapping
+  main: |
+    from sunray.dag import InputNode
+
+    with InputNode[dict[str, int]]() as node:
+        v = node["a"]
+        reveal_type(v)
+        reveal_type(node.a)
+    ret = v.execute({"a": 2})
+    reveal_type(ret)
+  out: |
+    main:5: note: Revealed type is "sunray._internal.dag.InputAttributeNode[sunray._internal.io.In[builtins.dict[builtins.str, builtins.int]], builtins.int]"
+    main:6: note: Revealed type is "Any"
+    main:8: note: Revealed type is "builtins.int"
+
+- case: multi_output_node
+  main: |
+    import sunray
+
+    from sunray.dag import InputNode
+    from sunray.dag import MultiOutputNode
+
+    class Worker(sunray.ActorMixin):
+        def __init__(self):
+            self.forwarded = 0
+
+        @sunray.remote_method
+        def forward(self, input_data: int) -> float:
+            self.forwarded += 1
+            return input_data + 1.0
+
+        @sunray.remote_method
+        def num_forwarded(self) -> int:
+            return self.forwarded
+
+    worker = Worker.new_actor().remote()
+
+    with InputNode[int]() as input_data:
+        dag = MultiOutputNode((worker.methods.forward.bind(input_data),))
+
+    reveal_type(dag)
+    reveal_type(dag.execute(1))
+    reveal_type(worker.methods.num_forwarded.remote())
+  out: |
+    main:24: note: Revealed type is "sunray._internal.dag.MultiOutputNode[sunray._internal.io.In[builtins.int], sunray._internal.io.Outs[sunray._internal.core.ObjectRef[builtins.float]]]"
+    main:25: note: Revealed type is "tuple[sunray._internal.core.ObjectRef[builtins.float]]"
+    main:26: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"

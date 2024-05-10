@@ -15,7 +15,7 @@ from sunray._internal.actor_mixin import ActorMethodWrapper
 from sunray._internal.actor_mixin import add_var_keyword_to_klass
 
 
-class Demo(ActorMixin, num_cpus=1, concurrency_groups={"group1": 1}):
+class Demo(ActorMixin, num_cpus=0, concurrency_groups={"group1": 1}):
     def __init__(self, init: int):
         self.init = init
 
@@ -125,7 +125,7 @@ def test_method_with_kwargs(demo_actor: Actor[Demo]):
     }
 
 
-def test_add_var_keyword_to_klass():
+def test_add_var_keyword_to_klass(init_ray):
     class C1:
         def __init__(self) -> None: ...
 
@@ -138,20 +138,20 @@ def test_add_var_keyword_to_klass():
     assert add_var_keyword_to_klass(C2).__init__ == origin_init
 
 
-def test_actor_without_default_options():
-    class Demo(ActorMixin): ...
+def test_actor_without_default_options(init_ray):
+    class Demo(ActorMixin, num_cpus=0): ...
 
     Demo.new_actor().remote()
 
 
-def test_actor_specify_empty_options():
-    class Demo(ActorMixin): ...
+def test_actor_specify_empty_options(init_ray):
+    class Demo(ActorMixin, num_cpus=0): ...
 
     Demo.new_actor().options().remote()
 
 
-def test_actor_method_wrapper():
-    class Demo(ActorMixin):
+def test_actor_method_wrapper(init_ray):
+    class Demo(ActorMixin, num_cpus=0):
         def __init__(self) -> None:
             self.init_v = 1
 
@@ -172,8 +172,8 @@ def test_actor_method_wrapper():
     assert ray.get(demo.methods.check_init_val_type.remote())
 
 
-def test_call_self_remote_method():
-    class Demo(ActorMixin):
+def test_call_self_remote_method(init_ray):
+    class Demo(ActorMixin, num_cpus=0):
         @remote_method
         async def f1(self) -> int:
             return 1
@@ -186,8 +186,8 @@ def test_call_self_remote_method():
     assert ray.get(actor.methods.f2.remote())
 
 
-def test_call_self_remote_method_with_options():
-    class Demo(ActorMixin, concurrency_groups={"a": 2, "b": 2}):
+def test_call_self_remote_method_with_options(init_ray):
+    class Demo(ActorMixin, num_cpus=0, concurrency_groups={"a": 2, "b": 2}):
         @remote_method(concurrency_group="a")
         async def f1(self) -> int:
             return 1
