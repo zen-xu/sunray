@@ -35,7 +35,7 @@ RemoteArg = Union[_T, "sunray.ObjectRef[_T]"]
 
 
 _Callable_co = TypeVar("_Callable_co", covariant=True, bound=Callable)
-_RemoteRet = TypeVar("_RemoteRet", covariant=True)
+_RemoteRet = TypeVar("_RemoteRet", covariant=True, bound=dag.Out)
 
 
 class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
@@ -46,7 +46,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -60,7 +60,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg9: RemoteArg[_T9],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -69,7 +69,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -82,7 +82,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg8: RemoteArg[_T8],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -91,7 +91,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -103,7 +103,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg7: RemoteArg[_T7],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -112,7 +112,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -123,7 +123,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg6: RemoteArg[_T6],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -132,7 +132,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -142,7 +142,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg5: RemoteArg[_T5],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -151,7 +151,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -160,7 +160,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg4: RemoteArg[_T4],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -169,7 +169,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _T3, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
@@ -177,7 +177,7 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg3: RemoteArg[_T3],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -186,14 +186,14 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _T2, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
         __arg2: RemoteArg[_T2],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -202,13 +202,13 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _T1, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         __arg1: RemoteArg[_T1],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
@@ -217,19 +217,22 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
                 Concatenate[_T0, _P],
                 Any,
             ],
-            Any,
+            dag.Out[_T],
         ],
         __arg0: RemoteArg[_T0],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     @overload
     def __call__(
-        self: RemoteCallable[Callable[_P, Any], Any],
+        self: RemoteCallable[
+            Callable[_P, Any],
+            dag.Out[_T],
+        ],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> _RemoteRet: ...
+    ) -> _T: ...
 
     def __call__(self, *args: Any, **kwds: Any) -> Any: ...
 
@@ -245,7 +248,7 @@ BindArg = Union[
 class BindCallable(Generic[_Callable_co, _BindRet]): ...
 
 
-class FunctionBind(BindCallable[_Callable_co, dag._OutT]):
+class FunctionBindCallable(BindCallable[_Callable_co, dag._OutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -626,7 +629,7 @@ class FunctionBind(BindCallable[_Callable_co, dag._OutT]):
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-class ClassMethodBind(BindCallable[_Callable_co, dag._OutT]):
+class ClassMethodBindCallable(BindCallable[_Callable_co, dag._OutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1010,7 +1013,7 @@ class ClassMethodBind(BindCallable[_Callable_co, dag._OutT]):
 _YieldT = TypeVar("_YieldT")
 
 
-class StreamBind(BindCallable[_Callable_co, _YieldT]):
+class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1391,7 +1394,7 @@ class StreamBind(BindCallable[_Callable_co, _YieldT]):
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-class ClassStreamBind(BindCallable[_Callable_co, _YieldT]):
+class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1772,10 +1775,10 @@ class ClassStreamBind(BindCallable[_Callable_co, _YieldT]):
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-_ActorT = TypeVar("_ActorT", bound="sunray.ActorMixin")
+_ActorT = TypeVar("_ActorT")
 
 
-class ClassBind(BindCallable[_Callable_co, _ActorT]):
+class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
     @overload
     def __call__(
         self: BindCallable[

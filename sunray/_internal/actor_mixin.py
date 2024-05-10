@@ -12,6 +12,7 @@ import ray
 
 from typing_extensions import ParamSpec
 
+from .dag2 import Out
 from .util import get_num_returns
 
 
@@ -28,19 +29,18 @@ if TYPE_CHECKING:
     from typing_extensions import TypedDict
     from typing_extensions import Unpack
 
+    from .callable import ClassBindCallable
+    from .callable import ClassMethodBindCallable
+    from .callable import ClassStreamBindCallable
+    from .callable import RemoteCallable
     from .core import ObjectRef
     from .core import ObjectRefGenerator
-    from .dag import BindCallable
-    from .dag import ClassMethodNode
-    from .dag import ClassNode
-    from .dag import ClassStreamMethodNode
     from .typing import ActorRemoteOptions
-    from .typing import RemoteCallable
 
 
 _Ret = TypeVar("_Ret")
 _YieldItem = TypeVar("_YieldItem")
-_RemoteRet = TypeVar("_RemoteRet")
+_RemoteRet = TypeVar("_RemoteRet", bound=Out)
 _ClassT = TypeVar("_ClassT")
 _P = ParamSpec("_P")
 _R0 = TypeVar("_R0")
@@ -82,8 +82,8 @@ class ActorClass(Generic[_P, _ClassT]):
         self._default_opts = default_opts
 
     if TYPE_CHECKING:
-        remote: RemoteCallable[Callable[_P, _ClassT], Actor[_ClassT]]
-        bind: BindCallable[Callable[_P, _ClassT], ClassNode, _ClassT]
+        remote: RemoteCallable[Callable[_P, _ClassT], Out[Actor[_ClassT]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT], Out[Actor[_ClassT]]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -114,8 +114,8 @@ class ActorClassWrapper(Generic[_P, _ClassT]):
         self._opts = opts
 
     if TYPE_CHECKING:
-        remote: RemoteCallable[Callable[_P, _ClassT], Actor[_ClassT]]
-        bind: BindCallable[Callable[_P, _ClassT], ClassNode, _ClassT]
+        remote: RemoteCallable[Callable[_P, _ClassT], Out[Actor[_ClassT]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT], Out[Actor[_ClassT]]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -196,8 +196,8 @@ if TYPE_CHECKING:
         _generator_backpressure_num_objects: Any
 
     class Method(Generic[_P, _Ret]):
-        remote: RemoteCallable[Callable[_P, _Ret], ObjectRef[_Ret]]
-        bind: BindCallable[Callable[_P, _Ret], ClassMethodNode, ObjectRef[_Ret]]
+        remote: RemoteCallable[Callable[_P, _Ret], Out[ObjectRef[_Ret]]]
+        bind: ClassMethodBindCallable[Callable[_P, _Ret], Out[ObjectRef[_Ret]]]
 
         @overload
         def options(
@@ -205,7 +205,7 @@ if TYPE_CHECKING:
             *,
             unpack: Literal[False] = False,
             **options: Unpack[MethodOptions],
-        ) -> MethodWrapper[_P, _Ret, ObjectRef[_Ret]]: ...
+        ) -> MethodWrapper[_P, _Ret, Out[ObjectRef[_Ret]]]: ...
 
         @overload
         def options(
@@ -213,7 +213,7 @@ if TYPE_CHECKING:
             *,
             unpack: Literal[True],
             **options: Unpack[MethodOptions],
-        ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0]]]: ...
+        ) -> MethodWrapper[_P, _Ret, Out[tuple[ObjectRef[_R0]]]]: ...
 
         @overload
         def options(
@@ -221,7 +221,7 @@ if TYPE_CHECKING:
             *,
             unpack: Literal[True],
             **options: Unpack[MethodOptions],
-        ) -> MethodWrapper[_P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1]]]: ...
+        ) -> MethodWrapper[_P, _Ret, Out[tuple[ObjectRef[_R0], ObjectRef[_R1]]]]: ...
 
         @overload
         def options(
@@ -230,7 +230,7 @@ if TYPE_CHECKING:
             unpack: Literal[True],
             **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
-            _P, _Ret, tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]
+            _P, _Ret, Out[tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]]
         ]: ...
 
         @overload
@@ -242,11 +242,13 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                ]
             ],
         ]: ...
 
@@ -259,12 +261,14 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                ]
             ],
         ]: ...
 
@@ -277,13 +281,15 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                ]
             ],
         ]: ...
 
@@ -296,14 +302,16 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                ]
             ],
         ]: ...
 
@@ -316,15 +324,17 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                ]
             ],
         ]: ...
 
@@ -337,16 +347,18 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
-                ObjectRef[_R8],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                    ObjectRef[_R8],
+                ]
             ],
         ]: ...
 
@@ -359,17 +371,19 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             _Ret,
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
-                ObjectRef[_R8],
-                ObjectRef[_R9],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                    ObjectRef[_R8],
+                    ObjectRef[_R9],
+                ]
             ],
         ]: ...
 
@@ -380,15 +394,15 @@ if TYPE_CHECKING:
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
 
     class AsyncMethod(Generic[_P, _Ret]):
-        remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], ObjectRef[_Ret]]
-        bind: BindCallable[
-            Callable[_P, Awaitable[_Ret]], ClassMethodNode, ObjectRef[_Ret]
+        remote: RemoteCallable[Callable[_P, Awaitable[_Ret]], Out[ObjectRef[_Ret]]]
+        bind: ClassMethodBindCallable[
+            Callable[_P, Awaitable[_Ret]], Out[ObjectRef[_Ret]]
         ]
 
         @overload
         def options(
             self, *, unpack: Literal[False] = False, **options: Unpack[MethodOptions]
-        ) -> MethodWrapper[_P, Awaitable[_Ret], ObjectRef[_Ret]]: ...
+        ) -> MethodWrapper[_P, Awaitable[_Ret], Out[ObjectRef[_Ret]]]: ...
 
         @overload
         def options(
@@ -396,7 +410,7 @@ if TYPE_CHECKING:
             *,
             unpack: Literal[True],
             **options: Unpack[MethodOptions],
-        ) -> MethodWrapper[_P, Awaitable[_Ret], tuple[ObjectRef[_R0]]]: ...
+        ) -> MethodWrapper[_P, Awaitable[_Ret], Out[tuple[ObjectRef[_R0]]]]: ...
 
         @overload
         def options(
@@ -405,7 +419,7 @@ if TYPE_CHECKING:
             unpack: Literal[True],
             **options: Unpack[MethodOptions],
         ) -> MethodWrapper[
-            _P, Awaitable[_Ret], tuple[ObjectRef[_R0], ObjectRef[_R1]]
+            _P, Awaitable[_Ret], Out[tuple[ObjectRef[_R0], ObjectRef[_R1]]]
         ]: ...
 
         @overload
@@ -417,7 +431,7 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]],
+            Out[tuple[ObjectRef[_R0], ObjectRef[_R1], ObjectRef[_R2]]],
         ]: ...
 
         @overload
@@ -429,11 +443,13 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                ]
             ],
         ]: ...
 
@@ -446,12 +462,14 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                ]
             ],
         ]: ...
 
@@ -464,13 +482,15 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                ]
             ],
         ]: ...
 
@@ -483,14 +503,16 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                ]
             ],
         ]: ...
 
@@ -503,15 +525,17 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                ]
             ],
         ]: ...
 
@@ -524,16 +548,18 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
-                ObjectRef[_R8],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                    ObjectRef[_R8],
+                ]
             ],
         ]: ...
 
@@ -548,17 +574,19 @@ if TYPE_CHECKING:
         ) -> MethodWrapper[
             _P,
             Awaitable[_Ret],
-            tuple[
-                ObjectRef[_R0],
-                ObjectRef[_R1],
-                ObjectRef[_R2],
-                ObjectRef[_R3],
-                ObjectRef[_R4],
-                ObjectRef[_R5],
-                ObjectRef[_R6],
-                ObjectRef[_R7],
-                ObjectRef[_R8],
-                ObjectRef[_R9],
+            Out[
+                tuple[
+                    ObjectRef[_R0],
+                    ObjectRef[_R1],
+                    ObjectRef[_R2],
+                    ObjectRef[_R3],
+                    ObjectRef[_R4],
+                    ObjectRef[_R5],
+                    ObjectRef[_R6],
+                    ObjectRef[_R7],
+                    ObjectRef[_R8],
+                    ObjectRef[_R9],
+                ]
             ],
         ]: ...
 
@@ -569,12 +597,14 @@ if TYPE_CHECKING:
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> Awaitable[_Ret]: ...
 
     class StreamMethod(Generic[_P, _Ret, _YieldItem]):
-        remote: RemoteCallable[Callable[_P, _Ret], ObjectRefGenerator[_YieldItem]]
-        bind: BindCallable[Callable[_P, _Ret], ClassStreamMethodNode, _YieldItem]
+        remote: RemoteCallable[Callable[_P, _Ret], Out[ObjectRefGenerator[_YieldItem]]]
+        bind: ClassStreamBindCallable[
+            Callable[_P, _Ret], Out[ObjectRefGenerator[_YieldItem]]
+        ]
 
         def options(
             self, **options: Unpack[MethodOptions]
-        ) -> MethodWrapper[_P, _Ret, ObjectRefGenerator[_YieldItem]]: ...
+        ) -> MethodWrapper[_P, _Ret, Out[ObjectRefGenerator[_YieldItem]]]: ...
 
         def __call__(self, *args: _P.args, **kwds: _P.kwargs) -> _Ret: ...
 

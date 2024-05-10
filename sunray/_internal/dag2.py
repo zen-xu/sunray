@@ -428,7 +428,7 @@ class StreamNode(  # type: ignore[misc]
 ): ...
 
 
-_ActorT = TypeVar("_ActorT", bound=sunray.ActorMixin)
+_ActorT = TypeVar("_ActorT")
 
 
 class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
