@@ -13,15 +13,15 @@ from typing import overload
 
 from ray import dag as ray_dag
 from typing_extensions import Self
-from typing_extensions import TypeVarTuple
-from typing_extensions import Unpack
 
 import sunray
 
+from . import io
+from .io import _In
+from .io import _Out
+
 
 _T = TypeVar("_T")
-_I = TypeVar("_I", covariant=True)
-_O = TypeVar("_O", covariant=True)
 _O0 = TypeVar("_O0")
 _O1 = TypeVar("_O1")
 _O2 = TypeVar("_O2")
@@ -32,37 +32,12 @@ _O6 = TypeVar("_O6")
 _O7 = TypeVar("_O7")
 _O8 = TypeVar("_O8")
 _O9 = TypeVar("_O9")
-_Os = TypeVarTuple("_Os")
 
 
-class _BaseIn: ...
+_InT = TypeVar("_InT", bound=io.BaseIn, covariant=True)
+_OutT = TypeVar("_OutT", bound=io.BaseOut, covariant=True)
 
-
-class In(_BaseIn, Generic[_I]): ...
-
-
-class NoIn(_BaseIn): ...
-
-
-class _BaseOut: ...
-
-
-class Out(_BaseOut, Generic[_O]): ...
-
-
-class Outs(_BaseOut, Generic[Unpack[_Os]]): ...
-
-
-class Yield(_BaseOut, Generic[_O]): ...
-
-
-class Actor(_BaseOut, Generic[_T]): ...
-
-
-_InT = TypeVar("_InT", bound=_BaseIn, covariant=True)
-_OutT = TypeVar("_OutT", bound=_BaseOut, covariant=True)
-
-ExecArg = Union[_T, "sunray.ObjectRef[_T]", "DAGNode[Any, Out[_T]]"]
+ExecArg = Union[_T, "sunray.ObjectRef[_T]", "DAGNode[Any, io.Out[_T]]"]
 
 
 class DAGNode(Generic[_InT, _OutT]): ...
@@ -73,7 +48,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         # ==== without input ====
         @overload
         def execute(
-            self: DAGNode[NoIn, Outs[_O0]],
+            self: DAGNode[io.NoIn, io.Outs[_O0]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -81,7 +56,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1]],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -89,7 +64,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2]],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2]],
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -98,7 +73,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3]],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3]],
             _ray_cache_refs: bool = False,
             **kwargs,
         ) -> tuple[
@@ -110,159 +85,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-            sunray.ObjectRef[_O9],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[NoIn, Out[_O]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> sunray.ObjectRef[_O]: ...
-
-        # ==== with input ====
-
-        @overload
-        def execute(
-            self: DAGNode[In[_I], Outs[_O0]],
-            __in: ExecArg[_I],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1]],
-            __in: ExecArg[_I],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0], sunray.ObjectRef[_O1]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2]],
-            __in: ExecArg[_I],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0], sunray.ObjectRef[_O1], sunray.ObjectRef[_O2]
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3]],
-            __in: ExecArg[_I],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-        ]: ...
-        @overload
-        def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -276,8 +99,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -292,8 +114,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -309,8 +130,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -327,8 +147,9 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]],
-            __in: ExecArg[_I],
+            self: DAGNode[
+                io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]
+            ],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -347,9 +168,8 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: DAGNode[
-                In[_I], Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+                io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
             ],
-            __in: ExecArg[_I],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -368,63 +188,223 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Out[_O]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.NoIn, io.Out[_Out]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_O]: ...
+        ) -> sunray.ObjectRef[_Out]: ...
+
+        # ==== with input ====
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[sunray.ObjectRef[_O0]]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[sunray.ObjectRef[_O0], sunray.ObjectRef[_O1]]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0], sunray.ObjectRef[_O1], sunray.ObjectRef[_O2]
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+        ]: ...
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+            sunray.ObjectRef[_O5],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+            sunray.ObjectRef[_O5],
+            sunray.ObjectRef[_O6],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+            sunray.ObjectRef[_O5],
+            sunray.ObjectRef[_O6],
+            sunray.ObjectRef[_O7],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[
+                io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]
+            ],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+            sunray.ObjectRef[_O5],
+            sunray.ObjectRef[_O6],
+            sunray.ObjectRef[_O7],
+            sunray.ObjectRef[_O8],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[
+                io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+            ],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> tuple[
+            sunray.ObjectRef[_O0],
+            sunray.ObjectRef[_O1],
+            sunray.ObjectRef[_O2],
+            sunray.ObjectRef[_O3],
+            sunray.ObjectRef[_O4],
+            sunray.ObjectRef[_O5],
+            sunray.ObjectRef[_O6],
+            sunray.ObjectRef[_O7],
+            sunray.ObjectRef[_O8],
+            sunray.ObjectRef[_O9],
+        ]: ...
+
+        @overload
+        def execute(
+            self: DAGNode[io.In[_In], io.Out[_Out]],
+            __in: ExecArg[_In],
+            *,
+            _ray_cache_refs: bool = False,
+            **kwargs,
+        ) -> sunray.ObjectRef[_Out]: ...
 
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
 
 
 class FunctionNode(  # type: ignore[misc]
-    _FunctionLikeNode[_InT, _OutT],
-    ray_dag.FunctionNode,
+    _FunctionLikeNode[_InT, _OutT], ray_dag.FunctionNode
 ): ...
 
 
-class _StreamLikeNode(DAGNode[_InT, Yield[_O]]):
+class _StreamLikeNode(DAGNode[_InT, io.Yield[_Out]]):
     if TYPE_CHECKING:
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Any],
+            self: DAGNode[io.NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRefGenerator[_O]: ...
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Any],
-            __in: ExecArg[_I],
+            self: DAGNode[io.In[_In], Any],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRefGenerator[_O]: ...
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
 
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRefGenerator[_O]: ...
+        ) -> sunray.ObjectRefGenerator[_Out]: ...
 
 
 class StreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _O], ray_dag.FunctionNode
+    _StreamLikeNode[_InT, _Out], ray_dag.FunctionNode
 ): ...
 
 
 _ActorT = TypeVar("_ActorT")
 
 
-class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
+class ClassNode(ray_dag.ClassNode, DAGNode[_InT, io.Actor[_ActorT]]):
     @property
     def methods(self) -> type[_ActorT]:
         return self  # type: ignore[return-value]
 
     @overload
     def execute(
-        self: DAGNode[NoIn, Any],
+        self: DAGNode[io.NoIn, Any],
         *,
         _ray_cache_refs: bool = False,
         **kwargs,
@@ -432,8 +412,8 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, Actor[_ActorT]]):
 
     @overload
     def execute(
-        self: DAGNode[In[_I], Any],
-        __in: ExecArg[_I],
+        self: DAGNode[io.In[_In], Any],
+        __in: ExecArg[_In],
         *,
         _ray_cache_refs: bool = False,
         **kwargs,
@@ -452,18 +432,18 @@ class ClassMethodNode(  # type: ignore[misc]
 
 
 class ClassStreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _O], ray_dag.ClassMethodNode
+    _StreamLikeNode[_InT, _Out], ray_dag.ClassMethodNode
 ): ...
 
 
 class InputAttributeNode(  # type: ignore[misc]
-    ray_dag.InputAttributeNode, DAGNode[_InT, Out[_T]]
+    ray_dag.InputAttributeNode, DAGNode[_InT, io.Out[_T]]
 ):
     if TYPE_CHECKING:
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Any],
+            self: DAGNode[io.NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -471,8 +451,8 @@ class InputAttributeNode(  # type: ignore[misc]
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Any],
-            __in: ExecArg[_I],
+            self: DAGNode[io.In[_In], Any],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -485,7 +465,7 @@ _K = TypeVar("_K")
 _V = TypeVar("_V")
 
 
-class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
+class InputNode(ray_dag.InputNode, DAGNode[io.In[_In], io.Out[_In]]):
     if TYPE_CHECKING:
 
         def __getattr__(self, key) -> Any: ...
@@ -493,15 +473,15 @@ class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
         @overload
         def __getitem__(
             self: InputNode[Mapping[_K, _V]], key: _K
-        ) -> InputAttributeNode[In[_I], _V]: ...
+        ) -> InputAttributeNode[io.In[_In], _V]: ...
 
         @overload
         def __getitem__(
             self: InputNode[Sequence[_V]], key: int
-        ) -> InputAttributeNode[In[_I], _V]: ...
+        ) -> InputAttributeNode[io.In[_In], _V]: ...
 
         @overload
-        def __getitem__(self, key) -> InputAttributeNode[In[_I], Any]: ...
+        def __getitem__(self, key) -> InputAttributeNode[io.In[_In], Any]: ...
 
         def __getitem__(self, key) -> Any: ...
 
@@ -509,25 +489,25 @@ class InputNode(ray_dag.InputNode, DAGNode[In[_I], Out[_I]]):
 
         @overload
         def execute(
-            self: DAGNode[NoIn, Any],
+            self: DAGNode[io.NoIn, Any],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> _I: ...
+        ) -> _In: ...
 
         @overload
         def execute(
-            self: DAGNode[In[_I], Any],
-            __in: ExecArg[_I],
+            self: DAGNode[io.In[_In], Any],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> _I: ...
+        ) -> _In: ...
 
-        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _I: ...
+        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _In: ...
 
 
-MoArg = DAGNode[_InT, Out[_O]]
+MoArg = DAGNode[_InT, io.Out[_Out]]
 
 
 class MultiOutputNode(DAGNode[_InT, _OutT]):
@@ -536,21 +516,21 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         cls,
         args: tuple[MoArg[_InT, _O0]],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0]]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[MoArg[_InT, _O0], MoArg[_InT, _O1]],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1]]: ...
 
     @overload
     def __new__(
         cls,
         args: tuple[MoArg[_InT, _O0], MoArg[_InT, _O1], MoArg[_InT, _O2]],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2]]: ...
 
     @overload
     def __new__(
@@ -559,7 +539,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O0], MoArg[_InT, _O1], MoArg[_InT, _O2], MoArg[_InT, _O3]
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2, _O3]]: ...
 
     @overload
     def __new__(
@@ -572,7 +552,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O4],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2, _O3, _O4]]: ...
 
     @overload
     def __new__(
@@ -586,7 +566,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O5],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]]: ...
 
     @overload
     def __new__(
@@ -601,7 +581,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O6],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]]: ...
 
     @overload
     def __new__(
@@ -617,7 +597,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O7],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]]: ...
+    ) -> MultiOutputNode[_InT, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]]: ...
 
     @overload
     def __new__(
@@ -634,7 +614,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
             MoArg[_InT, _O8],
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
-    ) -> MultiOutputNode[_InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]]: ...
+    ) -> MultiOutputNode[
+        _InT, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]
+    ]: ...
 
     @overload
     def __new__(
@@ -653,7 +635,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         ],
         other_args_to_resolve: dict[str, Any] | None = None,
     ) -> MultiOutputNode[
-        _InT, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
+        _InT, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
@@ -663,8 +645,8 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I] | NoIn, Outs[_O0]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.In[_In] | io.NoIn, io.Outs[_O0]],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -672,8 +654,8 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[In[_I] | NoIn, Outs[_O0, _O1]],
-            __in: ExecArg[_I],
+            self: DAGNode[io.In[_In] | io.NoIn, io.Outs[_O0, _O1]],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -681,8 +663,8 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2]],
-            __in: ExecArg[_I],
+            self: MultiOutputNode[io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2]],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -690,8 +672,8 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3]],
-            __in: ExecArg[_I],
+            self: MultiOutputNode[io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2, _O3]],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -699,8 +681,10 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4]],
-            __in: ExecArg[_I],
+            self: MultiOutputNode[
+                io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4]
+            ],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -708,8 +692,10 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            __in: ExecArg[_I],
+            self: MultiOutputNode[
+                io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]
+            ],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -718,9 +704,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]
+                io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]
             ],
-            __in: ExecArg[_I],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -729,9 +715,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I] | NoIn, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]
+                io.In[_In] | io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]
             ],
-            __in: ExecArg[_I],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -740,10 +726,10 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I] | NoIn,
-                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
+                io.In[_In] | io.NoIn,
+                io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
             ],
-            __in: ExecArg[_I],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -752,10 +738,10 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         @overload
         def execute(
             self: MultiOutputNode[
-                In[_I] | NoIn,
-                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
+                io.In[_In] | io.NoIn,
+                io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
             ],
-            __in: ExecArg[_I],
+            __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -765,7 +751,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[Any, Outs[_O0]],
+            self: DAGNode[Any, io.Outs[_O0]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -773,7 +759,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: DAGNode[Any, Outs[_O0, _O1]],
+            self: DAGNode[Any, io.Outs[_O0, _O1]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -781,7 +767,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -789,7 +775,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2, _O3]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -797,7 +783,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2, _O3, _O4]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -805,7 +791,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -813,7 +799,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -821,7 +807,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
 
         @overload
         def execute(
-            self: MultiOutputNode[Any, Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
+            self: MultiOutputNode[Any, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
             *args,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -831,7 +817,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         def execute(
             self: MultiOutputNode[
                 Any,
-                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
+                io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8],
             ],
             *args,
             _ray_cache_refs: bool = False,
@@ -842,7 +828,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
         def execute(
             self: MultiOutputNode[
                 Any,
-                Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
+                io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9],
             ],
             *args,
             _ray_cache_refs: bool = False,

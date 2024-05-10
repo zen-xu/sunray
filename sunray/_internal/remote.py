@@ -15,8 +15,8 @@ from ray import remote_function as ray_func
 from typing_extensions import ParamSpec
 
 from .dag import FunctionNode
-from .dag import Out
 from .dag import StreamNode
+from .io import Out
 from .util import get_num_returns
 
 
