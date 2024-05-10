@@ -23,7 +23,7 @@ def test_get(init_ray):
 
 
 def test_get_actor(init_ray):
-    class MyActor(ActorMixin, name="my-actor"): ...
+    class MyActor(ActorMixin, num_cpus=0.1, name="my-actor"): ...
 
     _actor = MyActor.new_actor().remote()
 

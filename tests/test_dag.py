@@ -12,7 +12,7 @@ from sunray.dag import MultiOutputNode
 
 
 def test_func_bind(init_ray):
-    @sunray.remote
+    @sunray.remote(num_cpus=0.1)
     def func(src: int, inc: int = 1) -> int:
         return src + inc
 
@@ -25,7 +25,7 @@ def test_func_bind(init_ray):
 
 
 def test_func_option_bind(init_ray):
-    @sunray.remote
+    @sunray.remote(num_cpus=0.1)
     def func(v: str) -> str:
         import os
 
@@ -36,7 +36,7 @@ def test_func_option_bind(init_ray):
 
 
 @pytest.mark.min_ray_version(2, 10)
-def test_stream_bind(init_ray):
+def test_stream_bind(init_ray, num_cpus=0.1):
     @sunray.remote
     def func(count: int) -> Generator[int, None, None]:
         yield from range(count)
@@ -46,7 +46,7 @@ def test_stream_bind(init_ray):
 
 
 @pytest.mark.min_ray_version(2, 10)
-def test_stream_option_bind(init_ray):
+def test_stream_option_bind(init_ray, num_cpus=0.1):
     @sunray.remote
     def func(count: int) -> Generator[str, None, None]:
         import os
@@ -59,7 +59,7 @@ def test_stream_option_bind(init_ray):
 
 
 def test_actor_bind(init_ray):
-    class Actor(sunray.ActorMixin):
+    class Actor(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, init_value: int):
             self.i = init_value
 
@@ -92,7 +92,7 @@ def test_actor_bind(init_ray):
 
 
 def test_actor_option_bind(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, v: int):
             import os
 
@@ -107,7 +107,7 @@ def test_actor_option_bind(init_ray):
 
 
 def test_actor_async_method_bind(init_ray):
-    class Actor(sunray.ActorMixin):
+    class Actor(sunray.ActorMixin, num_cpus=0.1):
         @sunray.remote_method
         async def cal(self, x: int) -> int:
             return x + 2
@@ -118,7 +118,7 @@ def test_actor_async_method_bind(init_ray):
 
 
 def test_actor_stream_bind(init_ray):
-    class Actor(sunray.ActorMixin):
+    class Actor(sunray.ActorMixin, num_cpus=0.1):
         @sunray.remote_method
         def gen(self, x: int) -> Generator[int, None, None]:
             yield from range(x)
@@ -129,7 +129,7 @@ def test_actor_stream_bind(init_ray):
 
 
 def test_actor_async_stream_bind(init_ray):
-    class Actor(sunray.ActorMixin):
+    class Actor(sunray.ActorMixin, num_cpus=0.1):
         @sunray.remote_method
         async def gen(self, x: int) -> AsyncGenerator[int, None]:
             for i in range(x):
@@ -142,7 +142,7 @@ def test_actor_async_stream_bind(init_ray):
 
 @pytest.mark.min_ray_version(2, 10)
 def test_reuse_ray_actor_in_dag(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self):
             self.forwarded = 0
 
@@ -167,7 +167,7 @@ def test_reuse_ray_actor_in_dag(init_ray):
 
 
 def test_func_with_input_data(init_ray):
-    @sunray.remote
+    @sunray.remote(num_cpus=0.1)
     def func(v: int) -> int:
         return v + 1
 
@@ -181,7 +181,7 @@ def test_func_with_input_data(init_ray):
 
 @pytest.mark.min_ray_version(2, 10)
 def test_stream_with_input_data(init_ray):
-    @sunray.remote
+    @sunray.remote(num_cpus=0.1)
     def func(v: int) -> Generator[int, None, None]:
         yield from range(v)
 
@@ -194,7 +194,7 @@ def test_stream_with_input_data(init_ray):
 
 
 def test_actor_method_with_input_data(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, v: int) -> None:
             self.v = v
 
@@ -212,7 +212,7 @@ def test_actor_method_with_input_data(init_ray):
 
 
 def test_actor_async_method_with_input_data(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, v: int) -> None:
             self.v = v
 
@@ -230,7 +230,7 @@ def test_actor_async_method_with_input_data(init_ray):
 
 
 def test_actor_stream_with_input_data(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, v: int) -> None:
             self.v = v
 
@@ -248,7 +248,7 @@ def test_actor_stream_with_input_data(init_ray):
 
 
 def test_actor_async_stream_with_input_data(init_ray):
-    class Worker(sunray.ActorMixin):
+    class Worker(sunray.ActorMixin, num_cpus=0.1):
         def __init__(self, v: int) -> None:
             self.v = v
 
