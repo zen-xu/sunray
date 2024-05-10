@@ -86,9 +86,17 @@ pip install sunray
 - sunray maintains a consistent calling convention, whether it's from internal or external functions.
 - ray, you need to first obtain the current actor from the running context, and then call through the actor.
 
+### Round 9: Lazy Computation
+|                                            sunray                                             |                                            ray                                             |
+| :-------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_bind.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_bind.jpg) |
+
+- sunray can successfully track the input parameter types and output types.
+- ray does not have this capability.
+
 ## API
 
-`sunray` re-export all apis from `ray.core` with friendly type hinting. In addition, `sunray` provides `ActorMixin` which is used to help creating more robust actors.
+`sunray` re-export all apis from `ray.core` with friendly type hints. In addition, `sunray` provides `ActorMixin` which is used to help creating more robust actors.
 
 ### ActorMixin
 
