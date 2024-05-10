@@ -12,7 +12,6 @@ from typing import Union
 from typing import overload
 
 from ray import dag as ray_dag
-from typing_extensions import ParamSpec
 from typing_extensions import Self
 from typing_extensions import TypeVarTuple
 from typing_extensions import Unpack
@@ -20,19 +19,7 @@ from typing_extensions import Unpack
 import sunray
 
 
-_P = ParamSpec("_P")
 _T = TypeVar("_T")
-_T0 = TypeVar("_T0")
-_T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2")
-_T3 = TypeVar("_T3")
-_T4 = TypeVar("_T4")
-_T5 = TypeVar("_T5")
-_T6 = TypeVar("_T6")
-_T7 = TypeVar("_T7")
-_T8 = TypeVar("_T8")
-_T9 = TypeVar("_T9")
-
 _I = TypeVar("_I", covariant=True)
 _O = TypeVar("_O", covariant=True)
 _O0 = TypeVar("_O0")
