@@ -15,7 +15,7 @@ from sunray._internal.actor_mixin import ActorMethodWrapper
 from sunray._internal.actor_mixin import add_var_keyword_to_klass
 
 
-class Demo(ActorMixin, num_cpus=0.1, concurrency_groups={"group1": 1}):
+class Demo(ActorMixin, num_cpus=0, concurrency_groups={"group1": 1}):
     def __init__(self, init: int):
         self.init = init
 
@@ -139,19 +139,19 @@ def test_add_var_keyword_to_klass(init_ray):
 
 
 def test_actor_without_default_options(init_ray):
-    class Demo(ActorMixin, num_cpus=0.1): ...
+    class Demo(ActorMixin, num_cpus=0): ...
 
     Demo.new_actor().remote()
 
 
 def test_actor_specify_empty_options(init_ray):
-    class Demo(ActorMixin, num_cpus=0.1): ...
+    class Demo(ActorMixin, num_cpus=0): ...
 
     Demo.new_actor().options().remote()
 
 
 def test_actor_method_wrapper(init_ray):
-    class Demo(ActorMixin, num_cpus=0.1):
+    class Demo(ActorMixin, num_cpus=0):
         def __init__(self) -> None:
             self.init_v = 1
 
@@ -173,7 +173,7 @@ def test_actor_method_wrapper(init_ray):
 
 
 def test_call_self_remote_method(init_ray):
-    class Demo(ActorMixin, num_cpus=0.1):
+    class Demo(ActorMixin, num_cpus=0):
         @remote_method
         async def f1(self) -> int:
             return 1
@@ -187,7 +187,7 @@ def test_call_self_remote_method(init_ray):
 
 
 def test_call_self_remote_method_with_options(init_ray):
-    class Demo(ActorMixin, num_cpus=0.1, concurrency_groups={"a": 2, "b": 2}):
+    class Demo(ActorMixin, num_cpus=0, concurrency_groups={"a": 2, "b": 2}):
         @remote_method(concurrency_group="a")
         async def f1(self) -> int:
             return 1
