@@ -12,7 +12,7 @@ import ray
 
 from typing_extensions import ParamSpec
 
-from .dag2 import Out
+from .dag import Out
 from .util import get_num_returns
 
 

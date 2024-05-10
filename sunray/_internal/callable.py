@@ -11,7 +11,7 @@ from typing import overload
 from typing_extensions import Concatenate
 from typing_extensions import ParamSpec
 
-from . import dag2 as dag
+from . import dag
 
 
 if TYPE_CHECKING:
