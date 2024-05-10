@@ -318,7 +318,7 @@ class RemoteStream(RemoteStreamWrapper[_Callable_co, _R]):
 
     if not TYPE_CHECKING:
 
-        def bind(self, *args, **kwargs):
+        def bind(self, *args, **kwargs):  # pragma: no cover
             return self._remote_func.bind(*args, **kwargs)
 
 
