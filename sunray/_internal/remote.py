@@ -17,6 +17,7 @@ from typing_extensions import ParamSpec
 from .dag import FunctionNode
 from .dag import StreamNode
 from .io import Out
+from .io import Yield
 from .util import get_num_returns
 
 
@@ -292,7 +293,7 @@ class RemoteStreamWrapper(Generic[_Callable_co, _R]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[_Callable_co, Out[ObjectRefGenerator[_R]]]
-        bind: StreamBindCallable[_Callable_co, Out[ObjectRefGenerator[_R]]]
+        bind: StreamBindCallable[_Callable_co, Yield[_R]]
     else:
 
         def remote(self, *args, **kwargs):

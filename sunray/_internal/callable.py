@@ -243,6 +243,7 @@ BindArg = Union[
     _T,
     "sunray.ObjectRef[_T]",
     "dag.DAGNode[dag._InT, io.Out[_T]]",
+    "dag.DAGNode[dag._InT, io.Out[sunray.ObjectRef[_T]]]",
 ]
 
 
@@ -1014,7 +1015,7 @@ class ClassMethodBindCallable(BindCallable[_Callable_co, dag._OutT]):
 _YieldT = TypeVar("_YieldT")
 
 
-class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
+class StreamBindCallable(BindCallable[_Callable_co, dag._StreamOutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1036,7 +1037,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg9: BindArg[_T9, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1058,7 +1059,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg8: BindArg[_T8, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1079,7 +1080,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg7: BindArg[_T7, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1099,7 +1100,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg6: BindArg[_T6, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1118,7 +1119,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg5: BindArg[_T5, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1136,7 +1137,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg4: BindArg[_T4, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1153,7 +1154,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg3: BindArg[_T3, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1169,7 +1170,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg2: BindArg[_T2, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1184,7 +1185,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg1: BindArg[_T1, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1198,7 +1199,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg0: BindArg[_T0, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1221,7 +1222,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg9: BindArg[_T9, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1243,7 +1244,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg8: BindArg[_T8, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1264,7 +1265,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg7: BindArg[_T7, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1284,7 +1285,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg6: BindArg[_T6, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1303,7 +1304,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg5: BindArg[_T5, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1321,7 +1322,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg4: BindArg[_T4, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1338,7 +1339,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg3: BindArg[_T3, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1354,7 +1355,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg2: BindArg[_T2, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1369,7 +1370,7 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg1: BindArg[_T1, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1383,19 +1384,19 @@ class StreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg0: BindArg[_T0, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.StreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
         self: BindCallable[Callable[_P, Any], Any],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.StreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.StreamNode[io.NoIn, dag._StreamOutT]: ...
 
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
+class ClassStreamBindCallable(BindCallable[_Callable_co, dag._StreamOutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1417,7 +1418,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg9: BindArg[_T9, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1439,7 +1440,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg8: BindArg[_T8, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1460,7 +1461,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg7: BindArg[_T7, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1480,7 +1481,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg6: BindArg[_T6, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1499,7 +1500,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg5: BindArg[_T5, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1517,7 +1518,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg4: BindArg[_T4, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1534,7 +1535,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg3: BindArg[_T3, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1550,7 +1551,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg2: BindArg[_T2, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1565,7 +1566,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg1: BindArg[_T1, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1579,7 +1580,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg0: BindArg[_T0, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1602,7 +1603,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg9: BindArg[_T9, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1624,7 +1625,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg8: BindArg[_T8, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1645,7 +1646,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg7: BindArg[_T7, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1665,7 +1666,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg6: BindArg[_T6, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1684,7 +1685,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg5: BindArg[_T5, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1702,7 +1703,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg4: BindArg[_T4, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1719,7 +1720,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg3: BindArg[_T3, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1735,7 +1736,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg2: BindArg[_T2, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1750,7 +1751,7 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg1: BindArg[_T1, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
@@ -1764,22 +1765,19 @@ class ClassStreamBindCallable(BindCallable[_Callable_co, _YieldT]):
         __arg0: BindArg[_T0, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.In[io._In], _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.In[io._In], dag._StreamOutT]: ...
 
     @overload
     def __call__(
         self: BindCallable[Callable[_P, Any], Any],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassStreamNode[io.NoIn, _YieldT]: ...
+    ) -> dag.ClassStreamNode[io.NoIn, dag._StreamOutT]: ...
 
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-_ActorT = TypeVar("_ActorT")
-
-
-class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
+class ClassBindCallable(BindCallable[_Callable_co, dag._ClassOutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1787,7 +1785,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
                 Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
                 Any,
             ],
-            Any,
+            dag._ClassOutT,
         ],
         __arg0: BindArg[_T0, io.NoIn],
         __arg1: BindArg[_T1, io.NoIn],
@@ -1801,7 +1799,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg9: BindArg[_T9, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1823,7 +1821,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg8: BindArg[_T8, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1844,7 +1842,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg7: BindArg[_T7, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1864,7 +1862,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg6: BindArg[_T6, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1883,7 +1881,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg5: BindArg[_T5, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1901,7 +1899,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg4: BindArg[_T4, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1918,7 +1916,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg3: BindArg[_T3, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1934,7 +1932,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg2: BindArg[_T2, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1949,7 +1947,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg1: BindArg[_T1, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1963,7 +1961,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg0: BindArg[_T0, io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -1986,7 +1984,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg9: BindArg[_T9, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2008,7 +2006,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg8: BindArg[_T8, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2029,7 +2027,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg7: BindArg[_T7, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2049,7 +2047,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg6: BindArg[_T6, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2068,7 +2066,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg5: BindArg[_T5, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2086,7 +2084,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg4: BindArg[_T4, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2103,7 +2101,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg3: BindArg[_T3, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2119,7 +2117,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg2: BindArg[_T2, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2134,7 +2132,7 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg1: BindArg[_T1, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
@@ -2148,13 +2146,13 @@ class ClassBindCallable(BindCallable[_Callable_co, _ActorT]):
         __arg0: BindArg[_T0, io.In[io._In] | io.NoIn],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.In[io._In], _ActorT]: ...
+    ) -> dag.ClassNode[io.In[io._In], dag._ClassOutT]: ...
 
     @overload
     def __call__(
         self: BindCallable[Callable[_P, Any], Any],
         *args: _P.args,
         **kwargs: _P.kwargs,
-    ) -> dag.ClassNode[io.NoIn, _ActorT]: ...
+    ) -> dag.ClassNode[io.NoIn, dag._ClassOutT]: ...
 
     def __call__(self, *args, **kwargs) -> Any: ...

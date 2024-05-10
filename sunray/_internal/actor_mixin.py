@@ -83,7 +83,7 @@ class ActorClass(Generic[_P, _ClassT]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
-        bind: ClassBindCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT], io.Actor[_ClassT]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -115,7 +115,7 @@ class ActorClassWrapper(Generic[_P, _ClassT]):
 
     if TYPE_CHECKING:
         remote: RemoteCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
-        bind: ClassBindCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT], io.Actor[_ClassT]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -600,9 +600,7 @@ if TYPE_CHECKING:
         remote: RemoteCallable[
             Callable[_P, _Ret], io.Out[ObjectRefGenerator[_YieldItem]]
         ]
-        bind: ClassStreamBindCallable[
-            Callable[_P, _Ret], io.Out[ObjectRefGenerator[_YieldItem]]
-        ]
+        bind: ClassStreamBindCallable[Callable[_P, _Ret], io.Yield[_YieldItem]]
 
         def options(
             self, **options: Unpack[MethodOptions]

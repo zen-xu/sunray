@@ -13,6 +13,8 @@ from typing import overload
 
 from ray import dag as ray_dag
 from typing_extensions import Self
+from typing_extensions import TypeVarTuple
+from typing_extensions import Unpack
 
 import sunray
 
@@ -33,9 +35,9 @@ _O7 = TypeVar("_O7")
 _O8 = TypeVar("_O8")
 _O9 = TypeVar("_O9")
 
-
 _InT = TypeVar("_InT", bound=io.BaseIn, covariant=True)
 _OutT = TypeVar("_OutT", bound=io.BaseOut, covariant=True)
+_Ts = TypeVarTuple("_Ts")
 
 ExecArg = Union[_T, "sunray.ObjectRef[_T]", "DAGNode[Any, io.Out[_T]]"]
 
@@ -48,143 +50,11 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         # ==== without input ====
         @overload
         def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0]],
+            self: DAGNode[io.NoIn, io.Outs[Unpack[_Ts]]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0], sunray.ObjectRef[_O1]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2]],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0], sunray.ObjectRef[_O1], sunray.ObjectRef[_O2]
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3]],
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[
-                io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]
-            ],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[
-                io.NoIn, io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
-            ],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-            sunray.ObjectRef[_O9],
-        ]: ...
+        ) -> tuple[Unpack[_Ts]]: ...
 
         @overload
         def execute(
@@ -192,160 +62,18 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
+        ) -> _Out: ...
 
         # ==== with input ====
 
         @overload
         def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0]],
+            self: DAGNode[io.In[_In], io.Outs[Unpack[_Ts]]],
             __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[sunray.ObjectRef[_O0], sunray.ObjectRef[_O1]]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0], sunray.ObjectRef[_O1], sunray.ObjectRef[_O2]
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-        ]: ...
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7]],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[
-                io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8]
-            ],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-        ]: ...
-
-        @overload
-        def execute(
-            self: DAGNode[
-                io.In[_In], io.Outs[_O0, _O1, _O2, _O3, _O4, _O5, _O6, _O7, _O8, _O9]
-            ],
-            __in: ExecArg[_In],
-            *,
-            _ray_cache_refs: bool = False,
-            **kwargs,
-        ) -> tuple[
-            sunray.ObjectRef[_O0],
-            sunray.ObjectRef[_O1],
-            sunray.ObjectRef[_O2],
-            sunray.ObjectRef[_O3],
-            sunray.ObjectRef[_O4],
-            sunray.ObjectRef[_O5],
-            sunray.ObjectRef[_O6],
-            sunray.ObjectRef[_O7],
-            sunray.ObjectRef[_O8],
-            sunray.ObjectRef[_O9],
-        ]: ...
+        ) -> tuple[Unpack[_Ts]]: ...
 
         @overload
         def execute(
@@ -354,7 +82,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
-        ) -> sunray.ObjectRef[_Out]: ...
+        ) -> _Out: ...
 
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
 
@@ -364,12 +92,15 @@ class FunctionNode(  # type: ignore[misc]
 ): ...
 
 
-class _StreamLikeNode(DAGNode[_InT, io.Yield[_Out]]):
+_StreamOutT = TypeVar("_StreamOutT", bound=io.Yield)
+
+
+class _StreamLikeNode(DAGNode[_InT, _StreamOutT]):
     if TYPE_CHECKING:
 
         @overload
         def execute(
-            self: DAGNode[io.NoIn, Any],
+            self: DAGNode[io.NoIn, io.Yield[_Out]],
             *,
             _ray_cache_refs: bool = False,
             **kwargs,
@@ -377,7 +108,7 @@ class _StreamLikeNode(DAGNode[_InT, io.Yield[_Out]]):
 
         @overload
         def execute(
-            self: DAGNode[io.In[_In], Any],
+            self: DAGNode[io.In[_In], io.Yield[_Out]],
             __in: ExecArg[_In],
             *,
             _ray_cache_refs: bool = False,
@@ -386,42 +117,40 @@ class _StreamLikeNode(DAGNode[_InT, io.Yield[_Out]]):
 
         def execute(
             self, *args, _ray_cache_refs: bool = False, **kwargs
-        ) -> sunray.ObjectRefGenerator[_Out]: ...
+        ) -> sunray.ObjectRefGenerator: ...
 
 
 class StreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _Out], ray_dag.FunctionNode
+    _StreamLikeNode[_InT, _StreamOutT], ray_dag.FunctionNode
 ): ...
 
 
-_ActorT = TypeVar("_ActorT")
+_ClassOutT = TypeVar("_ClassOutT", bound=io.Actor)
 
 
-class ClassNode(ray_dag.ClassNode, DAGNode[_InT, io.Actor[_ActorT]]):
+class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
     @property
-    def methods(self) -> type[_ActorT]:
+    def methods(self: DAGNode[_InT, io.Actor[_Out]]) -> type[_Out]:
         return self  # type: ignore[return-value]
 
     @overload
     def execute(
-        self: DAGNode[io.NoIn, Any],
+        self: DAGNode[io.NoIn, io.Actor[_Out]],
         *,
         _ray_cache_refs: bool = False,
         **kwargs,
-    ) -> sunray.Actor[_ActorT]: ...
+    ) -> sunray.Actor[_Out]: ...
 
     @overload
     def execute(
-        self: DAGNode[io.In[_In], Any],
+        self: DAGNode[io.In[_In], io.Actor[_Out]],
         __in: ExecArg[_In],
         *,
         _ray_cache_refs: bool = False,
         **kwargs,
-    ) -> sunray.Actor[_ActorT]: ...
+    ) -> sunray.Actor[_Out]: ...
 
-    def execute(
-        self, *args, _ray_cache_refs: bool = False, **kwargs
-    ) -> sunray.Actor[_ActorT]:
+    def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> sunray.Actor:
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
         return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
 
@@ -432,7 +161,7 @@ class ClassMethodNode(  # type: ignore[misc]
 
 
 class ClassStreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _Out], ray_dag.ClassMethodNode
+    _StreamLikeNode[_InT, _StreamOutT], ray_dag.ClassMethodNode
 ): ...
 
 

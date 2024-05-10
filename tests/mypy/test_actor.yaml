@@ -18,7 +18,7 @@
 
     reveal_type(Actor.new_actor().remote)
   out: |
-    main:5: note: Revealed type is "sunray._internal.typing.RemoteCallable[def () -> main.Actor, sunray._internal.actor_mixin.Actor[main.Actor]]"
+    main:5: note: Revealed type is "sunray._internal.callable.RemoteCallable[def () -> main.Actor, sunray._internal.io.Out[sunray._internal.actor_mixin.Actor[main.Actor]]]"
 
 - case: without_args__remote_call
   main: |
@@ -40,7 +40,6 @@
   out: |
     main:5: note: Revealed type is "sunray._internal.actor_mixin.ActorClassWrapper[[], main.Actor]"
 
-
 - case: with_args__new_actor
   main: |
     from sunray import ActorMixin
@@ -61,7 +60,7 @@
 
     reveal_type(Actor.new_actor().remote)
   out: |
-    main:6: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (a: builtins.int, b: builtins.str) -> main.Actor, sunray._internal.actor_mixin.Actor[main.Actor]]"
+    main:6: note: Revealed type is "sunray._internal.callable.RemoteCallable[def (a: builtins.int, b: builtins.str) -> main.Actor, sunray._internal.io.Out[sunray._internal.actor_mixin.Actor[main.Actor]]]"
 
 - case: with_args__remote_call
   main: |
@@ -135,7 +134,7 @@
 
     reveal_type(Actor.new_actor().remote().methods.echo.options(concurrency_group="test"))
   out: |
-    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[], builtins.str, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.str]]]"
 
 - case: remote_method_without_args__remote
   main: |
@@ -147,7 +146,7 @@
 
     reveal_type(Actor.new_actor().remote().methods.echo.remote)
   out: |
-    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def () -> builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+    main:7: note: Revealed type is "sunray._internal.callable.RemoteCallable[def () -> builtins.str, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.str]]]"
 
 - case: remote_method_without_args__remote_call
   main: |
@@ -183,7 +182,7 @@
 
     reveal_type(Actor.new_actor().remote().methods.echo.options(concurrency_group="test"))
   out: |
-    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[msg: builtins.str], builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+    main:7: note: Revealed type is "sunray._internal.actor_mixin.MethodWrapper[[msg: builtins.str], builtins.str, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.str]]]"
 
 - case: remote_method_with_args__remote
   main: |
@@ -195,7 +194,7 @@
 
     reveal_type(Actor.new_actor().remote().methods.echo.remote)
   out: |
-    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (msg: builtins.str) -> builtins.str, sunray._internal.core.ObjectRef[builtins.str]]"
+    main:7: note: Revealed type is "sunray._internal.callable.RemoteCallable[def (msg: builtins.str) -> builtins.str, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.str]]]"
 
 - case: remote_method_with_args__remote_call
   main: |
@@ -234,7 +233,7 @@
 
     reveal_type(Actor.new_actor().remote().methods.echo.remote)
   out: |
-    main:7: note: Revealed type is "sunray._internal.typing.RemoteCallable[def (msg: builtins.str) -> typing.Awaitable[builtins.str], sunray._internal.core.ObjectRef[builtins.str]]"
+    main:7: note: Revealed type is "sunray._internal.callable.RemoteCallable[def (msg: builtins.str) -> typing.Awaitable[builtins.str], sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.str]]]"
 
 - case: async_method__remote_call
   main: |
