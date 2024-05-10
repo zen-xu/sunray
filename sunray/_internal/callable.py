@@ -245,7 +245,7 @@ BindArg = Union[
 class BindCallable(Generic[_Callable_co, _BindRet]): ...
 
 
-class FunctionNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
+class FunctionBind(BindCallable[_Callable_co, dag._OutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -626,7 +626,7 @@ class FunctionNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
     def __call__(self, *args, **kwargs) -> Any: ...
 
 
-class ClassMethodNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
+class ClassMethodBind(BindCallable[_Callable_co, dag._OutT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1010,7 +1010,7 @@ class ClassMethodNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
 _YieldT = TypeVar("_YieldT")
 
 
-class StreamNodeBindCallable(BindCallable[_Callable_co, _YieldT]):
+class StreamBind(BindCallable[_Callable_co, _YieldT]):
     @overload
     def __call__(
         self: BindCallable[
@@ -1394,7 +1394,7 @@ class StreamNodeBindCallable(BindCallable[_Callable_co, _YieldT]):
 _ActorT = TypeVar("_ActorT", bound="sunray.ActorMixin")
 
 
-class ClassNodeBindCallable(BindCallable[_Callable_co, _ActorT]):
+class ClassBind(BindCallable[_Callable_co, _ActorT]):
     @overload
     def __call__(
         self: BindCallable[
