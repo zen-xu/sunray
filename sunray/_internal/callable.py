@@ -1005,3 +1005,387 @@ class ClassMethodNodeBindCallable(BindCallable[_Callable_co, dag._OutT]):
     ) -> dag.ClassMethodNode[dag.NoIn, dag._OutT]: ...
 
     def __call__(self, *args, **kwargs) -> Any: ...
+
+
+_YieldT = TypeVar("_YieldT")
+
+
+class StreamNodeBindCallable(BindCallable[_Callable_co, _YieldT]):
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        __arg9: BindArg[_T9, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        __arg8: BindArg[_T8, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        __arg7: BindArg[_T7, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        __arg6: BindArg[_T6, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        __arg5: BindArg[_T5, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        __arg4: BindArg[_T4, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        __arg3: BindArg[_T3, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        __arg2: BindArg[_T2, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        __arg1: BindArg[_T1, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        __arg9: BindArg[_T9, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        __arg8: BindArg[_T8, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        __arg7: BindArg[_T7, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _T6, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        __arg6: BindArg[_T6, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _T5, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        __arg5: BindArg[_T5, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _T4, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        __arg4: BindArg[_T4, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _T3, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        __arg3: BindArg[_T3, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _T2, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        __arg2: BindArg[_T2, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _T1, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        __arg1: BindArg[_T1, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[
+            Callable[
+                Concatenate[_T0, _P],
+                Any,
+            ],
+            Any,
+        ],
+        __arg0: BindArg[_T0, dag.In[dag._I] | dag.NoIn],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.In[dag._I], _YieldT]: ...
+
+    @overload
+    def __call__(
+        self: BindCallable[Callable[_P, Any], Any],
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> dag.StreamNode[dag.NoIn, _YieldT]: ...
+
+    def __call__(self, *args, **kwargs) -> Any: ...
