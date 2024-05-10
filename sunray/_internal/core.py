@@ -154,6 +154,12 @@ if TYPE_CHECKING:
     ) -> _R0: ...
     @overload
     def get(
+        __object_refs: tuple[ObjectRef[_R0]],
+        *,
+        timeout: float = ...,
+    ) -> tuple[_R0]: ...
+    @overload
+    def get(
         __object_refs: tuple[ObjectRef[_R0], ObjectRef[_R1]],
         *,
         timeout: float = ...,
@@ -275,6 +281,8 @@ if TYPE_CHECKING:
         timeout: float | None = ...,
     ) -> tuple: ...
 
+    def get(__object_refs, *, timeout: float | None = ...) -> Any: ...
+
     def put(value: _T, *, _owner: ray.actor.ActorHandle = ...) -> ObjectRef[_T]: ...
 
     @overload
@@ -293,6 +301,14 @@ if TYPE_CHECKING:
         timeout: float | None = ...,
         fetch_local: bool = ...,
     ) -> tuple[list[ObjectRef], list[ObjectRef]]: ...
+
+    def wait(
+        object_refs,
+        *,
+        num_returns: int = ...,
+        timeout: float | None = ...,
+        fetch_local: bool = ...,
+    ) -> Any: ...
 
     class Language(enum.IntEnum):
         JAVA = 1
@@ -409,6 +425,8 @@ if TYPE_CHECKING:
 
     @overload
     def timeline(filename: None = None) -> list[ProfileEvent]: ...
+
+    def timeline(filename=None) -> Any: ...
 
     def cancel(
         ray_waitable: ObjectRef[_R] | ObjectRefGenerator[_R],
