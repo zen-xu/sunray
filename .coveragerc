@@ -4,6 +4,7 @@ source = sunray
 omit =
     sunray/**/__init__.py
     sunray/_internal/typing.py
+    sunray/_internal/callable.py
 
 [report]
 skip_covered = True
