@@ -39,8 +39,10 @@
     a1 = Actor.new_actor().bind(10)
     val = a1.methods.add.bind(1)
     reveal_type(val)
+    reveal_type(sunray.get(val.execute()))
   out: |
     main:14: note: Revealed type is "sunray._internal.dag.ClassMethodNode[sunray._internal.io.NoIn, sunray._internal.io.Out[sunray._internal.core.ObjectRef[builtins.int]]]"
+    main:15: note: Revealed type is "builtins.int"
 
 - case: actor_bind_stream
   main: |
@@ -56,8 +58,10 @@
     a1 = Actor.new_actor().bind()
     val = a1.methods.gen.bind(10)
     reveal_type(val)
+    reveal_type(next(val.execute()))
   out: |
     main:12: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
+    main:13: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
 
 - case: actor_bind_async_stream
   main: |
@@ -74,8 +78,10 @@
     a1 = Actor.new_actor().bind()
     val = a1.methods.gen.bind(10)
     reveal_type(val)
+    reveal_type(next(val.execute()))
   out: |
     main:13: note: Revealed type is "sunray._internal.dag.ClassStreamNode[sunray._internal.io.NoIn, sunray._internal.io.Yield[builtins.int]]"
+    main:14: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
 
 - case: task_bind
   main: |
