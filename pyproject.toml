@@ -3,7 +3,7 @@ authors     = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 description = ""
 name        = "sunray"
 readme      = "README.md"
-version     = "0.2.0"                              # version anchor
+version     = "0.3.0"                              # version anchor
 
 [tool.poetry.dependencies]
 python = "^3.7,<3.12"
@@ -26,7 +26,7 @@ pytest-mypy-plugins = { version = "^3", python = "^3.10" }
 [tool.commitizen]
 bump_message   = "chore(release): bump version $current_version -> $new_version"
 pre_bump_hooks = ["./update-changelog.sh"]
-version        = "0.2.0"                                                         # version anchor
+version        = "0.3.0"                                                         # version anchor
 version_files  = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
