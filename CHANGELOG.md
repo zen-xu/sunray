@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2024-05-20
+
+### 🐛 Bug Fixes
+
+- *(typing)* Fix `runtime_env` does not support extra options (#41)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update pyproject metadata (#42)
+
 ## [0.3.0] - 2024-05-11
 
 ### 🚀 Features
