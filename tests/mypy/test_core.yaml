@@ -49,3 +49,14 @@
   out: |
     main:5: note: Revealed type is "ray.actor.ActorHandle"
     main:6: note: Revealed type is "sunray._internal.actor_mixin.Actor[main.MyActor]"
+
+- case: init_runtime_env_with_extra_options
+  main: |
+    import sunray
+
+    sunray.init(
+      runtime_env={
+        "working_dir": ".",
+        "custom": {"key": "value"},
+      }
+    )
