@@ -355,7 +355,7 @@
     - arg: lifetime
       expected_type: Literal['detached'] | None
     - arg: runtime_env
-      expected_type: RuntimeEnv
+      expected_type: 'RuntimeEnv | dict[str, Any]'
     - arg: concurrency_groups
       expected_type: dict[str, int]
     - arg: scheduling_strategy
