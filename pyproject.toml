@@ -1,9 +1,16 @@
 [tool.poetry]
 authors     = ["ZhengYu, Xu <zen-xu@outlook.com>"]
-description = ""
+description = "More robust ray"
 name        = "sunray"
 readme      = "README.md"
 version     = "0.3.0"                              # version anchor
+classifiers = [
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
 
 [tool.poetry.dependencies]
 python = "^3.7,<3.12"
