@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import types
 
+    from typing import Any
     from typing import Union
 
     from ray import runtime_env
@@ -37,7 +38,7 @@ if TYPE_CHECKING:
         name: str
         namespace: str
         lifetime: Literal["detached"] | None
-        runtime_env: RuntimeEnv
+        runtime_env: RuntimeEnv | dict[str, Any]
         concurrency_groups: dict[str, int]
         scheduling_strategy: SchedulingStrategy
 
@@ -50,14 +51,14 @@ if TYPE_CHECKING:
         object_store_memory: float
         max_calls: int
         max_retries: int
-        runtime_env: RuntimeEnv
+        runtime_env: RuntimeEnv | dict[str, Any]
         retry_exceptions: list[type[Exception]]
         scheduling_strategy: SchedulingStrategy
 
     class RayInitOpts(TypedDict, total=False):
         labels: dict[str, str]
         namespace: str
-        runtime_env: RuntimeEnv
+        runtime_env: RuntimeEnv | dict[str, Any]
 
     class RuntimeEnv(TypedDict, total=False):
         working_dir: str

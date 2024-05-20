@@ -456,7 +456,7 @@ if TYPE_CHECKING:
         logging_format: str | None = None,
         log_to_driver: bool = True,
         namespace: str | None = None,
-        runtime_env: RuntimeEnv | None = None,
+        runtime_env: RuntimeEnv | dict[str, Any] | None = None,
         storage: str | None = None,
         **kwargs,
     ) -> BaseContext: ...
