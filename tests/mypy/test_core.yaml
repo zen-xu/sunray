@@ -60,3 +60,12 @@
         "custom": {"key": "value"},
       }
     )
+
+- case: put_owner
+  main: |
+    from sunray import get_actor, ActorMixin, put
+
+    class MyActor(ActorMixin, name="my-actor"): ...
+
+    actor = MyActor.new_actor().remote()
+    put(1, _owner=actor)

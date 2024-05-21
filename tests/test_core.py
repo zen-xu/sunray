@@ -6,6 +6,7 @@ from ray.util.state import get_actor
 
 from sunray import Actor
 from sunray import ActorMixin
+from sunray import put
 from sunray import remote
 from sunray import remote_method
 from sunray._internal import core
@@ -49,3 +50,16 @@ def test_kill(init_ray):
     ray.get(actor2.methods.ready.remote())
     core.kill(actor2._actor_handle)
     assert get_actor(actor2._actor_handle._actor_id.hex()).state == "DEAD"
+
+
+def test_put(init_ray):
+    class MyActor(ActorMixin, num_cpus=0):
+        @remote_method
+        def ready(self):
+            return True
+
+    actor = MyActor.new_actor().options(name="demo1").remote()
+    ray.get(actor.methods.ready.remote())
+
+    ref = put(1, _owner=actor)
+    assert ray.get(ref) == 1
