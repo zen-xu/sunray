@@ -3,4 +3,3 @@ include = ["*.toml"]
 [formatting]
 align_entries       = true
 inline_table_expand = false
-reorder_keys        = true

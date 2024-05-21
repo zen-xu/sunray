@@ -1,9 +1,9 @@
 [tool.poetry]
-authors     = ["ZhengYu, Xu <zen-xu@outlook.com>"]
+authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 description = "More robust ray"
-name        = "sunray"
-readme      = "README.md"
-version     = "0.3.1"                              # version anchor
+name = "sunray"
+readme = "README.md"
+version = "0.3.1" # version anchor
 classifiers = [
   "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
