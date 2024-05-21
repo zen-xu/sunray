@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2024-05-21
+
+### 🚀 Features
+
+- Support `put` owner with Actor (#45)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(taplo)* Disable reorder_keys (#43)
+
 ## [0.3.1] - 2024-05-20
 
 ### 🐛 Bug Fixes
