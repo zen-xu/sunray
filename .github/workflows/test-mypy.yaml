@@ -4,10 +4,20 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "sunray/**/*.py"
+      - "tests/mypy/*.yaml"
+      - noxfile.py
+      - poetry.lock
   pull_request:
     types:
       - opened
       - synchronize
+    paths:
+      - "sunray/**/*.py"
+      - "tests/mypy/*.yaml"
+      - noxfile.py
+      - poetry.lock
 
 jobs:
   mypy-tests:
