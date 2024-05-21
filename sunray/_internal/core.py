@@ -11,6 +11,8 @@ from typing import overload
 import ray
 import ray.runtime_context
 
+from . import actor_mixin
+
 
 if TYPE_CHECKING:
     import asyncio
@@ -30,7 +32,6 @@ if TYPE_CHECKING:
     from typing_extensions import TypedDict
     from typing_extensions import deprecated
 
-    from . import actor_mixin
     from .typing import RuntimeEnv
 
     _T = TypeVar("_T")
@@ -283,8 +284,6 @@ if TYPE_CHECKING:
 
     def get(__object_refs, *, timeout: float | None = ...) -> Any: ...
 
-    def put(value: _T, *, _owner: ray.actor.ActorHandle = ...) -> ObjectRef[_T]: ...
-
     @overload
     def wait(
         object_refs: list[ObjectRef[_T]],
@@ -490,7 +489,6 @@ else:
             return ray.get(__object_refs, timeout=timeout)
         return tuple(ray.get(list(__object_refs), timeout=timeout))
 
-    put = ray.put
     wait = ray.wait
     Language = ray.Language
     get_runtime_context = ray.get_runtime_context
@@ -565,3 +563,11 @@ def kill(
     if isinstance(actor, actor_mixin.Actor):
         actor = actor._actor_handle
     ray.kill(actor, no_restart=no_restart)
+
+
+def put(
+    value: _T, *, _owner: ray.actor.ActorHandle | actor_mixin.Actor | None = None
+) -> ObjectRef[_T]:
+    if isinstance(_owner, actor_mixin.Actor):
+        _owner = _owner._actor_handle
+    return ray.put(value, _owner=_owner)
