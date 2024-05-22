@@ -149,10 +149,22 @@ if TYPE_CHECKING:
 
     @overload
     def get(
+        __object_refs: ObjectRef[ObjectRef[_R0]],
+        *,
+        timeout: float = ...,
+    ) -> _R0: ...
+    @overload
+    def get(
         __object_refs: ObjectRef[_R0],
         *,
         timeout: float = ...,
     ) -> _R0: ...
+    @overload
+    def get(
+        __object_refs: tuple[ObjectRef[ObjectRef[_R0]]],
+        *,
+        timeout: float = ...,
+    ) -> tuple[_R0]: ...
     @overload
     def get(
         __object_refs: tuple[ObjectRef[_R0]],
@@ -269,6 +281,12 @@ if TYPE_CHECKING:
         *,
         timeout: float = ...,
     ) -> tuple[_R0, _R1, _R2, _R3, _R4, _R5, _R6, _R7, _R8, _R9]: ...
+    @overload
+    def get(
+        __object_refs: list[ObjectRef[ObjectRef[_R0]]],
+        *,
+        timeout: float | None = ...,
+    ) -> tuple[_R0, ...]: ...
     @overload
     def get(
         __object_refs: list[ObjectRef[_R0]],

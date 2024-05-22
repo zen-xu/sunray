@@ -330,6 +330,11 @@ if TYPE_CHECKING:
 
         @overload
         def __call__(
+            self, __obj: Callable[_P, Generator[ObjectRef[_R], Any, Any]]
+        ) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], _R]: ...
+
+        @overload
+        def __call__(
             self, __obj: Callable[_P, Generator[_R, Any, Any]]
         ) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], _R]: ...
 
@@ -343,6 +348,12 @@ if TYPE_CHECKING:
 
 @overload
 def remote(__type: type) -> ActorClass: ...
+
+
+@overload
+def remote(
+    __func: Callable[_P, Generator[ObjectRef[_R], Any, Any]],
+) -> RemoteStream[Callable[_P, Generator[_R, Any, Any]], _R]: ...
 
 
 @overload

@@ -388,3 +388,32 @@
         async def async_stream(self) -> AsyncGenerator[int, None]:
             for i in range(10):
                 yield i
+
+- case: stream_ObjectRef_of_ObjectRef
+  main: |
+    from typing import AsyncGenerator
+    from typing import Generator
+
+    import sunray
+
+
+    class Actor(sunray.ActorMixin):
+        @sunray.remote_method
+        def method1(self) -> Generator[sunray.ObjectRef[int], None, None]:
+            yield sunray.put(1)
+
+        @sunray.remote_method
+        async def method2(self) -> AsyncGenerator[sunray.ObjectRef[int], None]:
+            yield sunray.put(1)
+
+
+    actor = Actor.new_actor().remote()
+    reveal_type(next(actor.methods.method1.remote()))
+    reveal_type(next(actor.methods.method1.options(concurrency_group="a").remote()))
+    reveal_type(next(actor.methods.method2.remote()))
+    reveal_type(next(actor.methods.method2.options(concurrency_group="a").remote()))
+  out: |
+    main:18: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:19: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:20: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:21: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"

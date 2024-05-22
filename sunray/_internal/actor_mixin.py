@@ -617,8 +617,24 @@ if TYPE_CHECKING:
         @overload
         def __call__(
             self,
+            __method: Callable[
+                Concatenate[Any, _P], Generator[ObjectRef[_YieldItem], None, None]
+            ],
+        ) -> StreamMethod[_P, Generator[_YieldItem, None, None], _YieldItem]: ...
+
+        @overload
+        def __call__(
+            self,
             __method: Callable[Concatenate[Any, _P], Generator[_YieldItem, None, None]],
         ) -> StreamMethod[_P, Generator[_YieldItem, None, None], _YieldItem]: ...
+
+        @overload
+        def __call__(
+            self,
+            __method: Callable[
+                Concatenate[Any, _P], AsyncGenerator[ObjectRef[_YieldItem], None]
+            ],
+        ) -> StreamMethod[_P, AsyncGenerator[_YieldItem, None], _YieldItem]: ...
 
         @overload
         def __call__(
@@ -645,8 +661,24 @@ def remote_method(**options: Unpack[MethodOptions]) -> MethodDecorator: ...
 
 @overload
 def remote_method(
+    __method: Callable[
+        Concatenate[Any, _P], Generator[ObjectRef[_YieldItem], None, None]
+    ],
+) -> StreamMethod[_P, Generator[_YieldItem, None, None], _YieldItem]: ...
+
+
+@overload
+def remote_method(
     __method: Callable[Concatenate[Any, _P], Generator[_YieldItem, None, None]],
 ) -> StreamMethod[_P, Generator[_YieldItem, None, None], _YieldItem]: ...
+
+
+@overload
+def remote_method(
+    __method: Callable[
+        Concatenate[Any, _P], AsyncGenerator[ObjectRef[_YieldItem], None]
+    ],
+) -> StreamMethod[_P, AsyncGenerator[_YieldItem, None], _YieldItem]: ...
 
 
 @overload

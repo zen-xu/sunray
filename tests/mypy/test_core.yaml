@@ -69,3 +69,40 @@
 
     actor = MyActor.new_actor().remote()
     put(1, _owner=actor)
+
+- case: stream_ObjectRef_of_ObjectRef
+  main: |
+    import sunray
+    from typing import Generator
+
+    @sunray.remote
+    def func1() -> Generator[sunray.ObjectRef[int], None, None]:
+        yield sunray.put(1)
+
+    @sunray.remote(num_cpus=1)
+    def func2() -> Generator[sunray.ObjectRef[int], None, None]:
+        yield sunray.put(1)
+
+    reveal_type(next(func1.remote()))
+    reveal_type(next(func1.options(num_cpus=1).remote()))
+    reveal_type(next(func2.remote()))
+    reveal_type(next(func2.options(num_cpus=1).remote()))
+  out: |
+    main:12: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:13: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:14: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+    main:15: note: Revealed type is "sunray._internal.core.ObjectRef[builtins.int]"
+
+
+- case: get_ObjectRef_of_ObjectRef
+  main: |
+    import sunray
+
+    def func(ref: sunray.ObjectRef[sunray.ObjectRef[int]]):
+        reveal_type(sunray.get(ref))
+        reveal_type(sunray.get((ref,)))
+        reveal_type(sunray.get([ref]))
+  out: |
+    main:4: note: Revealed type is "builtins.int"
+    main:5: note: Revealed type is "tuple[builtins.int]"
+    main:6: note: Revealed type is "builtins.tuple[builtins.int, ...]"
