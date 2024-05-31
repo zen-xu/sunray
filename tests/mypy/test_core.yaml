@@ -22,7 +22,7 @@
   out: |
     main:6: note: Revealed type is "builtins.int"
     main:7: note: Revealed type is "builtins.tuple[builtins.int, ...]"
-    main:8: note: Revealed type is "builtins.tuple[Any, ...]"
+    main:8: note: Revealed type is "builtins.tuple[builtins.object, ...]"
     main:9: note: Revealed type is "tuple[builtins.int, builtins.str]"
 
 - case: wait
@@ -36,7 +36,7 @@
     reveal_type(wait([int_ref, str_ref]))
   out: |
     main:6: note: Revealed type is "tuple[builtins.list[sunray._internal.core.ObjectRef[builtins.int]], builtins.list[sunray._internal.core.ObjectRef[builtins.int]]]"
-    main:7: note: Revealed type is "tuple[builtins.list[sunray._internal.core.ObjectRef[Any]], builtins.list[sunray._internal.core.ObjectRef[Any]]]"
+    main:7: note: Revealed type is "tuple[builtins.list[sunray._internal.core.ObjectRef[builtins.object]], builtins.list[sunray._internal.core.ObjectRef[builtins.object]]]"
 
 - case: get_actor
   main: |
@@ -69,3 +69,15 @@
 
     actor = MyActor.new_actor().remote()
     put(1, _owner=actor)
+
+- case: object_ref_covariant
+  main: |
+    import sunray
+
+    class Base: ...
+    class Child(Base): ...
+
+    def func(ref: sunray.ObjectRef[Base]): ...
+
+    def main(ref: sunray.ObjectRef[Child]):
+        func(ref)
