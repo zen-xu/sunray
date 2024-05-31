@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2024-05-31
+
+### 🐛 Bug Fixes
+
+- Make ObjectRef type var as covariant (#48)
+
+### 🚜 Refactor
+
+- *(typing.py)* Move classes out of TYPE_CHECKING block (#49)
+
 ## [0.4.0] - 2024-05-21
 
 ### 🚀 Features
