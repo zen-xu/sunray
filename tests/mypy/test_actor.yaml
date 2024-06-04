@@ -388,3 +388,22 @@
         async def async_stream(self) -> AsyncGenerator[int, None]:
             for i in range(10):
                 yield i
+
+- case: covariant_actor
+  main: |
+    import sunray
+
+    class Base(sunray.ActorMixin):
+        ...
+
+    class Child(Base):
+        ...
+
+    def f1(actor: sunray.Actor[Base]): ...
+
+    @sunray.remote
+    def f2(actor: sunray.Actor[Base]): ...
+
+    def main(actor: sunray.Actor[Child]):
+        f1(actor)
+        f2.remote(actor)

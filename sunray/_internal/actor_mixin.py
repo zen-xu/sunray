@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 _Ret = TypeVar("_Ret")
 _YieldItem = TypeVar("_YieldItem")
 _RemoteRet = TypeVar("_RemoteRet", bound=io.Out)
-_ClassT = TypeVar("_ClassT")
+_ClassT_co = TypeVar("_ClassT_co", covariant=True)
 _P = ParamSpec("_P")
 _R0 = TypeVar("_R0")
 _R1 = TypeVar("_R1")
@@ -76,14 +76,16 @@ def add_var_keyword_to_klass(klass):
     return klass
 
 
-class ActorClass(Generic[_P, _ClassT]):
-    def __init__(self, klass: Callable[_P, _ClassT], default_opts: ActorRemoteOptions):
+class ActorClass(Generic[_P, _ClassT_co]):
+    def __init__(
+        self, klass: Callable[_P, _ClassT_co], default_opts: ActorRemoteOptions
+    ):
         self._klass = add_var_keyword_to_klass(klass)
         self._default_opts = default_opts
 
     if TYPE_CHECKING:
-        remote: RemoteCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
-        bind: ClassBindCallable[Callable[_P, _ClassT], io.Actor[_ClassT]]
+        remote: RemoteCallable[Callable[_P, _ClassT_co], io.Out[Actor[_ClassT_co]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT_co], io.Actor[_ClassT_co]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -103,19 +105,19 @@ class ActorClass(Generic[_P, _ClassT]):
 
     def options(
         self, **opts: Unpack[ActorRemoteOptions]
-    ) -> ActorClassWrapper[_P, _ClassT]:
+    ) -> ActorClassWrapper[_P, _ClassT_co]:
         opts = {**self._default_opts, **opts}
         return ActorClassWrapper(self._klass, opts)
 
 
-class ActorClassWrapper(Generic[_P, _ClassT]):
-    def __init__(self, klass: Callable[_P, _ClassT], opts: ActorRemoteOptions):
+class ActorClassWrapper(Generic[_P, _ClassT_co]):
+    def __init__(self, klass: Callable[_P, _ClassT_co], opts: ActorRemoteOptions):
         self._klass = add_var_keyword_to_klass(klass)
         self._opts = opts
 
     if TYPE_CHECKING:
-        remote: RemoteCallable[Callable[_P, _ClassT], io.Out[Actor[_ClassT]]]
-        bind: ClassBindCallable[Callable[_P, _ClassT], io.Actor[_ClassT]]
+        remote: RemoteCallable[Callable[_P, _ClassT_co], io.Out[Actor[_ClassT_co]]]
+        bind: ClassBindCallable[Callable[_P, _ClassT_co], io.Actor[_ClassT_co]]
     else:
 
         def remote(self, *args, **kwargs):
@@ -162,12 +164,12 @@ class ActorMethodProxy:
         return self.actor_method.bind(*args, **kwargs)
 
 
-class Actor(Generic[_ClassT]):
+class Actor(Generic[_ClassT_co]):
     def __init__(self, actor_handle: ActorHandle):
         self._actor_handle = actor_handle
 
     @property
-    def methods(self) -> type[_ClassT]:  # pragma: no cover
+    def methods(self) -> type[_ClassT_co]:  # pragma: no cover
         return ActorHandleProxy(self._actor_handle)  # type: ignore[return-value]
 
     def __repr__(self) -> str:
@@ -835,5 +837,5 @@ class ActorMixin:
         return attr
 
     @classmethod
-    def new_actor(cls: Callable[_P, _ClassT]) -> ActorClass[_P, _ClassT]:
+    def new_actor(cls: Callable[_P, _ClassT_co]) -> ActorClass[_P, _ClassT_co]:
         return ActorClass(cls, cls._default_ray_opts)  # type: ignore[attr-defined]
