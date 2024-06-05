@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2](https://github.com/zen-xu/sunray/compare/0.4.1..0.4.2) - 2024-06-05
+
+### 🐛 Bug Fixes
+
+- Make `sunray.Actor` type var as covariant ([#52](https://github.com/zen-xu/sunray/issues/52)) - ([ed8598c](https://github.com/zen-xu/sunray/commit/ed8598c2db367ac2bcb1aad4bc5171e15d060d4b))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update cliff.toml ([#50](https://github.com/zen-xu/sunray/issues/50)) - ([44e7e4e](https://github.com/zen-xu/sunray/commit/44e7e4e31d77a291ff174e14027f7e9b929ba01e))
+
 ## [0.4.1](https://github.com/zen-xu/sunray/compare/0.4.0..0.4.1) - 2024-05-31
 
 ### 🐛 Bug Fixes
