@@ -19,10 +19,10 @@ if TYPE_CHECKING:
     import concurrent.futures
     import enum
 
+    from collections.abc import Generator
     from pathlib import Path
     from typing import Any
     from typing import Callable
-    from typing import Generator
 
     import ray.actor
 

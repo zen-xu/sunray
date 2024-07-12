@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import os
 
-from typing import Generator
+from typing import TYPE_CHECKING
 
 import ray
 
 from sunray import remote
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 def test_remote_func(init_ray):

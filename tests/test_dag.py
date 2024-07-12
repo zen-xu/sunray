@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator
-from typing import Generator
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -9,6 +8,11 @@ import sunray
 
 from sunray.dag import InputNode
 from sunray.dag import MultiOutputNode
+
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+    from collections.abc import Generator
 
 
 def test_func_bind(init_ray):

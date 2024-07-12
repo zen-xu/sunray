@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generic
-from typing import Mapping
-from typing import Sequence
 from typing import TypeVar
 from typing import Union
 from typing import overload
@@ -21,6 +19,11 @@ import sunray
 from . import io
 from .io import _In
 from .io import _Out
+
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from collections.abc import Sequence
 
 
 _T = TypeVar("_T")

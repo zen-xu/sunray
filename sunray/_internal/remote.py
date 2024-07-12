@@ -22,8 +22,8 @@ from .util import get_num_returns
 
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from typing import Any
-    from typing import Generator
     from typing import Literal
 
     from ray.actor import ActorClass
