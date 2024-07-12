@@ -17,6 +17,7 @@ def test(session, ray_version):
         "pytest-cov",
         "typing-extensions",
         "async-timeout",
+        "madbg==1.3.2",
         f"ray[default]{ray_version}",
     ]
     if session.python < "3.9":

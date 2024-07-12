@@ -39,13 +39,7 @@ def set_trace(breakpoint_uuid=None):
     if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
         connect_ray_pdb = ray.util.rpdb._connect_ray_pdb
     else:
-        try:
-            # detect whether madbg is installed
-            import madbg as _madbg  # noqa: F401
-
-            connect_ray_pdb = _connect_ray_pdb
-        except ImportError:
-            connect_ray_pdb = ray.util.rpdb._connect_ray_pdb
+        connect_ray_pdb = _connect_ray_pdb
 
     # If there is an active debugger already, we do not want to
     # start another one, so "set_trace" is just a no-op in that case.
