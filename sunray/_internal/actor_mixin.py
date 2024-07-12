@@ -89,10 +89,12 @@ class ActorClass(Generic[_P, _ClassT_co]):
     else:
 
         def remote(self, *args, **kwargs):
+            import sunray
+
             remote_cls = (
-                ray.remote(**self._default_opts)(self._klass)
+                sunray.remote(**self._default_opts)(self._klass)
                 if self._default_opts
-                else ray.remote(self._klass)
+                else sunray.remote(self._klass)
             )
             handle = remote_cls.remote(*args, **kwargs)
 
@@ -121,10 +123,12 @@ class ActorClassWrapper(Generic[_P, _ClassT_co]):
     else:
 
         def remote(self, *args, **kwargs):
+            import sunray
+
             remote_cls = (
-                ray.remote(**self._opts)(self._klass)
+                sunray.remote(**self._opts)(self._klass)
                 if self._opts
-                else ray.remote(self._klass)
+                else sunray.remote(self._klass)
             )
             handle = remote_cls.remote(*args, **kwargs)
             return Actor(handle)

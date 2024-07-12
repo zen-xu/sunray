@@ -378,6 +378,25 @@ def remote(*args, **kwargs) -> ActorClass | RemoteFunction | RemoteStream | Call
     assert v2 == 5
     ```
     """
+
+    # try set env var PYTHONBREAKPOINT with 'sunray.set_trace'
+    def set_python_breakpoint(f):
+        def wrapper(*args, **kwargs):
+            import os
+
+            os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    if args and inspect.isfunction(args[0]):
+        f, *rest = args
+        args = (set_python_breakpoint(f), *rest)
+    elif args and inspect.isclass(args[0]):
+        kls, *rest = args
+        kls.__init__ = set_python_breakpoint(kls.__init__)
+        args = (kls, *rest)
+
     ret = ray.remote(*args, **kwargs)
     if isinstance(ret, ray_func.RemoteFunction):
         return (
@@ -393,6 +412,14 @@ def remote(*args, **kwargs) -> ActorClass | RemoteFunction | RemoteStream | Call
     decorator = ret
 
     def wrapper(*args, **kwargs):
+        if args and inspect.isfunction(args[0]):
+            f, *rest = args
+            args = (set_python_breakpoint(f), *rest)
+        elif args and inspect.isclass(args[0]):
+            kls, *rest = args
+            kls.__init__ = set_python_breakpoint(kls.__init__)
+            args = (kls, *rest)
+
         ret = decorator(*args, **kwargs)
 
         if isinstance(ret, ray_func.RemoteFunction):
