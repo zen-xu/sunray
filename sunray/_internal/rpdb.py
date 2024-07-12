@@ -1,6 +1,7 @@
 # mypy: disable-error-code = import-untyped
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import errno
 import inspect
@@ -42,6 +43,13 @@ def set_trace(breakpoint_uuid=None):
     if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
         ray.util.rpdb.set_trace(breakpoint_uuid)
         return
+
+    try:
+        asyncio.get_running_loop()
+        # we can't use madbg in async func
+        return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
+    except RuntimeError:
+        pass
 
     if ray.util.ray_debugpy._is_ray_debugger_enabled():
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
