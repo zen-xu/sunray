@@ -1,4 +1,3 @@
-# mypy: disable-error-code = import-untyped
 from __future__ import annotations
 
 import contextlib
