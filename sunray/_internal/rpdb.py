@@ -39,6 +39,10 @@ def set_trace(breakpoint_uuid=None):
         ray.util.rpdb.set_trace(breakpoint_uuid)
         return
 
+    if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
+        ray.util.rpdb.set_trace(breakpoint_uuid)
+        return
+
     if ray.util.ray_debugpy._is_ray_debugger_enabled():
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
 
