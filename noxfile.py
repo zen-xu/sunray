@@ -36,6 +36,7 @@ def test_mypy(session, ray_version):
         "typing-extensions",
         "mypy==1.9",
         "pytest-mypy-plugins",
+        "madbg==1.3.2",
         f"ray[default]{ray_version}",
     )
 
