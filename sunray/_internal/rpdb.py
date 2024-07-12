@@ -26,10 +26,6 @@ from ray.util.rpdb import _cry
 if TYPE_CHECKING:
     from typing import ContextManager
 
-with contextlib.suppress(ImportError):
-    from madbg.debugger import RemoteIPythonDebugger
-    from madbg.utils import use_context
-
 
 def set_trace(breakpoint_uuid=None):
     """Interrupt the flow of the program and drop into the Ray debugger.
@@ -60,122 +56,136 @@ def set_trace(breakpoint_uuid=None):
         rdb.set_trace(frame=frame)
 
 
-class RemotePdb(Pdb):
-    active_instance = None
-    _ctx_manager: ContextManager[RemoteIPythonDebugger]
+with contextlib.suppress(ImportError):
+    from madbg.debugger import RemoteIPythonDebugger
+    from madbg.utils import use_context
 
-    def __init__(
-        self,
-        breakpoint_uuid: str,
-        host: str,
-        port: int,
-        ip_address: str,
-        quiet=False,
-        **kwargs,
-    ) -> None:
-        self._breakpoint_uuid = breakpoint_uuid
-        self._host = host
-        self._port = port
-        self._ip_address = ip_address
-        self._quiet = quiet
+    class RemotePdb(Pdb):
+        active_instance = None
+        _ctx_manager: ContextManager[RemoteIPythonDebugger]
 
-        server_socket = socket.socket()
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
-        server_socket.bind((host, port))
-        self._listen_socket = server_socket
+        def __init__(
+            self,
+            breakpoint_uuid: str,
+            host: str,
+            port: int,
+            ip_address: str,
+            quiet=False,
+            **kwargs,
+        ) -> None:
+            self._breakpoint_uuid = breakpoint_uuid
+            self._host = host
+            self._port = port
+            self._ip_address = ip_address
+            self._quiet = quiet
 
-    def listen(self):
-        self._listen_socket.listen(1)
-        if not self._quiet:
-            _cry(
-                f"RemotePdb session open at {self._ip_address}:{self._listen_socket.getsockname()[1]}, "
-                f"use 'madbg connect {self._ip_address} {self._listen_socket.getsockname()[1]}' to connect..."
+            server_socket = socket.socket()
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+            server_socket.bind((host, port))
+            self._listen_socket = server_socket
+
+        def listen(self):
+            self._listen_socket.listen(1)
+            if not self._quiet:
+                _cry(
+                    f"RemotePdb session open at {self._ip_address}:{self._listen_socket.getsockname()[1]}, "
+                    f"use 'madbg connect {self._ip_address} {self._listen_socket.getsockname()[1]}' to connect..."
+                )
+            sock, address = self._listen_socket.accept()
+            self._listen_socket.close()
+
+            if not self._quiet:
+                _cry(f"RemotePdb accepted connection from {address!r}.")
+
+            self._ctx_manager = RemoteDebugger.start_from_new_connection(sock)
+            self.backup = []
+            RemotePdb.active_instance = self
+
+        def __restore(self):
+            if self.backup and not self._quiet:
+                _cry(f"Restoring streams: {self.backup} ...")
+            for name, fh in self.backup:
+                setattr(sys, name, fh)
+            _, exit_stack = use_context(self._ctx_manager)
+            exit_stack.close()
+            RemotePdb.active_instance = None
+
+        def do_quit(self, arg):
+            self.__restore()
+            debugger, _ = use_context(self._ctx_manager)
+            return debugger.do_quit(arg)
+
+        do_q = do_exit = do_quit
+
+        def do_continue(self, arg):
+            self.__restore()
+            debugger, _ = use_context(self._ctx_manager)
+            return debugger.do_continue(arg)
+
+        do_c = do_cont = do_continue
+
+        def set_trace(self, frame=None) -> None:
+            if frame is None:
+                frame = sys._getframe().f_back
+            debugger, exit_stack = use_context(self._ctx_manager)
+            try:
+                debugger.set_trace(frame, done_callback=exit_stack.close)
+            except OSError as exc:
+                if exc.errno != errno.ECONNRESET:
+                    raise
+
+        def post_mortem(self, traceback=None):
+            debugger, _ = use_context(self._ctx_manager)
+            try:
+                debugger.post_mortem(traceback)
+            except OSError as exc:
+                if exc.errno != errno.ECONNRESET:
+                    raise
+
+        def do_remote(self, arg):
+            """remote
+            Skip into the next remote call.
+            """
+            # Tell the next task to drop into the debugger.
+            ray._private.worker.global_worker.debugger_breakpoint = (
+                self._breakpoint_uuid
             )
-        sock, address = self._listen_socket.accept()
-        self._listen_socket.close()
+            # Tell the debug loop to connect to the next task.
+            data = json.dumps(
+                {
+                    "job_id": ray.get_runtime_context().get_job_id(),
+                }
+            )
+            _internal_kv_put(
+                f"RAY_PDB_CONTINUE_{self._breakpoint_uuid}",
+                data,
+                namespace=ray_constants.KV_NAMESPACE_PDB,
+            )
+            self.__restore()
+            _, exit_stack = use_context(self._ctx_manager)
+            exit_stack.close()
+            return self.do_continue(arg)
 
-        if not self._quiet:
-            _cry(f"RemotePdb accepted connection from {address!r}.")
+        def do_get(self, arg):
+            """get
+            Skip to where the current task returns to.
+            """
+            ray._private.worker.global_worker.debugger_get_breakpoint = (
+                self._breakpoint_uuid
+            )
+            self.__restore()
+            _, exit_stack = use_context(self._ctx_manager)
+            exit_stack.close()
+            return self.do_continue(arg)
 
-        self._ctx_manager = RemoteIPythonDebugger.start_from_new_connection(sock)
-        self.backup = []
-        RemotePdb.active_instance = self
+    class RemoteDebugger(RemoteIPythonDebugger):
+        def do_continue(self, arg):
+            """Overriding super to add a print"""
+            self.done_callback()
+            self.nosigint = True
+            return super().do_continue(arg)
 
-    def __restore(self):
-        if self.backup and not self._quiet:
-            _cry(f"Restoring streams: {self.backup} ...")
-        for name, fh in self.backup:
-            setattr(sys, name, fh)
-        _, exit_stack = use_context(self._ctx_manager)
-        exit_stack.close()
-        RemotePdb.active_instance = None
-
-    def do_quit(self, arg):
-        self.__restore()
-        debugger, _ = use_context(self._ctx_manager)
-        return debugger.do_quit(arg)
-
-    do_q = do_exit = do_quit
-
-    def do_continue(self, arg):
-        self.__restore()
-        debugger, exit_stack = use_context(self._ctx_manager)
-        exit_stack.close()
-        return debugger.do_continue(arg)
-
-    do_c = do_cont = do_continue
-
-    def set_trace(self, frame=None) -> None:
-        if frame is None:
-            frame = sys._getframe().f_back
-        debugger, exit_stack = use_context(self._ctx_manager)
-        try:
-            debugger.set_trace(frame, done_callback=exit_stack.close)
-        except OSError as exc:
-            if exc.errno != errno.ECONNRESET:
-                raise
-
-    def post_mortem(self, traceback=None):
-        debugger, _ = use_context(self._ctx_manager)
-        try:
-            debugger.post_mortem(traceback)
-        except OSError as exc:
-            if exc.errno != errno.ECONNRESET:
-                raise
-
-    def do_remote(self, arg):
-        """remote
-        Skip into the next remote call.
-        """
-        # Tell the next task to drop into the debugger.
-        ray._private.worker.global_worker.debugger_breakpoint = self._breakpoint_uuid
-        # Tell the debug loop to connect to the next task.
-        data = json.dumps(
-            {
-                "job_id": ray.get_runtime_context().get_job_id(),
-            }
-        )
-        _internal_kv_put(
-            f"RAY_PDB_CONTINUE_{self._breakpoint_uuid}",
-            data,
-            namespace=ray_constants.KV_NAMESPACE_PDB,
-        )
-        self.__restore()
-        _, exit_stack = use_context(self._ctx_manager)
-        exit_stack.close()
-        return self.do_continue(arg)
-
-    def do_get(self, arg):
-        """get
-        Skip to where the current task returns to.
-        """
-        ray._private.worker.global_worker.debugger_get_breakpoint = (
-            self._breakpoint_uuid
-        )
-        self.__restore()
-        _, exit_stack = use_context(self._ctx_manager)
-        exit_stack.close()
-        return self.do_continue(arg)
+        do_c = do_cont = do_continue
 
 
 def _connect_ray_pdb(
