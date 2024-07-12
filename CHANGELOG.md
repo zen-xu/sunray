@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0](https://github.com/zen-xu/sunray/compare/0.4.2..0.5.0) - 2024-07-12
+
+### 🚀  Features
+
+- Enhance rpdb by using madbg ([#54](https://github.com/zen-xu/sunray/issues/54)) - ([4686809](https://github.com/zen-xu/sunray/commit/4686809128dc0380c1783f2050539f47ec2e1da7))
+
+### ⚙️ Miscellaneous Tasks
+
+- Deprecate py37 and py38 ([#55](https://github.com/zen-xu/sunray/issues/55)) - ([ddb1b46](https://github.com/zen-xu/sunray/commit/ddb1b465bfd1d50e6278e40cf7a9c6a200d2f799))
+
 ## [0.4.2](https://github.com/zen-xu/sunray/compare/0.4.1..0.4.2) - 2024-06-05
 
 ### 🐛 Bug Fixes
