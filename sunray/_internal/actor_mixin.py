@@ -89,12 +89,10 @@ class ActorClass(Generic[_P, _ClassT_co]):
     else:
 
         def remote(self, *args, **kwargs):
-            import sunray
-
             remote_cls = (
-                sunray.remote(**self._default_opts)(self._klass)
+                ray.remote(**self._default_opts)(self._klass)
                 if self._default_opts
-                else sunray.remote(self._klass)
+                else ray.remote(self._klass)
             )
             handle = remote_cls.remote(*args, **kwargs)
 
@@ -123,12 +121,10 @@ class ActorClassWrapper(Generic[_P, _ClassT_co]):
     else:
 
         def remote(self, *args, **kwargs):
-            import sunray
-
             remote_cls = (
-                sunray.remote(**self._opts)(self._klass)
+                ray.remote(**self._opts)(self._klass)
                 if self._opts
-                else sunray.remote(self._klass)
+                else ray.remote(self._klass)
             )
             handle = remote_cls.remote(*args, **kwargs)
             return Actor(handle)
@@ -832,6 +828,9 @@ class ActorMixin:
 
     def __init_subclass__(cls, **default_ray_opts: Unpack[ActorRemoteOptions]) -> None:
         super().__init_subclass__()
+        import os
+
+        os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
         cls._default_ray_opts = default_ray_opts
 
     def __getattribute__(self, name: str) -> Any:  # pragma: no cover
