@@ -382,14 +382,27 @@ def remote(*args, **kwargs) -> ActorClass | RemoteFunction | RemoteStream | Call
 
     # try set env var PYTHONBREAKPOINT with 'sunray.set_trace'
     def set_python_breakpoint(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            import os
+        if inspect.isgeneratorfunction(f):
 
-            os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
-            return f(*args, **kwargs)
+            @wraps(f)
+            def wrapper_gen(*args, **kwargs):
+                import os
 
-        return wrapper
+                os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
+                yield from f(*args, **kwargs)
+
+            return wrapper_gen
+        elif inspect.isfunction(f):
+
+            @wraps(f)
+            def wrapper_func(*args, **kwargs):
+                import os
+
+                os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
+                return f(*args, **kwargs)
+
+            return wrapper_func
+        return f
 
     if args and inspect.isfunction(args[0]):
         f, *rest = args
