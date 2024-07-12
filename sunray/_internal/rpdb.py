@@ -14,6 +14,7 @@ from pdb import Pdb
 from typing import TYPE_CHECKING
 
 import ray
+import ray.util.rpdb
 
 from madbg.debugger import RemoteIPythonDebugger
 from madbg.utils import use_context
@@ -32,6 +33,13 @@ def set_trace(breakpoint_uuid=None):
 
     Can be used within a Ray task or actor.
     """
+    try:
+        # detect whether madbg is installed
+        import madbg  # noqa: F401
+    except ImportError:
+        ray.util.rpdb.set_trace(breakpoint_uuid)
+        return
+
     if ray.util.ray_debugpy._is_ray_debugger_enabled():
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
 
