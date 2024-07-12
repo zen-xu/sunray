@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 
-from typing import AsyncGenerator
+from typing import TYPE_CHECKING
 
 import pytest
 import ray
@@ -13,6 +13,10 @@ from sunray import ActorMixin
 from sunray import remote_method
 from sunray._internal.actor_mixin import ActorMethodWrapper
 from sunray._internal.actor_mixin import add_var_keyword_to_klass
+
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 class Demo(ActorMixin, num_cpus=0, concurrency_groups={"group1": 1}):
