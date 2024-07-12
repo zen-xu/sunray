@@ -1,6 +1,7 @@
 # mypy: disable-error-code = import-untyped
 from __future__ import annotations
 
+import contextlib
 import errno
 import inspect
 import json
@@ -16,8 +17,6 @@ from typing import TYPE_CHECKING
 import ray
 import ray.util.rpdb
 
-from madbg.debugger import RemoteIPythonDebugger
-from madbg.utils import use_context
 from ray._private import ray_constants
 from ray.experimental.internal_kv import _internal_kv_del
 from ray.experimental.internal_kv import _internal_kv_put
@@ -26,6 +25,10 @@ from ray.util.rpdb import _cry
 
 if TYPE_CHECKING:
     from typing import ContextManager
+
+with contextlib.suppress(ImportError):
+    from madbg.debugger import RemoteIPythonDebugger
+    from madbg.utils import use_context
 
 
 def set_trace(breakpoint_uuid=None):
