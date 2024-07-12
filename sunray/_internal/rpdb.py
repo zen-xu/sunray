@@ -32,25 +32,26 @@ def set_trace(breakpoint_uuid=None):
 
     Can be used within a Ray task or actor.
     """
-    try:
-        # detect whether madbg is installed
-        import madbg  # noqa: F401
-    except ImportError:
-        ray.util.rpdb.set_trace(breakpoint_uuid)
-        return
-
-    if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
-        ray.util.rpdb.set_trace(breakpoint_uuid)
-        return
 
     if ray.util.ray_debugpy._is_ray_debugger_enabled():
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
+
+    if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
+        connect_ray_pdb = ray.util.rpdb._connect_ray_pdb
+    else:
+        try:
+            # detect whether madbg is installed
+            import madbg as _madbg  # noqa: F401
+
+            connect_ray_pdb = _connect_ray_pdb
+        except ImportError:
+            connect_ray_pdb = ray.util.rpdb._connect_ray_pdb
 
     # If there is an active debugger already, we do not want to
     # start another one, so "set_trace" is just a no-op in that case.
     if ray._private.worker.global_worker.debugger_breakpoint == b"":
         frame = sys._getframe().f_back
-        rdb = _connect_ray_pdb(
+        rdb = connect_ray_pdb(
             host=None,
             port=None,
             quiet=None,
