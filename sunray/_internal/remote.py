@@ -360,7 +360,9 @@ def remote(__func: Callable[_P, _R]) -> RemoteFunction[Callable[_P, _R], _R]: ..
 def remote(**opts: Unpack[FunctionRemoteOptions]) -> RemoteDecorator: ...
 
 
-def remote(*args, **kwargs) -> ActorClass | RemoteFunction | RemoteStream | Callable:
+def remote(
+    *args, **kwargs
+) -> ActorClass | RemoteFunction | RemoteStream | Callable:  # pragma: no cover
     """
     This is an enhanced version of ``ray.remote`` that supports improved type hints.
 
