@@ -1,7 +1,6 @@
 # mypy: disable-error-code = import-untyped
 from __future__ import annotations
 
-import asyncio
 import contextlib
 import errno
 import inspect
@@ -43,13 +42,6 @@ def set_trace(breakpoint_uuid=None):
     if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
         ray.util.rpdb.set_trace(breakpoint_uuid)
         return
-
-    try:
-        asyncio.get_running_loop()
-        # we can't use madbg in async func
-        return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
-    except RuntimeError:
-        pass
 
     if ray.util.ray_debugpy._is_ray_debugger_enabled():
         return ray.util.ray_debugpy.set_trace(breakpoint_uuid)
@@ -191,10 +183,34 @@ with contextlib.suppress(ImportError):
             return self.do_continue(arg)
 
     class RemoteDebugger(RemoteIPythonDebugger):
+        def __init__(self, stdin, stdout, term_type):
+            from IPython.core.history import HistoryManager
+
+            HistoryManager.enabled = False
+            super().__init__(stdin, stdout, term_type)
+
+        @classmethod
+        @contextlib.contextmanager
+        def start_from_new_connection(cls, sock: socket.socket):
+            try:
+                with cls.start(sock.fileno()) as debugger:
+                    yield debugger
+            except Exception:
+                pass
+            finally:
+                cls._set_current_instance(None)
+                sock.close()
+
         def do_continue(self, arg):
             """Overriding super to add a print"""
             self.done_callback()
             self.nosigint = True
+            from IPython import get_ipython
+
+            ipy = get_ipython()
+            ipy.clear_instance()
+            ipy.cleanup()
+
             return super().do_continue(arg)
 
         do_c = do_cont = do_continue
