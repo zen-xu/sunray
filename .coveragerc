@@ -5,6 +5,7 @@ omit =
     sunray/**/__init__.py
     sunray/_internal/typing.py
     sunray/_internal/callable.py
+    sunray/_internal/rpdb.py
 
 [report]
 skip_covered = True
