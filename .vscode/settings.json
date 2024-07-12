@@ -3,6 +3,7 @@
         "builtins",
         "deepdiff",
         "importlib",
+        "madbg",
         "pygrep",
         "pyupgrade",
         "redef",
