@@ -135,3 +135,6 @@ actor = Demo.new_actor().remote(1)
 ref = actor.methods.add.remote(1)
 print(sunray.get(ref))
 ```
+
+## Better Remote Pdb
+![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb.jpg)
