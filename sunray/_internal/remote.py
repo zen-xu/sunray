@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 
+from functools import wraps
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Generic
@@ -381,6 +382,7 @@ def remote(*args, **kwargs) -> ActorClass | RemoteFunction | RemoteStream | Call
 
     # try set env var PYTHONBREAKPOINT with 'sunray.set_trace'
     def set_python_breakpoint(f):
+        @wraps(f)
         def wrapper(*args, **kwargs):
             import os
 
