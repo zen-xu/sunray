@@ -17,10 +17,10 @@ from .util import get_num_returns
 
 
 if TYPE_CHECKING:
-    from typing import AsyncGenerator
-    from typing import Awaitable
+    from collections.abc import AsyncGenerator
+    from collections.abc import Awaitable
+    from collections.abc import Generator
     from typing import Callable
-    from typing import Generator
 
     from ray.actor import ActorHandle
     from ray.actor import ActorMethod

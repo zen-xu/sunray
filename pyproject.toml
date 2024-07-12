@@ -5,20 +5,14 @@ name = "sunray"
 readme = "README.md"
 version = "0.4.2" # version anchor
 classifiers = [
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7,<3.12"
-ray = [
-  { version = "<2.8", extras = ["default"], python = "~3.7" },
-  { version = "<2.11", extras = ["default"], python = "~3.8" },
-  { version = "^2.11", extras = ["default"], python = "^3.9" },
-]
+python            = "^3.9,<3.12"
+ray               = { version = "^2.32", extras = ["default"], python = "^3.9" }
 typing-extensions = "^4.5.0"
 
 [tool.poetry.group.test.dependencies]
@@ -48,7 +42,7 @@ extend-exclude = [
 ]
 fix = true
 line-length = 88
-target-version = "py37"
+target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [

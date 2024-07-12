@@ -4,10 +4,10 @@ import nox
 import nox.tasks
 
 
-MIN_RAY_VERSION = "==2.7.2"
+MIN_RAY_VERSION = "==2.32.0"
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"], reuse_venv=True)
+@nox.session(python=["3.9", "3.10", "3.11"], reuse_venv=True)
 @nox.parametrize(
     "ray_version", [MIN_RAY_VERSION, ""], ids=["min-version", "latest-version"]
 )
@@ -19,9 +19,6 @@ def test(session, ray_version):
         "async-timeout",
         f"ray[default]{ray_version}",
     ]
-    if session.python < "3.9":
-        # https://github.com/ray-project/ray/issues/27299#issuecomment-1239918086
-        packages.append("grpcio>1.48")
 
     coverage_file = session.posargs[0] if session.posargs else "coverage.xml"
     session.install(*packages)
