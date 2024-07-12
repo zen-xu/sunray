@@ -24,7 +24,7 @@ from ray.util.rpdb import _cry
 
 
 if TYPE_CHECKING:
-    from typing import ContextManager
+    from contextlib import AbstractContextManager
 
 
 def set_trace(breakpoint_uuid=None):
@@ -61,7 +61,7 @@ with contextlib.suppress(ImportError):
 
     class RemotePdb(Pdb):
         active_instance = None
-        _ctx_manager: ContextManager[RemoteIPythonDebugger]
+        _ctx_manager: AbstractContextManager[RemoteIPythonDebugger]
 
         def __init__(
             self,
