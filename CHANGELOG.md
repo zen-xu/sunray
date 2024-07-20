@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1](https://github.com/zen-xu/sunray/compare/0.5.0..0.5.1) - 2024-07-20
+
+### 🐛 Bug Fixes
+
+- Fix connect_and_start return wrong context type ([#57](https://github.com/zen-xu/sunray/issues/57)) - ([db8b8ed](https://github.com/zen-xu/sunray/commit/db8b8ed832d4b5d730751f14d5a0dd4bd5cf615e))
+
+### 🚜 Refactor
+
+- Optimize rpdb ([#56](https://github.com/zen-xu/sunray/issues/56)) - ([b0fe71a](https://github.com/zen-xu/sunray/commit/b0fe71aefbe8db8089a9e589295c90e6a064753e))
+
 ## [0.5.0](https://github.com/zen-xu/sunray/compare/0.4.2..0.5.0) - 2024-07-12
 
 ### 🚀  Features
