@@ -16,7 +16,7 @@ from madbg.utils import use_context
 
 
 if TYPE_CHECKING:
-    from contextlib import AbstractAsyncContextManager
+    from contextlib import AbstractContextManager
     from types import FrameType
 
     from ray._private.worker import Worker
@@ -72,7 +72,7 @@ class RemoteDebugger(RemoteIPythonDebugger):
     @classmethod
     def connect_and_start(
         cls, ip: str, port: int
-    ) -> AbstractAsyncContextManager[RemoteIPythonDebugger]:
+    ) -> AbstractContextManager[RemoteIPythonDebugger]:
         # TODO: get rid of context managers at some level - nobody is going to use with start() anyway
         current_instance = cls._get_current_instance()
         if current_instance is not None:
@@ -86,4 +86,4 @@ class RemoteDebugger(RemoteIPythonDebugger):
                 flush=True,
             )
             sock, _ = server_socket.accept()
-        return cls.start_from_new_connection(sock)  # type: ignore[return-type]
+        return cls.start_from_new_connection(sock)
