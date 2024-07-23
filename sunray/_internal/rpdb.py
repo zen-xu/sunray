@@ -69,6 +69,14 @@ def set_trace_by_madbg(frame: FrameType | None):
 
 
 class RemoteDebugger(RemoteIPythonDebugger):
+    def __init__(self, stdin, stdout, term_type):
+        from prompt_toolkit.input import vt100
+
+        # fix annoying `Warning: Input is not a terminal (fd=0)`
+        vt100.Vt100Input._fds_not_a_terminal.add(0)
+
+        super().__init__(stdin, stdout, term_type)
+
     @classmethod
     def connect_and_start(
         cls, ip: str, port: int
