@@ -93,5 +93,10 @@ class RemoteDebugger(RemoteIPythonDebugger):
                 file=sys.__stderr__,
                 flush=True,
             )
-            sock, _ = server_socket.accept()
+            sock, address = server_socket.accept()
+            print(
+                f"RemotePdb accepted connection from {address}.",
+                file=sys.__stderr__,
+                flush=True,
+            )
         return cls.start_from_new_connection(sock)
