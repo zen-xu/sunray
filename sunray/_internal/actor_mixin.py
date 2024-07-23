@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import os
 
 from typing import TYPE_CHECKING
 from typing import Any
@@ -72,7 +73,9 @@ def add_var_keyword_to_klass(klass):
         orig_init(*args, **kwargs)
 
     __init__.__signature__ = sig.replace(parameters=new_params)
-    klass.__init__ = __init__
+    from .remote import update_wrapper_func_code
+
+    klass.__init__ = update_wrapper_func_code(__init__, orig_init.__code__)
     return klass
 
 
@@ -841,4 +844,14 @@ class ActorMixin:
 
     @classmethod
     def new_actor(cls: Callable[_P, _ClassT_co]) -> ActorClass[_P, _ClassT_co]:
+        cls = update_class_methods_filename(cls)  # type: ignore[arg-type]
         return ActorClass(cls, cls._default_ray_opts)  # type: ignore[attr-defined]
+
+
+def update_class_methods_filename(klass: type) -> type:
+    for name, member in inspect.getmembers(klass, inspect.isfunction):
+        member.__code__ = member.__code__.replace(
+            co_filename=member.__code__.co_filename.replace(f"{os.getcwd()}/", "")
+        )
+        setattr(klass, name, member)
+    return klass
