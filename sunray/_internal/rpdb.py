@@ -168,6 +168,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
                     {"info": "dim cyan", "warning": "magenta", "danger": "bold red"}
                 ),
             ),
+            show_layouts=False,
         )(stdin=stdin, stdout=stdout)
 
     debugger.prompt = "ray-pdb> "
