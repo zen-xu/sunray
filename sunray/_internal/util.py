@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def get_num_returns(f: Callable) -> int:
     sig = inspect.signature(f)
-    if getattr(sig.return_annotation, "__origin__", None) == tuple:
+    if getattr(sig.return_annotation, "__origin__", None) is tuple:
         return len(sig.return_annotation.__args__)
 
     ret_annotation = str(sig.return_annotation)
