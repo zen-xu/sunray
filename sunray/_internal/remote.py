@@ -467,10 +467,11 @@ def remote(
 def update_wrapper_func_code(
     wrapper_func: Callable, original_code: CodeType
 ) -> Callable:
-    wrapper_func.__code__ = wrapper_func.__code__.replace(
-        co_filename=original_code.co_filename,
-        co_firstlineno=original_code.co_firstlineno,
-        co_name=original_code.co_name,
-        co_linetable=original_code.co_linetable,
-    )
+    if hasattr(wrapper_func, "__code__"):
+        wrapper_func.__code__ = wrapper_func.__code__.replace(
+            co_filename=original_code.co_filename,
+            co_firstlineno=original_code.co_firstlineno,
+            co_name=original_code.co_name,
+            co_linetable=original_code.co_linetable,
+        )
     return wrapper_func
