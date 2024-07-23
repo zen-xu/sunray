@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import os
 
 from functools import wraps
 from typing import TYPE_CHECKING
@@ -24,6 +25,7 @@ from .util import get_num_returns
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from types import CodeType
     from typing import Any
     from typing import Literal
 
@@ -408,7 +410,11 @@ def remote(
 
     if args and inspect.isfunction(args[0]):
         f, *rest = args
-        args = (set_python_breakpoint(f), *rest)
+        co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
+        code = f.__code__ = f.__code__.replace(co_filename=co_filename)
+        f = set_python_breakpoint(f)
+        f = update_wrapper_func_code(f, code)
+        args = (f, *rest)
     elif args and inspect.isclass(args[0]):
         kls, *rest = args
         kls.__init__ = set_python_breakpoint(kls.__init__)
@@ -431,7 +437,11 @@ def remote(
     def wrapper(*args, **kwargs):
         if args and inspect.isfunction(args[0]):
             f, *rest = args
-            args = (set_python_breakpoint(f), *rest)
+            co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
+            code = f.__code__ = f.__code__.replace(co_filename=co_filename)
+            f = set_python_breakpoint(f)
+            f = update_wrapper_func_code(f, code)
+            args = (f, *rest)
         elif args and inspect.isclass(args[0]):
             kls, *rest = args
             kls.__init__ = set_python_breakpoint(kls.__init__)
@@ -452,3 +462,15 @@ def remote(
         raise ValueError(f"Unexpected return value: {ret}")  # pragma: no cover
 
     return wrapper
+
+
+def update_wrapper_func_code(
+    wrapper_func: Callable, original_code: CodeType
+) -> Callable:
+    wrapper_func.__code__ = wrapper_func.__code__.replace(
+        co_filename=original_code.co_filename,
+        co_firstlineno=original_code.co_firstlineno,
+        co_name=original_code.co_name,
+        co_linetable=original_code.co_linetable,
+    )
+    return wrapper_func
