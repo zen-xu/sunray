@@ -1460,6 +1460,24 @@ qa = ["flake8 (==5.0.4)", "mypy (==0.971)", "types-setuptools (==67.2.0.1)"]
 testing = ["docopt", "pytest"]
 
 [[package]]
+name = "pdbr"
+version = "0.8.8"
+description = "Pdb with Rich library."
+optional = false
+python-versions = ">=3.7.9,<4.0.0"
+files = [
+    {file = "pdbr-0.8.8-py3-none-any.whl", hash = "sha256:32c68956b9386198e38b9771e05e98f937e5410198f341e94db19421441bbb29"},
+    {file = "pdbr-0.8.8.tar.gz", hash = "sha256:e457414a9023fcbffb155699f1283711d1f31e00c218e3076397b359c94c0539"},
+]
+
+[package.dependencies]
+pyreadline3 = {version = ">=3.4.1,<4.0.0", markers = "sys_platform == \"win32\""}
+rich = "*"
+
+[package.extras]
+ipython = ["ipython"]
+
+[[package]]
 name = "pexpect"
 version = "4.9.0"
 description = "Pexpect allows easy control of interactive console applications."
@@ -1798,6 +1816,17 @@ files = [
     {file = "pyinjector-1.3.0-cp39-cp39-win32.whl", hash = "sha256:241a2cadcc5cfe603cc9cf92b2dd445a118e270b3005d420aa267649326071f7"},
     {file = "pyinjector-1.3.0-cp39-cp39-win_amd64.whl", hash = "sha256:fc1e6d00f6d2661b6e205ef200e7b5a7246b4a3eacb61b788264e349e7d9b25b"},
     {file = "pyinjector-1.3.0.tar.gz", hash = "sha256:181b8b3b418a6d88c2e9343b3b0d1e99f98961cb68b16515bbd086ea7c4c25e3"},
+]
+
+[[package]]
+name = "pyreadline3"
+version = "3.4.1"
+description = "A python implementation of GNU readline."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyreadline3-3.4.1-py3-none-any.whl", hash = "sha256:b0efb6516fd4fb07b45949053826a62fa4cb353db5be2bbb4a7aa1fdd1e345fb"},
+    {file = "pyreadline3-3.4.1.tar.gz", hash = "sha256:6f3d1f7b8a31ba32b73917cefc1f28cc660562f39aea8646d30bd6eff21f7bae"},
 ]
 
 [[package]]
@@ -2638,4 +2667,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9,<3.12"
-content-hash = "d595927e7bfdda108ef4d95237e25f935ca0f5110d712afdd8731e6bc84fae10"
+content-hash = "fa3853b7b12b08cced80ba2c3003f58e242e179f98debdcd365388e5c8ba0511"

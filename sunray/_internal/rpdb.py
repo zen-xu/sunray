@@ -4,15 +4,25 @@ from __future__ import annotations
 
 import os
 import sys
+import traceback
 
+from contextlib import contextmanager
 from contextlib import nullcontext
+from termios import tcdrain
 from typing import TYPE_CHECKING
 
 import ray
 import ray.util.rpdb
 
+from madbg.communication import Piping
+from madbg.communication import receive_message
 from madbg.debugger import RemoteIPythonDebugger
+from madbg.tty_utils import PTY
+from madbg.utils import run_thread
 from madbg.utils import use_context
+from pdbr._pdbr import rich_pdb_klass
+from rich.console import Console
+from rich.theme import Theme
 
 
 if TYPE_CHECKING:
@@ -69,12 +79,13 @@ def set_trace_by_madbg(frame: FrameType | None):
 
 
 class RemoteDebugger(RemoteIPythonDebugger):
-    def __init__(self, stdin, stdout, term_type):
+    def __init__(self, stdin, stdout, context, **kwargs):
         from prompt_toolkit.input import vt100
 
         # fix annoying `Warning: Input is not a terminal (fd=0)`
         vt100.Vt100Input._fds_not_a_terminal.add(0)
 
+        term_type = context["term_type"]
         super().__init__(stdin, stdout, term_type)
 
     @classmethod
@@ -100,3 +111,64 @@ class RemoteDebugger(RemoteIPythonDebugger):
                 flush=True,
             )
         return cls.start_from_new_connection(sock)
+
+    @classmethod
+    @contextmanager
+    def start(cls, sock_fd: int):
+        # TODO: just add to pipe list
+        assert cls._get_current_instance() is None
+        term_data = receive_message(sock_fd)
+        term_attrs, term_type, term_size = (
+            term_data["term_attrs"],
+            term_data["term_type"],
+            term_data["term_size"],
+        )
+        with PTY.open() as pty:
+            pty.resize(term_size[0], term_size[1])
+            pty.set_tty_attrs(term_attrs)
+            pty.make_ctty()
+            piping = Piping({sock_fd: {pty.master_fd}, pty.master_fd: {sock_fd}})
+            with run_thread(piping.run):
+                slave_reader = os.fdopen(pty.slave_fd, "r")
+                slave_writer = os.fdopen(pty.slave_fd, "w")
+                try:
+                    instance = build_remote_debugger(
+                        term_size, term_type, slave_reader, slave_writer
+                    )
+                    cls._set_current_instance(instance)
+                    yield instance
+                except Exception:
+                    print(traceback.format_exc(), file=slave_writer)
+                    raise
+                finally:
+                    cls._set_current_instance(None)
+                    print("Closing connection", file=slave_writer, flush=True)
+                    tcdrain(pty.slave_fd)
+                    slave_writer.close()
+
+
+def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, stdout):
+    height, width = term_size
+    if os.environ.get("DISABLE_RPDB_COLOR", "").lower() in ["1", "yes", "true"]:
+        debugger = RemoteDebugger(
+            stdin=stdin, stdout=stdout, context={"term_type": term_type}
+        )
+    else:
+        debugger = rich_pdb_klass(
+            RemoteDebugger,
+            context={"term_type": term_type},
+            console=Console(
+                file=stdout,
+                height=height,
+                width=width,
+                force_terminal=True,
+                force_interactive=True,
+                tab_size=4,
+                theme=Theme(
+                    {"info": "dim cyan", "warning": "magenta", "danger": "bold red"}
+                ),
+            ),
+        )(stdin=stdin, stdout=stdout)
+
+    debugger.prompt = "ray-pdb> "
+    return debugger
