@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import os
+import subprocess
 import sys
 import traceback
 
@@ -16,6 +17,7 @@ from typing import TYPE_CHECKING
 import ray
 import ray.util.rpdb
 
+from IPython.core.alias import Alias
 from madbg.communication import Piping
 from madbg.communication import receive_message
 from madbg.debugger import RemoteIPythonDebugger
@@ -191,6 +193,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
 
         def run_magic(self, line) -> str:
             magic_name, arg, line = self.parseline(line)
+            result = stdout = ""
             if hasattr(self, f"do_{magic_name}"):
                 # We want to use do_{magic_name} methods if defined.
                 # This is indeed the case with do_pdef, do_pdoc etc,
@@ -201,21 +204,28 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
                 if not magic_fn:
                     self.error(f"Line Magic %{magic_name} not found")
                     return ""
-                std_buffer = io.StringIO()
-                with redirect_stdout(std_buffer):
-                    if magic_name in ("time", "timeit"):
-                        result = magic_fn(
-                            arg,
-                            local_ns={
-                                **self.curframe_locals,
-                                **self.curframe.f_globals,
-                            },
-                        )
-                    else:
-                        result = magic_fn(arg)
-                stdout = std_buffer.getvalue()
-                if stdout:
-                    self._print(stdout, print_layout=False)
+
+                if isinstance(magic_fn, Alias):
+                    stdout, stderr = call_magic_fn(magic_fn, arg)
+                    if stderr:
+                        self.error(stderr)
+                        return ""
+                else:
+                    std_buffer = io.StringIO()
+                    with redirect_stdout(std_buffer):
+                        if magic_name in ("time", "timeit"):
+                            result = magic_fn(
+                                arg,
+                                local_ns={
+                                    **self.curframe_locals,
+                                    **self.curframe.f_globals,
+                                },
+                            )
+                        else:
+                            result = magic_fn(arg)
+                    stdout = std_buffer.getvalue()
+            if stdout:
+                self._print(stdout.rstrip("\n"), print_layout=False)
             if result is not None:
                 self._print(str(result), print_layout=False)
             return result
@@ -224,3 +234,29 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
     debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
     debugger.prompt = "ray-pdb> "
     return debugger
+
+
+def call_magic_fn(alias: Alias, rest):
+    cmd = alias.cmd
+    nargs = alias.nargs
+    # Expand the %l special to be the user's input line
+    if cmd.find("%l") >= 0:
+        cmd = cmd.replace("%l", rest)
+        rest = ""
+
+    if nargs == 0:
+        if cmd.find("%%s") >= 1:
+            cmd = cmd.replace("%%s", "%s")
+        # Simple, argument-less aliases
+        cmd = f"{cmd} {rest}"
+    else:
+        # Handle aliases with positional arguments
+        args = rest.split(None, nargs)
+        if len(args) < nargs:
+            raise RuntimeError(
+                f"Alias <{alias.name}> requires {nargs} arguments, {len(args)} given."
+            )
+        cmd = "{} {}".format(cmd % tuple(args[:nargs]), " ".join(args[nargs:]))
+    return subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    ).communicate()
