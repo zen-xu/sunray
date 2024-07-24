@@ -149,28 +149,23 @@ class RemoteDebugger(RemoteIPythonDebugger):
 
 def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, stdout):
     height, width = term_size
-    if os.environ.get("SUNRAY_REMOTE_PDB_COLOR", "1").lower() in ["1", "yes", "true"]:
-        debugger = rich_pdb_klass(
-            RemoteDebugger,
-            context={"term_type": term_type},
-            console=Console(
-                file=stdout,
-                height=height,
-                width=width,
-                force_terminal=True,
-                force_interactive=True,
-                tab_size=4,
-                theme=Theme(
-                    {"info": "dim cyan", "warning": "magenta", "danger": "bold red"}
-                ),
+    debugger = rich_pdb_klass(
+        RemoteDebugger,
+        context={"term_type": term_type},
+        console=Console(
+            file=stdout,
+            height=height,
+            width=width,
+            force_terminal=True,
+            force_interactive=True,
+            tab_size=4,
+            theme=Theme(
+                {"info": "dim cyan", "warning": "magenta", "danger": "bold red"}
             ),
-            show_layouts=False,
-        )(stdin=stdin, stdout=stdout)
-        debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
-    else:
-        debugger = RemoteDebugger(
-            stdin=stdin, stdout=stdout, context={"term_type": term_type}
-        )
-
+        ),
+        show_layouts=os.environ.get("SUNRAY_REMOTE_PDB_SHOW_LAYOUTS", "").lower()
+        in ["1", "yes", "true"],
+    )(stdin=stdin, stdout=stdout)
+    debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
     debugger.prompt = "ray-pdb> "
     return debugger
