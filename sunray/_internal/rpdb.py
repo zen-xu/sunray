@@ -149,7 +149,7 @@ class RemoteDebugger(RemoteIPythonDebugger):
 
 def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, stdout):
     height, width = term_size
-    debugger = rich_pdb_klass(
+    debugger_class = rich_pdb_klass(
         RemoteDebugger,
         context={"term_type": term_type},
         console=Console(
@@ -165,7 +165,16 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
         ),
         show_layouts=os.environ.get("SUNRAY_REMOTE_PDB_SHOW_LAYOUTS", "").lower()
         in ["1", "yes", "true"],
-    )(stdin=stdin, stdout=stdout)
+    )
+
+    class Debugger(debugger_class):
+        def _format_stack_entry(self, frame_lineno):
+            entry = super()._format_stack_entry(frame_lineno)
+            if len(entry.splitlines()) == 1:
+                entry += "\n\n"
+            return entry
+
+    debugger = Debugger(stdin=stdin, stdout=stdout)
     debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
     debugger.prompt = "ray-pdb> "
     return debugger
