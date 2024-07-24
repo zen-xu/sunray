@@ -71,24 +71,24 @@ pip install sunray
 - ray mypy raise error 'RemoteFunctionNoArgs has no attribute "options"'.
 
 ### Round 7: Get actor
-|                                    sunray                                    |                                    ray                                    |
-| :--------------------------------------------------------------------------: | :-----------------------------------------------------------------------: |
+|                                     sunray                                      |                                     ray                                      |
+| :-----------------------------------------------------------------------------: | :--------------------------------------------------------------------------: |
 | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_get_actor.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_get_actor.jpg) |
 
 - sunray get_actor will return `ActorHandle`, and return `Actor[Demo]` if you specify with generic type.
 - ray just return `Any`.
 
 ### Round 8: Call self remote method
-|                                     sunray                                      |                                     ray                                      |
-| :-----------------------------------------------------------------------------: | :--------------------------------------------------------------------------: |
+|                                            sunray                                             |                                            ray                                             |
+| :-------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
 | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_call_self_remote_method.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_call_self_remote_method.jpg) |
 
 - sunray maintains a consistent calling convention, whether it's from internal or external functions.
 - ray, you need to first obtain the current actor from the running context, and then call through the actor.
 
 ### Round 9: Lazy Computation
-|                                            sunray                                             |                                            ray                                             |
-| :-------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
+|                                   sunray                                   |                                   ray                                   |
+| :------------------------------------------------------------------------: | :---------------------------------------------------------------------: |
 | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/sunray_bind.jpg) | ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/ray_bind.jpg) |
 
 - sunray can successfully track the input parameter types and output types.
@@ -137,4 +137,28 @@ print(sunray.get(ref))
 ```
 
 ## Better Remote Pdb
-![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb.jpg)
+|               Support code highlighting and completion                |
+| :-------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-1.jpg) |
+
+|                  Better display variable information                  |
+| :-------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-2.jpg) |
+
+
+|                       Support inspect variables                       |
+| :-------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-3.jpg) |
+
+|                      Support IPython magic funcs                      |
+| :-------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-4.jpg) |
+
+|                    Support time/timeit magic funcs                    |
+| :-------------------------------------------------------------------: |
+| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-5.jpg) |
+
+### RPDB Environments
+- `SUNRAY_REMOTE_PDB`: Enable sunray as the pdb backend; otherwise, use ray. (Default `yes`)
+- `SUNRAY_REMOTE_PDB_SHOW_LAYOUTS`: If enabled, you will get a more user-friendly debug display. (Default `yes`)
+- `SUNRAY_REMOTE_PDB_THEME`: The pdb theme. (Default `ansi_dark`)
