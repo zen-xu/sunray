@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0](https://github.com/zen-xu/sunray/compare/0.5.1..0.6.0) - 2024-07-24
+
+### 🚀  Features
+
+- Add cli tool `sunray` ([#61](https://github.com/zen-xu/sunray/issues/61)) - ([00e8828](https://github.com/zen-xu/sunray/commit/00e8828edf39e58e66e243736fb44c77bfe948cc))
+- Support rpdb with color ([#60](https://github.com/zen-xu/sunray/issues/60)) - ([656cfca](https://github.com/zen-xu/sunray/commit/656cfcaae811753864023d0119e47acd30c0a258))
+
+### 🐛 Bug Fixes
+
+- Fix annoying `Warning: Input is not a terminal (fd=0)` ([#58](https://github.com/zen-xu/sunray/issues/58)) - ([bd6dc73](https://github.com/zen-xu/sunray/commit/bd6dc73a096f061114e2889ebaef76aaf4f6a664))
+
+### ⚙️ Miscellaneous Tasks
+
+- Print accepted connection address in RemotePdb ([#59](https://github.com/zen-xu/sunray/issues/59)) - ([b8f7e5b](https://github.com/zen-xu/sunray/commit/b8f7e5b923f931708c749e113d4dd7fd5d7c128e))
+
 ## [0.5.1](https://github.com/zen-xu/sunray/compare/0.5.0..0.5.1) - 2024-07-20
 
 ### 🐛 Bug Fixes
