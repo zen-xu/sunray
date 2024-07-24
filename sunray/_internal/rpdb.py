@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import io
 import os
 import sys
 import traceback
 
 from contextlib import contextmanager
 from contextlib import nullcontext
+from contextlib import redirect_stdout
 from termios import tcdrain
 from typing import TYPE_CHECKING
 
@@ -157,6 +159,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
             file=stdout,
             height=height,
             width=width,
+            stderr=True,
             force_terminal=True,
             force_interactive=True,
             tab_size=4,
@@ -185,6 +188,37 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
 
         def do_help(self, arg):
             return RemoteDebugger.do_help(self, arg)
+
+        def run_magic(self, line) -> str:
+            magic_name, arg, line = self.parseline(line)
+            if hasattr(self, f"do_{magic_name}"):
+                # We want to use do_{magic_name} methods if defined.
+                # This is indeed the case with do_pdef, do_pdoc etc,
+                # which are defined by our base class (IPython.core.debugger.Pdb).
+                result = getattr(self, f"do_{magic_name}")(arg)
+            else:
+                magic_fn = self.shell.find_line_magic(magic_name)
+                if not magic_fn:
+                    self.error(f"Line Magic %{magic_name} not found")
+                    return ""
+                std_buffer = io.StringIO()
+                with redirect_stdout(std_buffer):
+                    if magic_name in ("time", "timeit"):
+                        result = magic_fn(
+                            arg,
+                            local_ns={
+                                **self.curframe_locals,
+                                **self.curframe.f_globals,
+                            },
+                        )
+                    else:
+                        result = magic_fn(arg)
+                stdout = std_buffer.getvalue()
+                if stdout:
+                    self._print(stdout, print_layout=False)
+            if result is not None:
+                self._print(str(result), print_layout=False)
+            return result
 
     debugger = Debugger(stdin=stdin, stdout=stdout)
     debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
