@@ -4,7 +4,7 @@ import pytest
 import ray
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def init_ray():
     ray.init(address="local", include_dashboard=True)
     yield
