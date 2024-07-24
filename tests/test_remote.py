@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import os
+import sys
 
 from typing import TYPE_CHECKING
 
+import pytest
 import ray
 
 from sunray import remote
@@ -43,6 +45,10 @@ def test_stream_func(init_ray):
     assert [ray.get(next(stream_gen)) for _ in range(n)] == list(range(n))
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11) and os.getenv("GITHUB_ACTIONS") == "true",
+    reason="Python 3.11 will OOM in github actions",
+)
 def test_stream_func_with_options(init_ray):
     @remote(num_cpus=0, runtime_env={"env_vars": {"BASE": "1"}})
     def stream(n: int) -> Generator[int, None, None]:

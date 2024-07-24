@@ -18,6 +18,7 @@ def test(session, ray_version):
         "typing-extensions",
         "async-timeout",
         "madbg==1.3.2",
+        "pdbr",
         f"ray[default]{ray_version}",
     ]
 
@@ -37,6 +38,7 @@ def test_mypy(session, ray_version):
         "mypy==1.9",
         "pytest-mypy-plugins",
         "madbg==1.3.2",
+        "pdbr",
         f"ray[default]{ray_version}",
     )
 

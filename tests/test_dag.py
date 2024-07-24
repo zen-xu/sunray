@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import sys
+
 from typing import TYPE_CHECKING
 
 import pytest
@@ -49,6 +52,10 @@ def test_stream_bind(init_ray, num_cpus=0):
     assert sunray.get(list(gen_ref.execute())) == tuple(range(3))
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11) and os.getenv("GITHUB_ACTIONS") == "true",
+    reason="Python 3.11 will OOM in github actions",
+)
 @pytest.mark.min_ray_version(2, 10)
 def test_stream_option_bind(init_ray, num_cpus=0):
     @sunray.remote
@@ -95,6 +102,10 @@ def test_actor_bind(init_ray):
     assert sunray.get(dag.execute()) == 32
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11) and os.getenv("GITHUB_ACTIONS") == "true",
+    reason="Python 3.11 will OOM in github actions",
+)
 def test_actor_option_bind(init_ray):
     class Worker(sunray.ActorMixin, num_cpus=0):
         def __init__(self, v: int):
