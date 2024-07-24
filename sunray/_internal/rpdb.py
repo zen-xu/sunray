@@ -185,11 +185,22 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
                 entry += "\n\n"
             return entry
 
+        def _print_layout(self, val, **kwargs):
+            try:
+                return super()._print_layout(val, **kwargs)
+            except FileNotFoundError:
+                return self.console.print(val, **kwargs)
+
         def print_stack_entry(self, frame_lineno, prompt_prefix="\n-> ", context=None):
+            try:
+                syntax = self._get_syntax_for_list()
+            except FileNotFoundError:
+                return super().print_stack_entry(frame_lineno, prompt_prefix, context)
+
             head = ANSI_ESCAPE.sub(
                 "", self.format_stack_entry(frame_lineno, prompt_prefix)
             ).splitlines()[0]
-            syntax = self._get_syntax_for_list()
+
             self._print(head, print_layout=False)
             self._print(syntax, print_layout=False)
 
