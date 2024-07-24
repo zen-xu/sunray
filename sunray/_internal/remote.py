@@ -468,7 +468,7 @@ def update_wrapper_func_code(
     wrapper_func: Callable, original_code: CodeType
 ) -> Callable:
     updates = {}
-    for key in ["co_filename", "co_firstlineno", "co_name", "co_linetable"]:
+    for key in ["co_filename", "co_firstlineno", "co_name"]:
         if attr := getattr(original_code, key, None):
             updates[key] = attr
 
