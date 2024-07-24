@@ -105,7 +105,7 @@ class RemoteDebugger(RemoteIPythonDebugger):
             server_socket.listen(1)
             print(
                 f"RemotePdb session open at {ip}:{server_socket.getsockname()[1]}, "
-                f"use 'madbg connect {ip} {server_socket.getsockname()[1]}' to connect...",
+                f"use 'sunray debug {ip} {server_socket.getsockname()[1]}' to connect...",
                 file=sys.__stderr__,
                 flush=True,
             )
@@ -177,7 +177,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
-            self.prompt = "ray-pdb> "
+            self.prompt = "sunray-pdb> "
 
         def _format_stack_entry(self, frame_lineno):
             entry = super()._format_stack_entry(frame_lineno)
