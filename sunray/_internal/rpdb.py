@@ -54,10 +54,10 @@ def set_trace(breakpoint_uuid=None):
 
     frame = sys._getframe().f_back
 
-    if os.environ.get("DISABLE_MADBG", "").lower() in ["1", "yes", "true"]:
-        set_trace_by_ray(frame, breakpoint_uuid)
-    else:
+    if os.environ.get("SUNRAY_REMOTE_PDB", "yes").lower() in ["1", "yes", "true"]:
         set_trace_by_madbg(frame)
+    else:
+        set_trace_by_ray(frame, breakpoint_uuid)
 
 
 def set_trace_by_ray(frame: FrameType | None, breakpoint_uuid: bytes | None):
@@ -149,11 +149,7 @@ class RemoteDebugger(RemoteIPythonDebugger):
 
 def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, stdout):
     height, width = term_size
-    if os.environ.get("DISABLE_RPDB_COLOR", "").lower() in ["1", "yes", "true"]:
-        debugger = RemoteDebugger(
-            stdin=stdin, stdout=stdout, context={"term_type": term_type}
-        )
-    else:
+    if os.environ.get("SUNRAY_REMOTE_PDB_COLOR", "1").lower() in ["1", "yes", "true"]:
         debugger = rich_pdb_klass(
             RemoteDebugger,
             context={"term_type": term_type},
@@ -170,7 +166,11 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
             ),
             show_layouts=False,
         )(stdin=stdin, stdout=stdout)
-        debugger._theme = "ansi_dark"
+        debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
+    else:
+        debugger = RemoteDebugger(
+            stdin=stdin, stdout=stdout, context={"term_type": term_type}
+        )
 
     debugger.prompt = "ray-pdb> "
     return debugger
