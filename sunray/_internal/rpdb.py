@@ -182,7 +182,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
         def _format_stack_entry(self, frame_lineno):
             entry = super()._format_stack_entry(frame_lineno)
             if len(entry.splitlines()) == 1:
-                entry += "\n\n"
+                entry = entry.rstrip() + "\n "
             return entry
 
         def _print_layout(self, val, **kwargs):
