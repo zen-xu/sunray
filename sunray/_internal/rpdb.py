@@ -174,6 +174,11 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
     )
 
     class Debugger(debugger_class):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
+            self.prompt = "ray-pdb> "
+
         def _format_stack_entry(self, frame_lineno):
             entry = super()._format_stack_entry(frame_lineno)
             if len(entry.splitlines()) == 1:
@@ -231,8 +236,6 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
             return result
 
     debugger = Debugger(stdin=stdin, stdout=stdout)
-    debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
-    debugger.prompt = "ray-pdb> "
     return debugger
 
 
