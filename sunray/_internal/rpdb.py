@@ -20,6 +20,7 @@ from madbg.debugger import RemoteIPythonDebugger
 from madbg.tty_utils import PTY
 from madbg.utils import run_thread
 from madbg.utils import use_context
+from pdbr._pdbr import ANSI_ESCAPE
 from pdbr._pdbr import rich_pdb_klass
 from rich.console import Console
 from rich.theme import Theme
@@ -163,7 +164,7 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
                 {"info": "dim cyan", "warning": "magenta", "danger": "bold red"}
             ),
         ),
-        show_layouts=os.environ.get("SUNRAY_REMOTE_PDB_SHOW_LAYOUTS", "").lower()
+        show_layouts=os.environ.get("SUNRAY_REMOTE_PDB_SHOW_LAYOUTS", "yes").lower()
         in ["1", "yes", "true"],
     )
 
@@ -173,6 +174,17 @@ def build_remote_debugger(term_size: tuple[int, int], term_type: str, stdin, std
             if len(entry.splitlines()) == 1:
                 entry += "\n\n"
             return entry
+
+        def print_stack_entry(self, frame_lineno, prompt_prefix="\n-> ", context=None):
+            head = ANSI_ESCAPE.sub(
+                "", self.format_stack_entry(frame_lineno, prompt_prefix)
+            ).splitlines()[0]
+            syntax = self._get_syntax_for_list()
+            self._print(head, print_layout=False)
+            self._print(syntax, print_layout=False)
+
+        def do_help(self, arg):
+            return RemoteDebugger.do_help(self, arg)
 
     debugger = Debugger(stdin=stdin, stdout=stdout)
     debugger._theme = os.environ.get("SUNRAY_REMOTE_PDB_THEME", "ansi_dark")
