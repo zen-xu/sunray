@@ -28,9 +28,14 @@ from madbg.utils import run_thread
 from madbg.utils import use_context
 from pdbr._pdbr import ANSI_ESCAPE
 from pdbr._pdbr import rich_pdb_klass
+from prompt_toolkit.enums import DEFAULT_BUFFER
+from prompt_toolkit.filters import HasFocus
+from prompt_toolkit.filters import IsDone
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.input import vt100
 from prompt_toolkit.input.vt100 import Vt100Input
+from prompt_toolkit.layout.processors import ConditionalProcessor
+from prompt_toolkit.layout.processors import HighlightMatchingBracketProcessor
 from prompt_toolkit.output.vt100 import Vt100_Output
 from rich.console import Console
 from rich.theme import Theme
@@ -109,6 +114,14 @@ class RemoteDebugger(RemoteIPythonDebugger):
                     )
                 ),
                 "multiline": True,
+                "input_processors": [
+                    # Highlight matching brackets, but only when this setting is
+                    # enabled, and only when the DEFAULT_BUFFER has the focus.
+                    ConditionalProcessor(
+                        processor=HighlightMatchingBracketProcessor(chars="[](){}"),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone(),
+                    )
+                ],
             },
             stdin=stdin,
             stdout=stdout,
