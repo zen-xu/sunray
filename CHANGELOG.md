@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0](https://github.com/zen-xu/sunray/compare/0.6.1..0.7.0) - 2024-07-25
+
+### 🚀  Features
+
+- Rpdb highlight the input code ([#65](https://github.com/zen-xu/sunray/issues/65)) - ([cea079e](https://github.com/zen-xu/sunray/commit/cea079ec1505c22f6c9af989e6fd688bbb4f83d5))
+- Support rpdb multiline ([#64](https://github.com/zen-xu/sunray/issues/64)) - ([3ff160e](https://github.com/zen-xu/sunray/commit/3ff160eac0f5d683b89a18905a8a697e2a67c0b2))
+
+### 🐛 Bug Fixes
+
+- Fix raise exception in remote func will trigger ray panic ([#63](https://github.com/zen-xu/sunray/issues/63)) - ([63fee2e](https://github.com/zen-xu/sunray/commit/63fee2e4acb5b39ec079cd3dee2f1c9490abd6c1))
+
 ## [0.6.0](https://github.com/zen-xu/sunray/compare/0.5.1..0.6.0) - 2024-07-24
 
 ### 🚀  Features
