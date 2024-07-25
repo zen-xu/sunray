@@ -18,6 +18,8 @@ import ray
 import ray.util.rpdb
 
 from IPython.core.alias import Alias
+from IPython.terminal.debugger import TerminalPdb
+from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from madbg.communication import Piping
 from madbg.communication import receive_message
 from madbg.debugger import RemoteIPythonDebugger
@@ -26,6 +28,10 @@ from madbg.utils import run_thread
 from madbg.utils import use_context
 from pdbr._pdbr import ANSI_ESCAPE
 from pdbr._pdbr import rich_pdb_klass
+from prompt_toolkit.formatted_text import PygmentsTokens
+from prompt_toolkit.input import vt100
+from prompt_toolkit.input.vt100 import Vt100Input
+from prompt_toolkit.output.vt100 import Vt100_Output
 from rich.console import Console
 from rich.theme import Theme
 
@@ -85,13 +91,30 @@ def set_trace_by_madbg(frame: FrameType | None):
 
 class RemoteDebugger(RemoteIPythonDebugger):
     def __init__(self, stdin, stdout, context, **kwargs):
-        from prompt_toolkit.input import vt100
-
         # fix annoying `Warning: Input is not a terminal (fd=0)`
         vt100.Vt100Input._fds_not_a_terminal.add(0)
-
         term_type = context["term_type"]
-        super().__init__(stdin, stdout, term_type)
+        TerminalInteractiveShell.simple_prompt = False
+        term_input = Vt100Input(stdin)
+        term_output = Vt100_Output.from_pty(stdout, term_type)
+
+        TerminalPdb.__init__(
+            self,
+            pt_session_options={
+                "input": term_input,
+                "output": term_output,
+                "prompt_continuation": (
+                    lambda width, lineno, is_soft_wrap: PygmentsTokens(
+                        self.shell.prompts.continuation_prompt_tokens(width)
+                    )
+                ),
+                "multiline": True,
+            },
+            stdin=stdin,
+            stdout=stdout,
+        )
+        self.use_rawinput = True
+        self.done_callback = None
 
     @classmethod
     def connect_and_start(
