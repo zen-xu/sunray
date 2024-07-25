@@ -20,6 +20,7 @@ import ray.util.rpdb
 from IPython.core.alias import Alias
 from IPython.terminal.debugger import TerminalPdb
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
+from IPython.terminal.ptutils import IPythonPTLexer
 from madbg.communication import Piping
 from madbg.communication import receive_message
 from madbg.debugger import RemoteIPythonDebugger
@@ -113,6 +114,7 @@ class RemoteDebugger(RemoteIPythonDebugger):
                         self.shell.prompts.continuation_prompt_tokens(width)
                     )
                 ),
+                "lexer": IPythonPTLexer(),
                 "multiline": True,
                 "input_processors": [
                     # Highlight matching brackets, but only when this setting is
