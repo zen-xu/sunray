@@ -4,7 +4,7 @@ import nox
 import nox.tasks
 
 
-MIN_RAY_VERSION = "==2.32.0"
+MIN_RAY_VERSION = "==2.20.0"
 
 
 @nox.session(python=["3.9", "3.10", "3.11"], reuse_venv=True)
