@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0](https://github.com/zen-xu/sunray/compare/0.7.0..0.8.0) - 2024-07-26
+
+### 🚀  Features
+
+- Impl exception_auto_debugger contextmanager ([#67](https://github.com/zen-xu/sunray/issues/67)) - ([63f2d6a](https://github.com/zen-xu/sunray/commit/63f2d6ad8a6d79bd55c4cf07f6175082d75d1210))
+
+### Build
+
+- Update ray minimum version to 2.20.0 ([#66](https://github.com/zen-xu/sunray/issues/66)) - ([5a3ff7d](https://github.com/zen-xu/sunray/commit/5a3ff7dfe0431533269669849a6953472d4f0d73))
+
 ## [0.7.0](https://github.com/zen-xu/sunray/compare/0.6.1..0.7.0) - 2024-07-25
 
 ### 🚀  Features
