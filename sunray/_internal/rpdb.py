@@ -91,8 +91,35 @@ def set_trace_by_madbg(frame: FrameType | None):
         if get_global_worker().ray_debugger_external
         else os.environ.get("REMOTE_PDB_HOST", "localhost")
     )
+    debugger: RemoteDebugger
     debugger, exit_stack = use_context(RemoteDebugger.connect_and_start(ip, port))
     debugger.set_trace(frame, done_callback=exit_stack.close)
+
+
+def post_mortem(traceback=None):
+    traceback = traceback or sys.exc_info()[2] or sys.last_traceback
+    if os.environ.get("SUNRAY_REMOTE_PDB", "yes").lower() in ["1", "yes", "true"]:
+        post_mortem_by_madbg(traceback)
+    else:
+        post_mortem_by_ray(traceback)
+
+
+def post_mortem_by_ray(traceback):
+    ray.util.rpdb._connect_ray_pdb(
+        breakpoint_uuid=None,
+        debugger_external=get_global_worker().ray_debugger_external,
+    ).post_mortem(traceback)
+
+
+def post_mortem_by_madbg(traceback):
+    port = int(os.environ.get("REMOTE_PDB_PORT", "0"))
+    ip: str = (
+        get_global_worker().node_ip_address
+        if get_global_worker().ray_debugger_external
+        else os.environ.get("REMOTE_PDB_HOST", "localhost")
+    )
+    with RemoteDebugger.connect_and_start(ip, port) as debugger:
+        debugger.post_mortem(traceback)
 
 
 class RemoteDebugger(RemoteIPythonDebugger):

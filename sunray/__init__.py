@@ -51,4 +51,5 @@ from ._internal.core import wait as wait
 from ._internal.remote import remote as remote
 
 # remote pdb
+from ._internal.rpdb import post_mortem as post_mortem
 from ._internal.rpdb import set_trace as set_trace
