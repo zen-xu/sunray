@@ -199,8 +199,8 @@ class RemoteDebugger(RemoteIPythonDebugger):
             pty.make_ctty()
             piping = Piping({sock_fd: {pty.master_fd}, pty.master_fd: {sock_fd}})
             with run_thread(piping.run):
-                slave_reader = os.fdopen(pty.slave_fd, "r")
-                slave_writer = os.fdopen(pty.slave_fd, "w")
+                slave_reader = os.fdopen(pty.slave_fd, "r", encoding="utf-8")
+                slave_writer = os.fdopen(pty.slave_fd, "w", encoding="utf-8")
                 try:
                     instance = build_remote_debugger(
                         term_size, term_type, slave_reader, slave_writer
