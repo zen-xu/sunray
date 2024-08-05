@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.1](https://github.com/zen-xu/sunray/compare/0.8.0..0.8.1) - 2024-08-05
+
+### 🐛 Bug Fixes
+
+- Add encoding when fdopen slave_fd ([#69](https://github.com/zen-xu/sunray/issues/69)) - ([ae27f00](https://github.com/zen-xu/sunray/commit/ae27f00cb587b050b1f4b9e1bda85898c24e46f0))
+
 ## [0.8.0](https://github.com/zen-xu/sunray/compare/0.7.0..0.8.0) - 2024-07-26
 
 ### 🚀  Features
