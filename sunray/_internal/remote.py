@@ -3,7 +3,6 @@ from __future__ import annotations
 import inspect
 import os
 
-from functools import wraps
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Generic
@@ -384,40 +383,14 @@ def remote(
     ```
     """
 
-    # try set env var PYTHONBREAKPOINT with 'sunray.set_trace'
-    def set_python_breakpoint(f):
-        if inspect.isgeneratorfunction(f):
-
-            @wraps(f)
-            def wrapper_gen(*args, **kwargs):
-                import os
-
-                os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
-                yield from f(*args, **kwargs)
-
-            return wrapper_gen
-        elif inspect.isfunction(f):
-
-            @wraps(f)
-            def wrapper_func(*args, **kwargs):
-                import os
-
-                os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
-                return f(*args, **kwargs)
-
-            return wrapper_func
-        return f
-
     if args and inspect.isfunction(args[0]):
         f, *rest = args
         co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
         code = f.__code__ = f.__code__.replace(co_filename=co_filename)
-        f = set_python_breakpoint(f)
         f = update_wrapper_func_code(f, code)
         args = (f, *rest)
     elif args and inspect.isclass(args[0]):
         kls, *rest = args
-        kls.__init__ = set_python_breakpoint(kls.__init__)
         args = (kls, *rest)
 
     ret = ray.remote(*args, **kwargs)
@@ -439,12 +412,10 @@ def remote(
             f, *rest = args
             co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
             code = f.__code__ = f.__code__.replace(co_filename=co_filename)
-            f = set_python_breakpoint(f)
             f = update_wrapper_func_code(f, code)
             args = (f, *rest)
         elif args and inspect.isclass(args[0]):
             kls, *rest = args
-            kls.__init__ = set_python_breakpoint(kls.__init__)
             args = (kls, *rest)
 
         ret = decorator(*args, **kwargs)
