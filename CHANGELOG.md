@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0](https://github.com/zen-xu/sunray/compare/0.8.1..0.9.0) - 2024-10-31
+
+### ⚙️ Miscellaneous Tasks
+
+- Deprecate rpdb, please use plan-d ([#79](https://github.com/zen-xu/sunray/issues/79)) - ([0ee97ff](https://github.com/zen-xu/sunray/commit/0ee97ffa3ec653744f0719dfb24ef9863242e93e))
+
 ## [0.8.1](https://github.com/zen-xu/sunray/compare/0.8.0..0.8.1) - 2024-08-05
 
 ### 🐛 Bug Fixes
