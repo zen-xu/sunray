@@ -135,30 +135,3 @@ actor = Demo.new_actor().remote(1)
 ref = actor.methods.add.remote(1)
 print(sunray.get(ref))
 ```
-
-## Better Remote Pdb
-|               Support code highlighting and completion                |
-| :-------------------------------------------------------------------: |
-| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-1.jpg) |
-
-|                  Better display variable information                  |
-| :-------------------------------------------------------------------: |
-| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-2.jpg) |
-
-
-|                       Support inspect variables                       |
-| :-------------------------------------------------------------------: |
-| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-3.jpg) |
-
-|                      Support IPython magic funcs                      |
-| :-------------------------------------------------------------------: |
-| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-4.jpg) |
-
-|                    Support time/timeit magic funcs                    |
-| :-------------------------------------------------------------------: |
-| ![](https://zenxu-github-asset.s3.us-east-2.amazonaws.com/rpdb-5.jpg) |
-
-### RPDB Environments
-- `SUNRAY_REMOTE_PDB`: Enable sunray as the pdb backend; otherwise, use ray. (Default `yes`)
-- `SUNRAY_REMOTE_PDB_SHOW_LAYOUTS`: If enabled, you will get a more user-friendly debug display. (Default `yes`)
-- `SUNRAY_REMOTE_PDB_THEME`: The pdb theme. (Default `ansi_dark`)

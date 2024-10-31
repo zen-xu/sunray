@@ -831,9 +831,6 @@ class ActorMixin:
 
     def __init_subclass__(cls, **default_ray_opts: Unpack[ActorRemoteOptions]) -> None:
         super().__init_subclass__()
-        import os
-
-        os.environ["PYTHONBREAKPOINT"] = "sunray.set_trace"
         cls._default_ray_opts = default_ray_opts
 
     def __getattribute__(self, name: str) -> Any:  # pragma: no cover
