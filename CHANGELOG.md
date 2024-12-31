@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1](https://github.com/zen-xu/sunray/compare/0.9.0..0.9.1) - 2024-12-31
+
+### ⚙️ Miscellaneous Tasks
+
+- No longer limit python max version ([#85](https://github.com/zen-xu/sunray/issues/85)) - ([1e1078a](https://github.com/zen-xu/sunray/commit/1e1078a3faf817443b97d5153598b798bcb75f73))
+- Create FUNDING.yml ([#82](https://github.com/zen-xu/sunray/issues/82)) - ([0507273](https://github.com/zen-xu/sunray/commit/0507273574b746c215bf0fcbcedbb9af311bc875))
+
 ## [0.9.0](https://github.com/zen-xu/sunray/compare/0.8.1..0.9.0) - 2024-10-31
 
 ### ⚙️ Miscellaneous Tasks
