@@ -7,7 +7,7 @@ import nox.tasks
 MIN_RAY_VERSION = "==2.20.0"
 
 
-@nox.session(python=["3.9", "3.10", "3.11"], reuse_venv=True)
+@nox.session(python=["3.9", "3.10", "3.11", "3.12"], reuse_venv=True)
 @nox.parametrize(
     "ray_version", [MIN_RAY_VERSION, ""], ids=["min-version", "latest-version"]
 )

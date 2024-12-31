@@ -8,10 +8,11 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 
 [tool.poetry.dependencies]
-python            = "^3.9,<3.12"
+python            = "^3.9,<4"
 ray               = { version = "^2.20", extras = ["default"], python = "^3.9" }
 typing-extensions = "^4.5.0"
 
