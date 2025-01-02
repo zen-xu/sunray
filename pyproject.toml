@@ -3,7 +3,7 @@ authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 description = "More robust ray"
 name = "sunray"
 readme = "README.md"
-version = "0.9.1" # version anchor
+version = "0.10.0" # version anchor
 classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -31,7 +31,7 @@ sunray = 'sunray.__main__:cli'
 [tool.commitizen]
 bump_message   = "chore(release): bump version $current_version -> $new_version"
 pre_bump_hooks = ["./update-changelog.sh"]
-version        = "0.9.1"                                                         # version anchor
+version        = "0.10.0"                                                         # version anchor
 version_files  = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
