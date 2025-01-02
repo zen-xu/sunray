@@ -55,6 +55,7 @@ class FunctionRemoteOptions(TypedDict, total=False):
     max_calls: int
     max_retries: int
     runtime_env: RuntimeEnv | dict[str, Any]
+    name: str
     retry_exceptions: list[type[Exception]]
     scheduling_strategy: SchedulingStrategy
 

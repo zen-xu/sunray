@@ -194,6 +194,7 @@ class Actor(Generic[_ClassT_co]):
 if TYPE_CHECKING:
 
     class MethodOptions(TypedDict, total=False):
+        name: str
         concurrency_group: str
         max_task_retries: int
         retry_exceptions: bool | list[type[Exception]]
