@@ -48,6 +48,7 @@ jobs:
         id: setup-python
         with:
           python-version: ${{ matrix.python-version }}
+          check-latest: true
 
       - name: Set up nox
         run: pip install nox
@@ -61,7 +62,7 @@ jobs:
 
       - name: Run unit test
         run: |
-          nox --no-error-on-external-run -s "test-${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
+          nox -s "test-${{ matrix.python-version }}" --no-stop-on-first-error -- coverage.${{ runner.os }}-py${{ matrix.python-version }}.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
