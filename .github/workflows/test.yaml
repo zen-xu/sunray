@@ -48,16 +48,10 @@ jobs:
         id: setup-python
         with:
           python-version: ${{ matrix.python-version }}
+          check-latest: true
 
       - name: Set up nox
         run: pip install nox
-
-      - name: Set up cache
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: .nox
-          key: nox-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('noxfile.py') }}
 
       - name: Run unit test
         run: |
