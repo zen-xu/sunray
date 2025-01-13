@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0](https://github.com/zen-xu/sunray/compare/0.10.0..0.11.0) - 2025-01-13
+
+### 🚀  Features
+
+- Impl ActorPool ([#87](https://github.com/zen-xu/sunray/issues/87)) - ([070dc6a](https://github.com/zen-xu/sunray/commit/070dc6aed458ba6245d576f0da3e184f616bd1fe))
+
 ## [0.10.0](https://github.com/zen-xu/sunray/compare/0.9.1..0.10.0) - 2025-01-02
 
 ### 🚀  Features
