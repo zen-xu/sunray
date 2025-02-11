@@ -43,6 +43,7 @@ class ActorRemoteOptions(TypedDict, total=False):
     runtime_env: RuntimeEnv | dict[str, Any]
     concurrency_groups: dict[str, int]
     scheduling_strategy: SchedulingStrategy
+    get_if_exists: bool
 
 
 class FunctionRemoteOptions(TypedDict, total=False):
