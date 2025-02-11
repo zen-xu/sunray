@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.1](https://github.com/zen-xu/sunray/compare/0.11.0..0.11.1) - 2025-02-11
+
+### 🐛 Bug Fixes
+
+- Add `get_if_exists` to ActorRemoteOptions ([#88](https://github.com/zen-xu/sunray/issues/88)) - ([29bb70b](https://github.com/zen-xu/sunray/commit/29bb70bffce50d372e067f7c9b266cb49123070c))
+
 ## [0.11.0](https://github.com/zen-xu/sunray/compare/0.10.0..0.11.0) - 2025-01-13
 
 ### 🚀  Features
