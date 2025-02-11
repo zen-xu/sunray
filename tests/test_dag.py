@@ -36,7 +36,7 @@ def test_func_option_bind(init_ray):
     def func(v: str) -> str:
         import os
 
-        return f'{os.environ.get("ARG", "1")} + {v}'
+        return f"{os.environ.get('ARG', '1')} + {v}"
 
     a_ref = func.options(runtime_env={"env_vars": {"ARG": "3"}}).bind("1")
     assert sunray.get(a_ref.execute()) == "3 + 1"

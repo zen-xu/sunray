@@ -26,7 +26,7 @@ def test_remote_func(init_ray):
 def test_remote_func_options(init_ray):
     @remote(num_cpus=0, runtime_env={"env_vars": {"ARG": "Hello"}})
     def func() -> str:
-        return f'{os.environ["ARG"]} sunray'
+        return f"{os.environ['ARG']} sunray"
 
     assert ray.get(func.remote()) == "Hello sunray"
     assert (
