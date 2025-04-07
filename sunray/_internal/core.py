@@ -27,11 +27,12 @@ if TYPE_CHECKING:
     import ray.actor
 
     from ray._private.worker import BaseContext
-    from ray.job_config import JobConfig
     from typing_extensions import Self
     from typing_extensions import TypedDict
+    from typing_extensions import Unpack
     from typing_extensions import deprecated
 
+    from .typing import RayInitOpts
     from .typing import RuntimeEnv
 
     _T = TypeVar("_T")
@@ -437,27 +438,8 @@ if TYPE_CHECKING:
     def get_gpu_ids() -> list[int] | list[str]: ...
 
     def init(
-        address: str | None = None,
-        *,
-        num_cpus: int | None = None,
-        num_gpus: int | None = None,
-        resources: dict[str, float] | None = None,
-        labels: dict[str, str] | None = None,
-        object_store_memory: int | None = None,
-        local_mode: bool = False,
-        ignore_reinit_error: bool = False,
-        include_dashboard: bool | None = None,
-        dashboard_host: str = ...,
-        dashboard_port: int | None = None,
-        job_config: JobConfig | None = None,
-        configure_logging: bool = True,
-        logging_level: int = ...,
-        logging_format: str | None = None,
-        log_to_driver: bool = True,
-        namespace: str | None = None,
-        runtime_env: RuntimeEnv | dict[str, Any] | None = None,
-        storage: str | None = None,
-        **kwargs,
+        address: str = ...,
+        **kwargs: Unpack[RayInitOpts],
     ) -> BaseContext: ...
 
     def is_initialized() -> bool: ...

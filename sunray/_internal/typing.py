@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     import types
 
     from ray import runtime_env
-
+    from ray.job_config import JobConfig
 
 SchedulingStrategy = Union[
     Literal["DEFAULT", "SPREAD"],
@@ -62,9 +62,33 @@ class FunctionRemoteOptions(TypedDict, total=False):
 
 
 class RayInitOpts(TypedDict, total=False):
+    num_cpus: int
+    num_gpus: int
+    resources: dict[str, float]
     labels: dict[str, str]
+    object_store_memory: int
+    local_mode: bool
+    ignore_reinit_error: bool
+    include_dashboard: bool
+    dashboard_host: str
+    dashboard_port: int
+    job_config: JobConfig
+    configure_logging: bool
+    logging_level: int
+    logging_format: str
+    log_to_driver: bool
     namespace: str
     runtime_env: RuntimeEnv | dict[str, Any]
+    storage: str
+    _enable_object_reconstruction: bool
+    _redis_max_memory: int
+    _plasma_directory: str
+    _node_ip_address: str
+    _redis_password: str
+    _temp_dir: str
+    _metrics_export_port: int
+    _tracing_startup_hook: str
+    _node_name: str
 
 
 class RuntimeEnv(TypedDict, total=False):
