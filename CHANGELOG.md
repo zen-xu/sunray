@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0](https://github.com/zen-xu/sunray/compare/0.11.1..0.12.0) - 2025-04-07
+
+### 🚀  Features
+
+- Add more ray init options ([#91](https://github.com/zen-xu/sunray/issues/91)) - ([e7de4c1](https://github.com/zen-xu/sunray/commit/e7de4c127f79e73f44537eb9025209eb690c9635))
+- Support uv ([#90](https://github.com/zen-xu/sunray/issues/90)) - ([fbf80fe](https://github.com/zen-xu/sunray/commit/fbf80fed778fb0bddd8deb93babac5b4baf707d6))
+
 ## [0.11.1](https://github.com/zen-xu/sunray/compare/0.11.0..0.11.1) - 2025-02-11
 
 ### 🐛 Bug Fixes
