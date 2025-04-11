@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.1](https://github.com/zen-xu/sunray/compare/0.12.0..0.12.1) - 2025-04-11
+
+### 🐛 Bug Fixes
+
+- Add runtime_env `worker_process_setup_hook` and `py_executable` ([#93](https://github.com/zen-xu/sunray/issues/93)) - ([28b682b](https://github.com/zen-xu/sunray/commit/28b682b7ebc33e7f969493f25e6373a6cef85c45))
+
 ## [0.12.0](https://github.com/zen-xu/sunray/compare/0.11.1..0.12.0) - 2025-04-07
 
 ### 🚀  Features
