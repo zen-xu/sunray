@@ -14,6 +14,8 @@ from typing_extensions import TypedDict
 if TYPE_CHECKING:
     import types
 
+    from collections.abc import Callable
+
     from ray import runtime_env
     from ray.job_config import JobConfig
 
@@ -140,6 +142,15 @@ class RuntimeEnv(TypedDict, total=False):
     Note: This feature is currently limited to modules that are packages with a single directory containing an ``__init__.py`` file.  For single-file modules, you may use ``working_dir``.
     """
 
+    py_executable: str
+    """
+    Specifies the executable used for running the Ray workers. It can include arguments as well. The executable can be
+    located in the `working_dir`. This runtime environment is useful to run workers in a custom debugger or profiler as well as to run workers
+    in an environment set up by a package manager like `UV` (see :ref:`here <use-uv-for-package-management>`).
+
+    Note: ``py_executable`` is new functionality and currently experimental. If you have some requirements or run into any problems, raise issues in `github <https://github.com/ray-project/ray/issues>`.
+    """
+
     excludes: list[str]
     """
     When used with ``working_dir`` or ``py_modules``, specifies a list of files or paths to exclude from being uploaded to the cluster.
@@ -233,6 +244,16 @@ class RuntimeEnv(TypedDict, total=False):
     - Example: ``{"LD_LIBRARY_PATH": "${LD_LIBRARY_PATH}:/home/admin/my_lib"}``
 
     - Non-existent variable example: ``{"ENV_VAR_NOT_EXIST": "${ENV_VAR_NOT_EXIST}:/home/admin/my_lib"}`` -> ``ENV_VAR_NOT_EXIST=":/home/admin/my_lib"``.
+    """
+
+    worker_process_setup_hook: Callable
+    """
+    (Experimental) The setup hook that's called after workers start and before Tasks and Actors are scheduled.
+    A module name (string type) or callable (function) can be passed.
+    When a module name is passed, Ray worker should be able to access the
+    module name. When a callable is passed, callable should be serializable.
+    When a runtime env is specified by job submission API,
+    only a module name (string) is allowed.
     """
 
     config: RuntimeEnvConfig | runtime_env.RuntimeEnvConfig
