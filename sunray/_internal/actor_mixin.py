@@ -173,7 +173,11 @@ class Actor(Generic[_ClassT_co]):
 
     @property
     def methods(self) -> type[_ClassT_co]:  # pragma: no cover
+        """Get the methods of the actor."""
         return ActorHandleProxy(self._actor_handle)  # type: ignore[return-value]
+
+    m = methods
+    """alias for methods"""
 
     def __repr__(self) -> str:
         return repr(self._actor_handle)
