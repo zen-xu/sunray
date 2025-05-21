@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Generic
+from typing import Protocol
 from typing import TypeVar
 from typing import Union
 from typing import overload
@@ -37,6 +38,12 @@ RemoteArg = Union[_T, "sunray.ObjectRef[_T]"]
 
 _Callable_co = TypeVar("_Callable_co", covariant=True, bound=Callable)
 _RemoteRet = TypeVar("_RemoteRet", covariant=True, bound=io.Out)
+
+_T_co = TypeVar("_T_co", contravariant=True)
+
+
+class HomogeneousCallable(Protocol[_T_co]):
+    def __call__(self, *args: _T_co) -> Any: ...
 
 
 class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
@@ -223,6 +230,15 @@ class RemoteCallable(Generic[_Callable_co, _RemoteRet]):
         __arg0: RemoteArg[_T0],
         *args: _P.args,
         **kwargs: _P.kwargs,
+    ) -> _T: ...
+
+    @overload
+    def __call__(
+        self: RemoteCallable[
+            HomogeneousCallable[_T_co],
+            io.Out[_T],
+        ],
+        *args: RemoteArg[_T_co],
     ) -> _T: ...
 
     @overload
