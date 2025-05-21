@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0](https://github.com/zen-xu/sunray/compare/0.12.1..0.13.0) - 2025-05-21
+
+### 🚀  Features
+
+- Support homogeneous remote func ([#97](https://github.com/zen-xu/sunray/issues/97)) - ([452852e](https://github.com/zen-xu/sunray/commit/452852ee8f64012e925889123d7b369d1e607ae0))
+- Actor add an alias `m` for the `methods` ([#95](https://github.com/zen-xu/sunray/issues/95)) - ([e11eba9](https://github.com/zen-xu/sunray/commit/e11eba96304030bfc7d054b42fdd399830c49863))
+
 ## [0.12.1](https://github.com/zen-xu/sunray/compare/0.12.0..0.12.1) - 2025-04-11
 
 ### 🐛 Bug Fixes
