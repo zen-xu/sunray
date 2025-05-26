@@ -1,42 +1,37 @@
-[tool.poetry]
-authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
-description = "More robust ray"
+[project]
 name = "sunray"
-readme = "README.md"
 version = "0.13.0" # version anchor
+authors = [{ name = "ZhengYu, Xu", email = "zen-xu@outlook.com" }]
+description = "More robust ray"
+readme = "README.md"
+requires-python = ">=3.9,<4"
 classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
+dependencies = ["ray[default] >=2.20,<3", "typing-extensions >=4.5.0,<5"]
 
-[tool.poetry.dependencies]
-python            = "^3.9,<4"
-ray               = { version = "^2.20", extras = ["default"], python = "^3.9" }
-typing-extensions = "^4.5.0"
-
-[tool.poetry.group.test.dependencies]
-deepdiff            = "^6.7.1"
-importlib_metadata  = "6.7.0"
-mypy                = { version = "^1.9", python = "^3.10" }
-nox                 = "^2024.4.15"
-pytest              = "<8.0"
-pytest-cov          = "^4.1.0"
-pytest-mypy-plugins = { version = "^3", python = "^3.10" }
-
-[tool.poetry.scripts]
-sunray = 'sunray.__main__:cli'
+[project.optional-dependencies]
+test = [
+  "pytest >=8,<9",
+  "pytest-cov >=4.1",
+  "nox >=2024.4.15",
+  "deepdiff >=6.7.1",
+  "importlib-metadata >=6.7.0",
+  "mypy >=1.9; python_version >= '3.10'",
+  "pytest-mypy-plugins>=3; python_version >= '3.10'",
+]
 
 [tool.commitizen]
-bump_message   = "chore(release): bump version $current_version -> $new_version"
-pre_bump_hooks = ["./update-changelog.sh"]
-version        = "0.13.0"                                                        # version anchor
-version_files  = ["pyproject.toml:version anchor", "sunray/__init__.py"]
+bump_message  = "chore(release): bump version $current_version -> $new_version"
+version       = "0.13.0"                                                        # version anchor
+version_files = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires      = ["poetry-core"]
+requires      = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 extend-exclude = [
@@ -59,7 +54,7 @@ extend-select = [
   "PGH", # pygrep
   "RUF", # ruff checks
   "SIM", # flake8-simplify
-  "TCH", # flake8-type-checking
+  "TC",  # flake8-type-checking
   "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
 ]
@@ -88,3 +83,30 @@ explicit_package_bases = true
 files                  = "sunray"
 namespace_packages     = true
 show_error_codes       = true
+
+[tool.coverage.run]
+branch = true
+source = ["sunray"]
+omit = [
+  "sunray/**/__init__.py",
+  "sunray/_internal/typing.py",
+  "sunray/_internal/callable.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "^\\s*if TYPE_CHECKING:",
+  "@overload( |$)",
+  "def __repr__",
+  "def __str__",
+  "import",
+  "pragma: no cover",
+  "if self\\.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "@abc\\.abstractmethod",
+  "@abstractmethod",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "def __reduce__",
+]

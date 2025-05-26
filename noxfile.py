@@ -17,8 +17,6 @@ def test(session: nox.Session, ray_version):
         "pytest-cov",
         "typing-extensions",
         "async-timeout",
-        "madbg==1.3.2",
-        "pdbr",
         f"ray[default]{ray_version}",
     ]
     if session.python == "3.12" and ray_version == MIN_RAY_VERSION:
@@ -39,8 +37,6 @@ def test_mypy(session, ray_version):
         "typing-extensions",
         "mypy==1.9",
         "pytest-mypy-plugins",
-        "madbg==1.3.2",
-        "pdbr",
         f"ray[default]{ray_version}",
     )
 
