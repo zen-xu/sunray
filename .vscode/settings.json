@@ -10,6 +10,9 @@
         "sunray",
         "unfixable"
     ],
+    "cSpell.dictionaries": [
+        "python"
+    ],
     "ruff.enable": true,
     "ruff.fixAll": false,
     "[python]": {
