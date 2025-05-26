@@ -33,8 +33,8 @@ version       = "0.13.0"                                                        
 version_files = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires      = ["poetry-core"]
+requires      = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 extend-exclude = [
