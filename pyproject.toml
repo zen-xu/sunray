@@ -86,3 +86,26 @@ explicit_package_bases = true
 files                  = "sunray"
 namespace_packages     = true
 show_error_codes       = true
+
+[tool.coverage.run]
+branch = true
+source = ["sunray"]
+omit   = ["sunray/**/__init__.py", "sunray/_internal/typing.py", "sunray/_internal/callable.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "^\\s*if TYPE_CHECKING:",
+  "@overload( |$)",
+  "def __repr__",
+  "def __str__",
+  "import",
+  "pragma: no cover",
+  "if self\\.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "@abc\\.abstractmethod",
+  "@abstractmethod",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "def __reduce__",
+]

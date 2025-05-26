@@ -8,6 +8,8 @@
         "pyupgrade",
         "redef",
         "sunray",
+        "taplo",
+        "uncenter",
         "unfixable"
     ],
     "cSpell.dictionaries": [
