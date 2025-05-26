@@ -1,12 +1,14 @@
 # Sunray
 
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Tests](https://github.com/zen-xu/sunray/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test.yaml)
 [![Mypy](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml)
 [![codecov](https://codecov.io/gh/zen-xu/sunray/graph/badge.svg?token=NkaEIVRqk6)](https://codecov.io/gh/zen-xu/sunray)
 ![GitHub License](https://img.shields.io/github/license/zen-xu/sunray)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sunray)
 ![PyPI - Version](https://img.shields.io/pypi/v/sunray)
-![Static Badge](https://img.shields.io/badge/ray_min_version-2.20.0-blue)
+![Static Badge](https://img.shields.io/badge/RMV-2.20.0-blue)
 
 [Ray](https://github.com/ray-project/ray) is a unified framework for scaling AI and Python applications. However, it falls short in offering friendly type hints, particularly when it comes to working with the `Actor`.
 
