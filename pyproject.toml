@@ -87,7 +87,11 @@ show_error_codes       = true
 [tool.coverage.run]
 branch = true
 source = ["sunray"]
-omit   = ["sunray/**/__init__.py", "sunray/_internal/typing.py", "sunray/_internal/callable.py"]
+omit = [
+  "sunray/**/__init__.py",
+  "sunray/_internal/typing.py",
+  "sunray/_internal/callable.py",
+]
 
 [tool.coverage.report]
 exclude_lines = [
