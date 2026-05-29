@@ -438,9 +438,11 @@ def remote(
 def update_wrapper_func_code(
     wrapper_func: Callable, original_code: CodeType
 ) -> Callable:
-    wrapper_func.__code__ = wrapper_func.__code__.replace(  # ty:ignore[unresolved-attribute]
-        co_name=original_code.co_name,
-        co_filename=original_code.co_filename,
-        co_firstlineno=original_code.co_firstlineno,
+    wrapper_func.__code__ = (
+        wrapper_func.__code__.replace(  # ty:ignore[unresolved-attribute]
+            co_name=original_code.co_name,
+            co_filename=original_code.co_filename,
+            co_firstlineno=original_code.co_firstlineno,
+        )
     )
     return wrapper_func

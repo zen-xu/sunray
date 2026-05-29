@@ -72,7 +72,9 @@ def add_var_keyword_to_klass(klass):
         kwargs.pop("_ray_trace_ctx", None)
         orig_init(*args, **kwargs)
 
-    __init__.__signature__ = sig.replace(parameters=new_params)  # ty: ignore[unresolved-attribute]
+    __init__.__signature__ = sig.replace(
+        parameters=new_params
+    )  # ty: ignore[unresolved-attribute]
     from .remote import update_wrapper_func_code
 
     klass.__init__ = update_wrapper_func_code(__init__, orig_init.__code__)
@@ -721,7 +723,9 @@ def remote_method(__method=None, **kwargs):
             *sig.parameters.values(),
             inspect.Parameter("_kwargs", inspect.Parameter.VAR_KEYWORD),
         ]
-        wrapper_method.__signature__ = sig.replace(parameters=new_params)  # ty: ignore[invalid-assignment]
+        wrapper_method.__signature__ = sig.replace(
+            parameters=new_params
+        )  # ty: ignore[invalid-assignment]
         for assigned in ["__name__", "__module__", "__qualname__"]:
             setattr(wrapper_method, assigned, getattr(method, assigned))
         return ray.method(**options)(wrapper_method)
@@ -847,7 +851,9 @@ class ActorMixin:
     @classmethod
     def new_actor(cls: Callable[_P, _ClassT_co]) -> ActorClass[_P, _ClassT_co]:
         cls = update_class_methods_filename(cls)  # ty: ignore[invalid-argument-type]
-        return ActorClass(cls, cls._default_ray_opts)  # ty: ignore[unresolved-attribute]
+        return ActorClass(
+            cls, cls._default_ray_opts
+        )  # ty: ignore[unresolved-attribute]
 
 
 def update_class_methods_filename(klass: type) -> type:

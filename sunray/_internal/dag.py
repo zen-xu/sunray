@@ -147,7 +147,9 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
         **kwargs,
     ) -> sunray.Actor[_Out]: ...
 
-    def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> sunray.Actor:  # ty:ignore[invalid-method-override]
+    def execute(
+        self, *args, _ray_cache_refs: bool = False, **kwargs
+    ) -> sunray.Actor:  # ty:ignore[invalid-method-override]
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
         return sunray.Actor(handler)  # ty:ignore[invalid-argument-type]
 
@@ -178,7 +180,9 @@ class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_InT, io.Out[_T]]):
             **kwargs,
         ) -> _T: ...
 
-        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...  # ty:ignore[invalid-method-override]
+        def execute(
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> _T: ...  # ty:ignore[invalid-method-override]
 
 
 _K = TypeVar("_K")
@@ -224,7 +228,9 @@ class InputNode(ray_dag.InputNode, DAGNode[io.In[_In], io.Out[_In]]):
             **kwargs,
         ) -> _In: ...
 
-        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _In: ...  # ty:ignore[invalid-method-override]
+        def execute(
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> _In: ...  # ty:ignore[invalid-method-override]
 
 
 MoArg = DAGNode[_InT, io.Out[_Out]]
@@ -359,7 +365,9 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
-        return ray_dag.MultiOutputNode(args, other_args_to_resolve)  # ty:ignore[invalid-return-type, invalid-argument-type]
+        return ray_dag.MultiOutputNode(
+            args, other_args_to_resolve
+        )  # ty:ignore[invalid-return-type, invalid-argument-type]
 
     if TYPE_CHECKING:
 

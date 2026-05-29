@@ -131,7 +131,9 @@ def case_multi_output_node(value: int) -> None:
     worker = Worker.new_actor().remote()
 
     with InputNode[int]() as input_data:
-        out = worker.methods.forward.bind(input_data)  # ty: ignore[no-matching-overload]
+        out = worker.methods.forward.bind(
+            input_data
+        )  # ty: ignore[no-matching-overload]
         dag_node = MultiOutputNode((out,))
 
     assert_type(dag_node, dag.MultiOutputNode[Any, Any])

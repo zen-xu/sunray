@@ -300,13 +300,17 @@ def case_actor_mixin_class_args() -> None:
 
     class A5(ActorMixin, memory=obj): ...  # ty: ignore[invalid-argument-type]
 
-    class A6(ActorMixin, object_store_memory=obj): ...  # ty: ignore[invalid-argument-type]
+    class A6(
+        ActorMixin, object_store_memory=obj
+    ): ...  # ty: ignore[invalid-argument-type]
 
     class A7(ActorMixin, max_restarts=obj): ...  # ty: ignore[invalid-argument-type]
 
     class A8(ActorMixin, max_task_retries=obj): ...  # ty: ignore[invalid-argument-type]
 
-    class A9(ActorMixin, max_pending_calls=obj): ...  # ty: ignore[invalid-argument-type]
+    class A9(
+        ActorMixin, max_pending_calls=obj
+    ): ...  # ty: ignore[invalid-argument-type]
 
     class A10(ActorMixin, max_concurrency=obj): ...  # ty: ignore[invalid-argument-type]
 
@@ -318,9 +322,13 @@ def case_actor_mixin_class_args() -> None:
 
     class A14(ActorMixin, runtime_env=obj): ...  # ty: ignore[invalid-argument-type]
 
-    class A15(ActorMixin, concurrency_groups=obj): ...  # ty: ignore[invalid-argument-type]
+    class A15(
+        ActorMixin, concurrency_groups=obj
+    ): ...  # ty: ignore[invalid-argument-type]
 
-    class A16(ActorMixin, scheduling_strategy=obj): ...  # ty: ignore[invalid-argument-type]
+    class A16(
+        ActorMixin, scheduling_strategy=obj
+    ): ...  # ty: ignore[invalid-argument-type]
 
 
 def case_actor_mixin_class_with_invalid_args() -> None:
