@@ -11,9 +11,9 @@ import sunray
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Generator
     from typing import Any
-    from typing import Callable
 
 
 _ActorT = TypeVar("_ActorT", bound=sunray.Actor)
@@ -21,7 +21,31 @@ _V = TypeVar("_V")
 _R = TypeVar("_R")
 
 
-class ActorPool(Generic[_ActorT], _ray_util.ActorPool):  # pragma: no cover
+if TYPE_CHECKING:
+    # ``ray``'s ``ActorPool`` types pool actors as the generic ``ActorHandle``.
+    # Sunray narrows them to the concrete actor type to provide precise hints,
+    # which a type checker rejects as a Liskov violation against that loose
+    # base. So for type checking we declare the precise API against a bare base
+    # (re-exposing the inherited helpers we do not narrow); at runtime we still
+    # inherit ``ray``'s real implementation.
+    class _ActorPoolBase:
+        def __init__(self, actors: list[Any]) -> None: ...
+
+        def get_next(
+            self, timeout: float | None = ..., ignore_if_timedout: bool = ...
+        ) -> Any: ...
+
+        def get_next_unordered(
+            self, timeout: float | None = ..., ignore_if_timedout: bool = ...
+        ) -> Any: ...
+
+        def has_free(self) -> bool: ...
+
+else:
+    _ActorPoolBase = _ray_util.ActorPool
+
+
+class ActorPool(Generic[_ActorT], _ActorPoolBase):  # pragma: no cover
     """Utility class to operate on a fixed pool of actors.
 
     Arguments:
@@ -52,7 +76,7 @@ class ActorPool(Generic[_ActorT], _ray_util.ActorPool):  # pragma: no cover
 
     if TYPE_CHECKING:
 
-        @overload  # type: ignore[override]
+        @overload
         def map(
             self,
             fn: Callable[[_ActorT, _V], sunray.ObjectRef[_R]],
@@ -72,7 +96,7 @@ class ActorPool(Generic[_ActorT], _ray_util.ActorPool):  # pragma: no cover
             values: list[_V],
         ) -> Generator[_R, None, None]: ...
 
-        @overload  # type: ignore[override]
+        @overload
         def map_unordered(
             self,
             fn: Callable[[_ActorT, _V], sunray.ObjectRef[_R]],

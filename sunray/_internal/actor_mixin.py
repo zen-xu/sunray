@@ -20,13 +20,13 @@ from .util import get_num_returns
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
     from collections.abc import Awaitable
+    from collections.abc import Callable
     from collections.abc import Generator
-    from typing import Callable
+    from typing import Concatenate
+    from typing import Literal
 
     from ray.actor import ActorHandle
     from ray.actor import ActorMethod
-    from typing_extensions import Concatenate
-    from typing_extensions import Literal
     from typing_extensions import TypedDict
     from typing_extensions import Unpack
 
@@ -72,7 +72,7 @@ def add_var_keyword_to_klass(klass):
         kwargs.pop("_ray_trace_ctx", None)
         orig_init(*args, **kwargs)
 
-    __init__.__signature__ = sig.replace(parameters=new_params)
+    __init__.__signature__ = sig.replace(parameters=new_params)  # ty: ignore[unresolved-attribute]
     from .remote import update_wrapper_func_code
 
     klass.__init__ = update_wrapper_func_code(__init__, orig_init.__code__)
@@ -174,7 +174,7 @@ class Actor(Generic[_ClassT_co]):
     @property
     def methods(self) -> type[_ClassT_co]:  # pragma: no cover
         """Get the methods of the actor."""
-        return ActorHandleProxy(self._actor_handle)  # type: ignore[return-value]
+        return ActorHandleProxy(self._actor_handle)  # type: ignore[return-value]  # ty: ignore[invalid-return-type]
 
     m = methods
     """alias for methods"""
@@ -721,7 +721,7 @@ def remote_method(__method=None, **kwargs):
             *sig.parameters.values(),
             inspect.Parameter("_kwargs", inspect.Parameter.VAR_KEYWORD),
         ]
-        wrapper_method.__signature__ = sig.replace(parameters=new_params)
+        wrapper_method.__signature__ = sig.replace(parameters=new_params)  # ty: ignore[invalid-assignment]
         for assigned in ["__name__", "__module__", "__qualname__"]:
             setattr(wrapper_method, assigned, getattr(method, assigned))
         return ray.method(**options)(wrapper_method)
@@ -846,8 +846,8 @@ class ActorMixin:
 
     @classmethod
     def new_actor(cls: Callable[_P, _ClassT_co]) -> ActorClass[_P, _ClassT_co]:
-        cls = update_class_methods_filename(cls)  # type: ignore[arg-type]
-        return ActorClass(cls, cls._default_ray_opts)  # type: ignore[attr-defined]
+        cls = update_class_methods_filename(cls)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+        return ActorClass(cls, cls._default_ray_opts)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
 
 def update_class_methods_filename(klass: type) -> type:

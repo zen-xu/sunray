@@ -1,11 +1,9 @@
-# ruff: noqa: E402, F401
-# mypy: disable-error-code="no-overload-impl"
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from typing import Generic
 from typing import TypeVar
+from typing import cast
 from typing import overload
 
 import ray
@@ -16,13 +14,14 @@ from . import actor_mixin
 
 if TYPE_CHECKING:
     import asyncio
+    import builtins
     import concurrent.futures
     import enum
 
+    from collections.abc import Callable
     from collections.abc import Generator
     from pathlib import Path
     from typing import Any
-    from typing import Callable
 
     import ray.actor
 
@@ -95,8 +94,8 @@ if TYPE_CHECKING:
 
     class JobID(_BaseID):
         @classmethod
-        def from_int(cls, value: int): ...
-        def int(self) -> int: ...
+        def from_int(cls, value: builtins.int): ...
+        def int(self) -> builtins.int: ...
 
     class PlacementGroupID(_BaseID):
         @classmethod
@@ -114,12 +113,12 @@ if TYPE_CHECKING:
 
     class FunctionID(UniqueID): ...
 
-    class ObjectRef(_BaseID, ray.ObjectRef[_R_co]):  # type: ignore[type-var]
+    class ObjectRef(_BaseID, ray.ObjectRef[_R_co]):  # type: ignore[type-var]  # ty: ignore[invalid-generic-class]
         def as_future(self, _internal: bool = False) -> asyncio.Future[_R_co]: ...
         def future(self) -> concurrent.futures.Future[_R_co]: ...
-        def job_id(self) -> JobID: ...
-        def task_id(self) -> TaskID: ...
-        def owner_address(self) -> bytes: ...
+        def job_id(self) -> JobID: ...  # type: ignore[override]  # ty: ignore[invalid-method-override]
+        def task_id(self) -> TaskID: ...  # type: ignore[override]  # ty: ignore[invalid-method-override]
+        def owner_address(self) -> bytes: ...  # type: ignore[override]  # ty: ignore[invalid-method-override]
         def call_site(self) -> str: ...
         @classmethod
         def from_random(cls) -> Self: ...
@@ -552,4 +551,4 @@ def put(
 ) -> ObjectRef[_T]:
     if isinstance(_owner, actor_mixin.Actor):
         _owner = _owner._actor_handle
-    return ray.put(value, _owner=_owner)
+    return cast("ObjectRef[_T]", ray.put(value, _owner=_owner))

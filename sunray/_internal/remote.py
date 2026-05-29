@@ -3,8 +3,8 @@ from __future__ import annotations
 import inspect
 import os
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
-from typing import Callable
 from typing import Generic
 from typing import TypeVar
 from typing import overload
@@ -275,7 +275,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ):
         opts = {**self._opts, **opts}
         num_returns = get_num_returns(self._remote_func._function) if unpack else 1
-        opts["num_returns"] = num_returns  # type: ignore[typeddict-unknown-key]
+        opts["num_returns"] = num_returns  # type: ignore[typeddict-unknown-key] # ty:ignore[invalid-key]
         return RemoteFunctionWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:
@@ -438,7 +438,7 @@ def remote(
 def update_wrapper_func_code(
     wrapper_func: Callable, original_code: CodeType
 ) -> Callable:
-    wrapper_func.__code__ = wrapper_func.__code__.replace(
+    wrapper_func.__code__ = wrapper_func.__code__.replace(  # ty:ignore[unresolved-attribute]
         co_name=original_code.co_name,
         co_filename=original_code.co_filename,
         co_firstlineno=original_code.co_firstlineno,

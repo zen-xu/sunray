@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Union
+from typing import Literal
 
 from ray.util import scheduling_strategies
-from typing_extensions import Literal
 from typing_extensions import NotRequired
 from typing_extensions import Required
 from typing_extensions import TypedDict
@@ -19,13 +18,13 @@ if TYPE_CHECKING:
     from ray import runtime_env
     from ray.job_config import JobConfig
 
-SchedulingStrategy = Union[
-    Literal["DEFAULT", "SPREAD"],
-    scheduling_strategies.PlacementGroupSchedulingStrategy,
-    scheduling_strategies.NodeAffinitySchedulingStrategy,
-    scheduling_strategies.NodeLabelSchedulingStrategy,
-    None,
-]
+SchedulingStrategy = (
+    Literal["DEFAULT", "SPREAD"]
+    | scheduling_strategies.PlacementGroupSchedulingStrategy
+    | scheduling_strategies.NodeAffinitySchedulingStrategy
+    | scheduling_strategies.NodeLabelSchedulingStrategy
+    | None
+)
 
 
 class ActorRemoteOptions(TypedDict, total=False):
