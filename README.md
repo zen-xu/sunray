@@ -8,7 +8,7 @@
 ![GitHub License](https://img.shields.io/github/license/zen-xu/sunray)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sunray)
 ![PyPI - Version](https://img.shields.io/pypi/v/sunray)
-![Static Badge](https://img.shields.io/badge/RMV-2.20.0-blue)
+![Static Badge](https://img.shields.io/badge/RMV-2.55.1-blue)
 
 [Ray](https://github.com/ray-project/ray) is a unified framework for scaling AI and Python applications. However, it falls short in offering friendly type hints, particularly when it comes to working with the `Actor`.
 
