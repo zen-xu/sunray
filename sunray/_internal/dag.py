@@ -1,5 +1,3 @@
-# mypy: disable-error-code="override"
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -90,9 +88,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
 
 
-class FunctionNode(  # type: ignore[misc]
-    _FunctionLikeNode[_InT, _OutT], ray_dag.FunctionNode
-): ...
+class FunctionNode(_FunctionLikeNode[_InT, _OutT], ray_dag.FunctionNode): ...
 
 
 _StreamOutT = TypeVar("_StreamOutT", bound=io.Yield)
@@ -123,9 +119,7 @@ class _StreamLikeNode(DAGNode[_InT, _StreamOutT]):
         ) -> sunray.ObjectRefGenerator: ...
 
 
-class StreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _StreamOutT], ray_dag.FunctionNode
-): ...
+class StreamNode(_StreamLikeNode[_InT, _StreamOutT], ray_dag.FunctionNode): ...
 
 
 _ClassOutT = TypeVar("_ClassOutT", bound=io.Actor)
@@ -134,7 +128,7 @@ _ClassOutT = TypeVar("_ClassOutT", bound=io.Actor)
 class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
     @property
     def methods(self: DAGNode[_InT, io.Actor[_Out]]) -> type[_Out]:
-        return self  # type: ignore[return-value]
+        return self  # ty:ignore[invalid-return-type]
 
     @overload
     def execute(
@@ -153,24 +147,20 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
         **kwargs,
     ) -> sunray.Actor[_Out]: ...
 
-    def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> sunray.Actor:
+    def execute(
+        self, *args, _ray_cache_refs: bool = False, **kwargs
+    ) -> sunray.Actor:  # ty:ignore[invalid-method-override]
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
-        return sunray.Actor(handler)  # type: ignore[return-value, arg-type]
+        return sunray.Actor(handler)  # ty:ignore[invalid-argument-type]
 
 
-class ClassMethodNode(  # type: ignore[misc]
-    _FunctionLikeNode[_InT, _OutT], ray_dag.ClassMethodNode
-): ...
+class ClassMethodNode(_FunctionLikeNode[_InT, _OutT], ray_dag.ClassMethodNode): ...
 
 
-class ClassStreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _StreamOutT], ray_dag.ClassMethodNode
-): ...
+class ClassStreamNode(_StreamLikeNode[_InT, _StreamOutT], ray_dag.ClassMethodNode): ...
 
 
-class InputAttributeNode(  # type: ignore[misc]
-    ray_dag.InputAttributeNode, DAGNode[_InT, io.Out[_T]]
-):
+class InputAttributeNode(ray_dag.InputAttributeNode, DAGNode[_InT, io.Out[_T]]):
     if TYPE_CHECKING:
 
         @overload
@@ -190,7 +180,9 @@ class InputAttributeNode(  # type: ignore[misc]
             **kwargs,
         ) -> _T: ...
 
-        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _T: ...
+        def execute(
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> _T: ...  # ty:ignore[invalid-method-override]
 
 
 _K = TypeVar("_K")
@@ -236,7 +228,9 @@ class InputNode(ray_dag.InputNode, DAGNode[io.In[_In], io.Out[_In]]):
             **kwargs,
         ) -> _In: ...
 
-        def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> _In: ...
+        def execute(
+            self, *args, _ray_cache_refs: bool = False, **kwargs
+        ) -> _In: ...  # ty:ignore[invalid-method-override]
 
 
 MoArg = DAGNode[_InT, io.Out[_Out]]
@@ -371,7 +365,11 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
-        return ray_dag.MultiOutputNode(args, other_args_to_resolve)  # type: ignore[return-value, attr-defined]
+        node = ray_dag.MultiOutputNode(
+            args,
+            other_args_to_resolve,  # ty: ignore[invalid-argument-type]
+        )
+        return node  # ty: ignore[invalid-return-type]
 
     if TYPE_CHECKING:
 

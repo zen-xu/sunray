@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from typing import Callable
+    from collections.abc import Callable
 
 
 def get_num_returns(f: Callable) -> int:
@@ -20,8 +20,8 @@ def get_num_returns(f: Callable) -> int:
 
         ret_ast = ast.parse(ret_annotation, mode="eval")
         try:
-            return len(ret_ast.body.slice.value.elts)  # type: ignore[attr-defined]
+            return len(ret_ast.body.slice.value.elts)  # ty:ignore[unresolved-attribute]
         # fix in py3.11
         except AttributeError:  # pragma: no cover
-            return len(ret_ast.body.slice.elts)  # type: ignore[attr-defined]
+            return len(ret_ast.body.slice.elts)  # ty:ignore[unresolved-attribute]
     return 1

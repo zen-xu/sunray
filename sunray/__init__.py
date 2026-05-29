@@ -1,4 +1,3 @@
-# ruff: noqa: E402, F401
 from __future__ import annotations
 
 
@@ -8,7 +7,6 @@ __authors__ = [
 ]
 
 # re-exports from ray
-from ray._private.worker import LOCAL_MODE as LOCAL_MODE
 from ray._private.worker import RESTORE_WORKER_MODE as RESTORE_WORKER_MODE
 from ray._private.worker import SCRIPT_MODE as SCRIPT_MODE
 from ray._private.worker import SPILL_WORKER_MODE as SPILL_WORKER_MODE
@@ -20,7 +18,7 @@ from ._internal.actor_mixin import ActorMixin as ActorMixin
 from ._internal.actor_mixin import remote_method as remote_method
 from ._internal.core import ActorClassID as ActorClassID
 from ._internal.core import ActorID as ActorID
-from ._internal.core import ClientBuilder as ClientBuilder
+from ._internal.core import ClientBuilder as ClientBuilder  # ty:ignore[deprecated]
 from ._internal.core import FunctionID as FunctionID
 from ._internal.core import JobID as JobID
 from ._internal.core import Language as Language

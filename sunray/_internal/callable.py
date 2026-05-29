@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
+from typing import Concatenate
 from typing import Generic
 from typing import Protocol
 from typing import TypeVar
 from typing import Union
 from typing import overload
 
-from typing_extensions import Concatenate
 from typing_extensions import ParamSpec
 
 from . import dag

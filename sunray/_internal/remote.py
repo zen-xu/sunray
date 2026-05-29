@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import functools
 import inspect
 import os
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
-from typing import Callable
 from typing import Generic
 from typing import TypeVar
 from typing import overload
@@ -275,7 +276,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ):
         opts = {**self._opts, **opts}
         num_returns = get_num_returns(self._remote_func._function) if unpack else 1
-        opts["num_returns"] = num_returns  # type: ignore[typeddict-unknown-key]
+        opts["num_returns"] = num_returns  # ty:ignore[invalid-key]
         return RemoteFunctionWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:
@@ -388,6 +389,7 @@ def remote(
         co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
         code = f.__code__ = f.__code__.replace(co_filename=co_filename)
         f = update_wrapper_func_code(f, code)
+        f = shield_stream_func(f)
         args = (f, *rest)
     elif args and inspect.isclass(args[0]):
         kls, *rest = args
@@ -413,6 +415,7 @@ def remote(
             co_filename = f.__code__.co_filename.replace(f"{os.getcwd()}/", "")
             code = f.__code__ = f.__code__.replace(co_filename=co_filename)
             f = update_wrapper_func_code(f, code)
+            f = shield_stream_func(f)
             args = (f, *rest)
         elif args and inspect.isclass(args[0]):
             kls, *rest = args
@@ -438,9 +441,33 @@ def remote(
 def update_wrapper_func_code(
     wrapper_func: Callable, original_code: CodeType
 ) -> Callable:
-    wrapper_func.__code__ = wrapper_func.__code__.replace(
+    new_code = wrapper_func.__code__.replace(  # ty: ignore[unresolved-attribute]
         co_name=original_code.co_name,
         co_filename=original_code.co_filename,
         co_firstlineno=original_code.co_firstlineno,
     )
+    wrapper_func.__code__ = new_code  # ty: ignore[unresolved-attribute]
     return wrapper_func
+
+
+def shield_stream_func(func: Callable) -> Callable:
+    """Drive a generator function with ``next()`` rather than exposing it raw.
+
+    ray>=2.55 advances a streaming generator with ``.send(value)``. If that value
+    reaches user code through ``yield from`` it breaks plain iterables -- e.g.
+    ``yield from range(...)`` raises ``AttributeError: 'range_iterator' object has
+    no attribute 'send'``. Iterating the user generator here absorbs the sent
+    value so it is driven purely with ``next()``. Non-generator functions are
+    returned unchanged.
+    """
+    if not inspect.isgeneratorfunction(func):
+        return func
+
+    @functools.wraps(func)
+    def shielded(*args, **kwargs):  # pragma: no cover
+        # iterate (next-drive) instead of `yield from` so ray>=2.55's
+        # `.send(...)` into the stream can't leak to the user generator
+        for item in func(*args, **kwargs):  # noqa: UP028
+            yield item
+
+    return shielded

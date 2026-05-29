@@ -1,4 +1,4 @@
-name: Test Mypy
+name: Test Ty
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
       - synchronize
 
 jobs:
-  mypy-tests:
-    name: mypy tests
+  ty-tests:
+    name: ty tests
     runs-on: ubuntu-22.04
     defaults:
       run:
@@ -33,11 +33,11 @@ jobs:
         id: cache
         with:
           path: .nox
-          key: nox-mypy-${{ hashFiles('noxfile.py') }}
+          key: nox-ty-${{ hashFiles('noxfile.py') }}
 
-      - name: Run mypy test
+      - name: Run ty test
         run: |
-          nox -s test_mypy
+          nox -s test_ty
 
       - name: Check for clean working tree
         run: |
