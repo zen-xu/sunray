@@ -1,6 +1,6 @@
 [project]
 name = "sunray"
-version = "0.13.0" # version anchor
+version = "0.14.0" # version anchor
 authors = [{ name = "ZhengYu, Xu", email = "zen-xu@outlook.com" }]
 description = "More robust ray"
 readme = "README.md"
@@ -29,7 +29,7 @@ default-groups = "all"
 
 [tool.commitizen]
 bump_message  = "chore(release): bump version $current_version -> $new_version"
-version       = "0.13.0"                                                        # version anchor
+version       = "0.14.0"                                                        # version anchor
 version_files = ["pyproject.toml:version anchor", "sunray/__init__.py"]
 
 [build-system]
