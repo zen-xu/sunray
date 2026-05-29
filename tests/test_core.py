@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 import ray.actor
 
 from ray.util.state import get_actor
@@ -40,16 +42,25 @@ def test_kill(init_ray):
         def ready(self):
             return True
 
+    def wait_dead(actor_id: str) -> str:
+        # ray.kill is asynchronous; poll until the actor is reported DEAD
+        state = get_actor(actor_id).state
+        for _ in range(50):
+            if state == "DEAD":
+                break
+            time.sleep(0.1)
+            state = get_actor(actor_id).state
+        return state
+
     actor = MyActor.new_actor().options(name="demo1").remote()
     ray.get(actor.methods.ready.remote())
     core.kill(actor)
-    actor_info = get_actor(actor._actor_handle._actor_id.hex())
-    assert actor_info.state == "DEAD"
+    assert wait_dead(actor._actor_handle._actor_id.hex()) == "DEAD"
 
     actor2 = MyActor.new_actor().options(name="demo2").remote()
     ray.get(actor2.methods.ready.remote())
     core.kill(actor2._actor_handle)
-    assert get_actor(actor2._actor_handle._actor_id.hex()).state == "DEAD"
+    assert wait_dead(actor2._actor_handle._actor_id.hex()) == "DEAD"
 
 
 def test_put(init_ray):
@@ -58,7 +69,7 @@ def test_put(init_ray):
         def ready(self):
             return True
 
-    actor = MyActor.new_actor().options(name="demo1").remote()
+    actor = MyActor.new_actor().options(name="put-owner").remote()
     ray.get(actor.methods.ready.remote())
 
     ref = put(1, _owner=actor)

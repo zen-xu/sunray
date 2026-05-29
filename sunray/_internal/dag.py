@@ -365,9 +365,11 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
-        return ray_dag.MultiOutputNode(
-            args, other_args_to_resolve
-        )  # ty:ignore[invalid-return-type, invalid-argument-type]
+        node = ray_dag.MultiOutputNode(
+            args,
+            other_args_to_resolve,  # ty: ignore[invalid-argument-type]
+        )
+        return node  # ty: ignore[invalid-return-type]
 
     if TYPE_CHECKING:
 
