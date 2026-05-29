@@ -174,7 +174,7 @@ class Actor(Generic[_ClassT_co]):
     @property
     def methods(self) -> type[_ClassT_co]:  # pragma: no cover
         """Get the methods of the actor."""
-        return ActorHandleProxy(self._actor_handle)  # type: ignore[return-value]  # ty: ignore[invalid-return-type]
+        return ActorHandleProxy(self._actor_handle)  # ty: ignore[invalid-return-type]
 
     m = methods
     """alias for methods"""
@@ -846,8 +846,8 @@ class ActorMixin:
 
     @classmethod
     def new_actor(cls: Callable[_P, _ClassT_co]) -> ActorClass[_P, _ClassT_co]:
-        cls = update_class_methods_filename(cls)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
-        return ActorClass(cls, cls._default_ray_opts)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
+        cls = update_class_methods_filename(cls)  # ty: ignore[invalid-argument-type]
+        return ActorClass(cls, cls._default_ray_opts)  # ty: ignore[unresolved-attribute]
 
 
 def update_class_methods_filename(klass: type) -> type:

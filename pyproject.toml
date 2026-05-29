@@ -21,8 +21,7 @@ test = [
   "nox >=2024.4.15",
   "deepdiff >=6.7.1",
   "importlib-metadata >=6.7.0",
-  "mypy >=1.9",
-  "pytest-mypy-plugins>=3",
+  "pytest-ty >=0.2",
 ]
 
 [tool.uv]
@@ -81,12 +80,11 @@ required-imports    = ["from __future__ import annotations"]
 [tool.ruff.format]
 docstring-code-format = true
 
-[tool.mypy]
-disable_error_code     = ["overload-overlap", "import-not-found", "import-untyped"]
-explicit_package_bases = true
-files                  = "sunray"
-namespace_packages     = true
-show_error_codes       = true
+[tool.ty.src]
+include = ["sunray"]
+
+[tool.ty.rules]
+unused-ignore-comment = "error"
 
 [tool.coverage.run]
 branch = true

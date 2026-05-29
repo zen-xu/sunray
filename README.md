@@ -3,7 +3,7 @@
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Tests](https://github.com/zen-xu/sunray/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test.yaml)
-[![Mypy](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test-mypy.yaml)
+[![Ty](https://github.com/zen-xu/sunray/actions/workflows/test-ty.yaml/badge.svg?branch=main)](https://github.com/zen-xu/sunray/actions/workflows/test-ty.yaml)
 [![codecov](https://codecov.io/gh/zen-xu/sunray/graph/badge.svg?token=NkaEIVRqk6)](https://codecov.io/gh/zen-xu/sunray)
 ![GitHub License](https://img.shields.io/github/license/zen-xu/sunray)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sunray)

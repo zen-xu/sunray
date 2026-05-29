@@ -275,7 +275,7 @@ class RemoteFunction(RemoteFunctionWrapper, Generic[_Callable_co, _R]):
     ):
         opts = {**self._opts, **opts}
         num_returns = get_num_returns(self._remote_func._function) if unpack else 1
-        opts["num_returns"] = num_returns  # type: ignore[typeddict-unknown-key] # ty:ignore[invalid-key]
+        opts["num_returns"] = num_returns  # ty:ignore[invalid-key]
         return RemoteFunctionWrapper(self._remote_func, opts)
 
     if TYPE_CHECKING:

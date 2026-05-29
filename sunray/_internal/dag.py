@@ -1,5 +1,3 @@
-# mypy: disable-error-code="override"
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -90,9 +88,7 @@ class _FunctionLikeNode(DAGNode[_InT, _OutT]):
         def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> Any: ...
 
 
-class FunctionNode(  # type: ignore[misc]
-    _FunctionLikeNode[_InT, _OutT], ray_dag.FunctionNode
-): ...
+class FunctionNode(_FunctionLikeNode[_InT, _OutT], ray_dag.FunctionNode): ...
 
 
 _StreamOutT = TypeVar("_StreamOutT", bound=io.Yield)
@@ -123,9 +119,7 @@ class _StreamLikeNode(DAGNode[_InT, _StreamOutT]):
         ) -> sunray.ObjectRefGenerator: ...
 
 
-class StreamNode(  # type: ignore[misc]
-    _StreamLikeNode[_InT, _StreamOutT], ray_dag.FunctionNode
-): ...
+class StreamNode(_StreamLikeNode[_InT, _StreamOutT], ray_dag.FunctionNode): ...
 
 
 _ClassOutT = TypeVar("_ClassOutT", bound=io.Actor)
@@ -134,7 +128,7 @@ _ClassOutT = TypeVar("_ClassOutT", bound=io.Actor)
 class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
     @property
     def methods(self: DAGNode[_InT, io.Actor[_Out]]) -> type[_Out]:
-        return self  # type: ignore[return-value]  # ty:ignore[invalid-return-type]
+        return self  # ty:ignore[invalid-return-type]
 
     @overload
     def execute(
@@ -155,7 +149,7 @@ class ClassNode(ray_dag.ClassNode, DAGNode[_InT, _ClassOutT]):
 
     def execute(self, *args, _ray_cache_refs: bool = False, **kwargs) -> sunray.Actor:  # ty:ignore[invalid-method-override]
         handler = super().execute(*args, _ray_cache_refs=_ray_cache_refs, **kwargs)
-        return sunray.Actor(handler)  # type: ignore[return-value, arg-type]  # ty:ignore[invalid-argument-type]
+        return sunray.Actor(handler)  # ty:ignore[invalid-argument-type]
 
 
 class ClassMethodNode(_FunctionLikeNode[_InT, _OutT], ray_dag.ClassMethodNode): ...
@@ -365,7 +359,7 @@ class MultiOutputNode(DAGNode[_InT, _OutT]):
     ]: ...
 
     def __new__(cls, args, other_args_to_resolve=None) -> MultiOutputNode:
-        return ray_dag.MultiOutputNode(args, other_args_to_resolve)  # type: ignore[return-value, attr-defined]  # ty:ignore[invalid-return-type, invalid-argument-type]
+        return ray_dag.MultiOutputNode(args, other_args_to_resolve)  # ty:ignore[invalid-return-type, invalid-argument-type]
 
     if TYPE_CHECKING:
 

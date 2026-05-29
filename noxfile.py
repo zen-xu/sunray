@@ -28,19 +28,13 @@ def test(session: nox.Session, ray_version):
 @nox.parametrize(
     "ray_version", [MIN_RAY_VERSION, ""], ids=["min-version", "latest-version"]
 )
-def test_mypy(session, ray_version):
+def test_ty(session, ray_version):
     session.install(
         "pytest",
+        "pytest-ty",
         "typing-extensions",
-        "mypy==1.9",
-        "pytest-mypy-plugins",
         f"ray[default]{ray_version}",
     )
 
-    session.run(
-        "pytest",
-        "tests/mypy",
-        "-v",
-        "--mypy-only-local-stub",
-        "--mypy-pyproject-toml-file=pyproject.toml",
-    )
+    session.run("ty", "check", "sunray")
+    session.run("pytest", "tests/ty", "-v", "--ty")
